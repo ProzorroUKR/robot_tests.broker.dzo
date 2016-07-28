@@ -38,10 +38,9 @@ ${locator.auctionPeriod.startDate}     xpath=//td[contains(text(), 'Дата п�
 
 
 *** Keywords ***
-Підготувати дані для оголошення тендера
-  [Arguments]  ${username}  ${tender_data}  ${role}
-  ${tender_data}=   adapt_unit_names   ${tender_data}
-  ${tender_data}=   adapt_procuringEntity   ${tender_data}
+Підготувати дані для оголошення тендера користувачем
+  [Arguments]  ${username}  ${tender_data}  ${role_name}
+  ${tender_data}=   adapt_data_for_role   ${role_name}   ${tender_data}
   [return]  ${tender_data}
 
 Підготувати клієнт для користувача
@@ -99,7 +98,6 @@ Login
 
 Додати предмет
   [Arguments]  ${item}
-  ${delivery_end_date}=   convert_date_to_slash_format   ${item.deliveryDate.endDate}  
   ${index}=   Get Element Attribute   xpath=(//div[@class="tenderItemElement tenderItemPositionElement"])[last()]@data-multiline
   Execute Javascript   $(".topFixed").remove();
   Wait Until Page Contains Element   name=data[items][${index}][description]
@@ -118,15 +116,13 @@ Login
   Input text   name=data[items][${index}][deliveryAddress][locality]   ${item.deliveryAddress.locality}
   Input text   name=data[items][${index}][deliveryAddress][streetAddress]   ${item.deliveryAddress.streetAddress}
   Input text   name=data[items][${index}][deliveryAddress][postalCode]   ${item.deliveryAddress.postalCode}
-  # Ввод дати JS-ом зумовлений наявністю атрибута readonly для цього поля і пов’язаними з цим проблемами при вводі кейвордом Input Text для більш ніж одного айтіма 
-  Execute Javascript   $("input[name|='data[items][${index}][deliveryDate][endDate]']").val('${delivery_end_date}');
   
 Input Date
-  [Arguments]  ${elem_name_locator}  ${smth_to_input}
-  ${smth_to_input}=  convert_date_to_slash_format  ${smth_to_input}
+  [Arguments]  ${elem_name_locator}  ${date}
+  ${date}=  convert_date_to_slash_format  ${date}
   Focus   name=${elem_name_locator}
   Execute Javascript   $("input[name|='${elem_name_locator}']").removeAttr('readonly');
-  Input Text  ${elem_name_locator}  ${smth_to_input}
+  Input Text  ${elem_name_locator}  ${date}
 
 Завантажити документ
   [Arguments]  ${username}  ${filepath}  ${tender_uaid}
@@ -172,6 +168,8 @@ Input Date
   Input Text   xpath=//form[@id="question_form"]/descendant::input[@name="title"]   ${question.data.title}
   Input Text   xpath=//form[@id="question_form"]/descendant::textarea[@name="description"]   ${question.data.description}
   Click Element   xpath=//button[contains(text(), 'Надіслати запитання')]
+  Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
+  Click Element   xpath=//a[./text()= 'Закрити']
   
 Відповісти на питання
   [Arguments]  ${username}  ${tender_uaid}  ${question_index}  ${answer_data}  ${question_id}
@@ -180,6 +178,8 @@ Input Date
   Click Element   xpath=//a[@class='reverse openCPart'][span[text()='Обговорення']]
   Input Text   xpath=//div[contains(text(), '${question_id}')]/../following-sibling::div/descendant::textarea[@name="answer"]   ${answer_data.data.answer}
   Click Element   xpath=//button[contains(text(), 'Опублікувати відповідь')]
+  Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
+  Click Element   xpath=//a[./text()= 'Закрити']
 
 
 ###############################################################################################################
@@ -203,8 +203,8 @@ Input Date
 
 Оновити сторінку з тендером
   [Arguments]  ${username}  ${tender_uaid}
-  Selenium2Library.Switch Browser   ${username}
-  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+#  Selenium2Library.Switch Browser   ${username}
+#  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Reload Page
 
 
@@ -219,7 +219,8 @@ Input Date
 
 Отримати текст із поля і показати на сторінці
   [Arguments]  ${fieldname}
-  sleep   1
+  #sleep   1
+  Wait Until Element Is Visible   ${locator.${fieldname}}
   ${return_value}=   Get Text   ${locator.${fieldname}}
   [return]  ${return_value}
   
@@ -333,7 +334,7 @@ Input Date
   [return]  ${region.split(',')[2].strip()}  
 
 Отримати інформацію про questions[0].title
-  sleep   3
+# sleep   3
   Click Element   xpath=//a[@class='reverse openCPart'][span[text()='Обговорення']]
   ${questionsTitle}=   Отримати текст із поля і показати на сторінці   questions.title
   [return]  ${questionsTitle}
@@ -348,7 +349,7 @@ Input Date
   [return]  ${questionsDate}
 
 Отримати інформацію про questions[0].answer
-  sleep   2
+ # sleep   2
   Click Element   xpath=//a[@class='reverse openCPart'][span[text()='Обговорення']]
   ${questionsAnswer}=   Отримати текст із поля і показати на сторінці   questions.answer
   [return]  ${questionsAnswer}
@@ -419,22 +420,14 @@ Input Date
   Click Element   xpath=//a[@class='button save bidToEdit']
   Wait Until Page Contains   Відкликати пропозицію   10
   Click Element   xpath=//button[@value='unbid']
-  Sleep   1
+  Wait Until Element Is Visible   xpath=//a[@class='jBtn green']
   Click Element   xpath=//a[@class='jBtn green']
-  Sleep   2
-  Wait Until Page Contains   Підтвердіть зміни в пропозиції
+  Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
   Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
+  Wait Until Element Is Not Visible   id=jAlertBack
   Click Element   xpath=//button[./text()='Надіслати']
-  Wait Until Page Contains   Вашу пропозицію відкликано   30
+  Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
   Click Element   xpath=//a[./text()= 'Закрити']
-
-Отримати пропозицію
-  [Arguments]  ${username}  ${tenderId}
-  ${resp}=     Run Keyword And Return Status    Element Should Be Visible   xpath=//div[@class="payBid bidPaid_invalid"]
-  ${status}=   Set Variable If     "${resp}" == "True"    invalid   active
-  ${data}=     Create Dictionary   status=${status}
-  ${bid}=      Create Dictionary   data=${data}
-  [return]  ${bid}
 
 Завантажити документ в ставку
   [Arguments]  ${username}  ${filePath}  ${tender_uaid}
@@ -444,19 +437,33 @@ Input Date
   Execute Javascript   $("body > div").removeAttr("style");
   Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
   Click Element   xpath=//button[@value='save']
+ # Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
+#  Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
+#  Wait Until Element Is Not Visible   id=jAlertBack
+#  Click Element   xpath=//button[./text()='Надіслати']
+#  Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
+#  Click Element   xpath=//a[./text()= 'Закрити']
 
 Змінити документ в ставці
-  [Arguments]   ${username}  ${path}  ${docid}
-  Switch browser   ${username}
-  Execute Javascript   $(".topFixed").remove();
+  [Arguments]   ${username}  ${path}  ${bidid}  ${docid}
+  Reload Page
+  Wait Until Page Contains   Ваша пропозиція   10
+  Click Element   xpath=//a[@class='button save bidToEdit']
+  Execute Javascript   $(".topFixed").remove(); $("body > div").removeAttr("style");
   Sleep   1
-  Execute Javascript   $("body > div").removeAttr("style");
+ # Execute Javascript   $("body > div").removeAttr("style");
+#  Wait Until Element Is Visible   xpath=//a[@title='Завантажити оновлену версію']
   Choose File   xpath=//input[@title='Завантажити оновлену версію']   ${path}
   Click Element   xpath=//button[@value='save']
+  #Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
+  #Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
+  #Wait Until Element Is Not Visible   id=jAlertBack
+  #Click Element   xpath=//button[./text()='Надіслати']
+  #Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
+  #Click Element   xpath=//a[./text()= 'Закрити']
 
 Отримати посилання на аукціон для глядача
   [Arguments]  ${username}  ${tenderId}
-  Sleep   120
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tenderId}
   ${url}=   Get Element Attribute   xpath=//section/h3/a[@class="reverse"]@href
   [return]  ${url}
