@@ -393,6 +393,10 @@ Input Date
 Дочекатися синхронізації для періоду подачі пропозицій
   Reload Page
   Wait Until Page Contains    Ваша пропозиція
+  
+Дочекатися синхронізації для періоду аукціон
+  Reload Page
+  Wait Until Page Contains Element   xpath=//div[@class="statusItem active" ][@data-status="3"]
 #######################################################################################################
 
 Змінити цінову пропозицію
@@ -446,12 +450,14 @@ Input Date
 Отримати посилання на аукціон для глядача
   [Arguments]  ${username}  ${tenderId}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tenderId}
+  Wait Until Keyword Succeeds   10 x   60 s   Дочекатися синхронізації для періоду аукціон
   ${url}=   Get Element Attribute   xpath=//section/h3/a[@class="reverse"]@href
   [return]  ${url}
 
 Отримати посилання на аукціон для учасника
   [Arguments]  ${username}  ${tenderId}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tenderId}
+  Wait Until Keyword Succeeds   10 x   60 s   Дочекатися синхронізації для періоду аукціон
   Click Element   xpath=//a[@class="reverse getAuctionUrl"]
   Sleep   3
   ${url}=   Get Element Attribute   xpath=//a[contains(text(),"Перейдіть до редукціону")]@href
