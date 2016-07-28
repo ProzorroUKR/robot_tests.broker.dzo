@@ -92,7 +92,7 @@ Login
   Input Date   data[enquiryPeriod][endDate]   ${tender_data.data.enquiryPeriod.endDate}
   Input Date   data[tenderPeriod][endDate]   ${tender_data.data.tenderPeriod.endDate}
   Click Element   xpath= //button[@value='publicate']
-  Wait Until Page Contains   Аукціон опубліковано   30
+  Wait Until Page Contains   Аукціон опубліковано   10
   ${tender_uaid}=   Get Text   ${locator.auctionID}  
   [return]  ${tender_uaid}
 
