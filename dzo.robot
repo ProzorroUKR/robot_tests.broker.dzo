@@ -203,8 +203,6 @@ Input Date
 
 Оновити сторінку з тендером
   [Arguments]  ${username}  ${tender_uaid}
-#  Selenium2Library.Switch Browser   ${username}
-#  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Reload Page
 
 
@@ -219,7 +217,6 @@ Input Date
 
 Отримати текст із поля і показати на сторінці
   [Arguments]  ${fieldname}
-  #sleep   1
   Wait Until Element Is Visible   ${locator.${fieldname}}
   ${return_value}=   Get Text   ${locator.${fieldname}}
   [return]  ${return_value}
@@ -334,7 +331,6 @@ Input Date
   [return]  ${region.split(',')[2].strip()}  
 
 Отримати інформацію про questions[0].title
-# sleep   3
   Click Element   xpath=//a[@class='reverse openCPart'][span[text()='Обговорення']]
   ${questionsTitle}=   Отримати текст із поля і показати на сторінці   questions.title
   [return]  ${questionsTitle}
@@ -349,7 +345,6 @@ Input Date
   [return]  ${questionsDate}
 
 Отримати інформацію про questions[0].answer
- # sleep   2
   Click Element   xpath=//a[@class='reverse openCPart'][span[text()='Обговорення']]
   ${questionsAnswer}=   Отримати текст із поля і показати на сторінці   questions.answer
   [return]  ${questionsAnswer}
@@ -437,12 +432,6 @@ Input Date
   Execute Javascript   $("body > div").removeAttr("style");
   Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
   Click Element   xpath=//button[@value='save']
- # Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
-#  Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
-#  Wait Until Element Is Not Visible   id=jAlertBack
-#  Click Element   xpath=//button[./text()='Надіслати']
-#  Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
-#  Click Element   xpath=//a[./text()= 'Закрити']
 
 Змінити документ в ставці
   [Arguments]   ${username}  ${path}  ${bidid}  ${docid}
@@ -451,16 +440,8 @@ Input Date
   Click Element   xpath=//a[@class='button save bidToEdit']
   Execute Javascript   $(".topFixed").remove(); $("body > div").removeAttr("style");
   Sleep   1
- # Execute Javascript   $("body > div").removeAttr("style");
-#  Wait Until Element Is Visible   xpath=//a[@title='Завантажити оновлену версію']
   Choose File   xpath=//input[@title='Завантажити оновлену версію']   ${path}
   Click Element   xpath=//button[@value='save']
-  #Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
-  #Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
-  #Wait Until Element Is Not Visible   id=jAlertBack
-  #Click Element   xpath=//button[./text()='Надіслати']
-  #Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
-  #Click Element   xpath=//a[./text()= 'Закрити']
 
 Отримати посилання на аукціон для глядача
   [Arguments]  ${username}  ${tenderId}
