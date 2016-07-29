@@ -8,7 +8,6 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг',u'к�
 def adapt_data_for_role(role_name, tender_data):
     if role_name == 'tender_owner':
           tender_data = adapt_unit_names(adapt_procuringEntity(tender_data))
-  #        tender_data = adapt_procuringEntity(tender_data)
     return tender_data
 
 def adapt_unit_names(tender_data):
@@ -44,3 +43,6 @@ def adapt_data_for_document(field, value):
     if field == 'tenderPeriod.endDate':
         value = convert_date_to_slash_format(value)
     return value
+
+def get_street(value):
+    return ','.join(value).strip()
