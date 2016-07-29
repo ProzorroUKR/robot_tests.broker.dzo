@@ -48,6 +48,7 @@ ${locator.auctionPeriod.startDate}     xpath=//td[contains(text(), 'Дата п�
   Open Browser   ${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${username}
   Set Window Size   @{USERS.users['${username}'].size}
   Set Window Position   @{USERS.users['${username}'].position}
+  Wait Until Element Is Visible   name=siteLogin
   Input Text   name=siteLogin   admin
   Input Text   name=sitePass   uStudio_dzo
   Click Element   xpath=//input[@value="Войти"]
@@ -58,8 +59,9 @@ Login
   Wait Until Page Contains Element   jquery=a[href="/cabinet"]
   Click Element   jquery=a[href="/cabinet"]
   Wait Until Page Contains Element   name=email   10
-  Sleep   1
   Input text   name=email   ${USERS.users['${username}'].login}
+  Execute Javascript   $('input[name="email"]').attr('rel','CHANGE');
+  Wait Until Element Is Visible   name=psw
   Input text   name=psw   ${USERS.users['${username}'].password}
   Wait Until Page Contains Element   xpath=//button[contains(@class, 'btn')][./text()='Вхід в кабінет']   20
   Click Element   xpath=//button[contains(@class, 'btn')][./text()='Вхід в кабінет']
@@ -149,6 +151,10 @@ Input Date
   Click Element   xpath=//select[@name='filter[object]']/option[@value='tenderID']
   Input text   xpath=//input[@name='filter[search]']   ${tender_uaid}
   Focus   name=filter[search2]
+  Wait Until Keyword Succeeds   12 x   10 s   Знайти тендер   ${tender_uaid}
+  
+Знайти тендер
+  [Arguments]  ${tender_uaid}
   Click Element   xpath=//button[@class='btn not_toExtend'][./text()='Пошук']
   Wait Until Page Contains   ${tender_uaid}   10
   Click Element   xpath=//span[contains('${tender_uaid}', text()) and contains(text(), '${tender_uaid}')]/../preceding-sibling::h2/a
@@ -324,11 +330,12 @@ Input Date
 
 Отримати інформацію про items[0].deliveryAddress.streetAddress
   ${streetAddress}=   Отримати текст із поля і показати на сторінці   items.deliveryAddress.streetAddress
-  [return]  ${streetAddress.split(',')[4:].strip()}
+  ${streetAddress}=   get_street   ${streetAddress.split(',')[4:]}
+  [return]  ${streetAddress}
 
 Отримати інформацію про items[0].deliveryAddress.region
   ${region}=   Отримати текст із поля і показати на сторінці   items.deliveryAddress.region
-  [return]  ${region.split(',')[2].strip()}  
+  [return]  ${region.split(',')[2].strip()}
 
 Отримати інформацію про questions[0].title
   Click Element   xpath=//a[@class='reverse openCPart'][span[text()='Обговорення']]
