@@ -1,6 +1,8 @@
 *** Settings ***
 Library  Selenium2Screenshots
+Library  Selenium2Library
 Library  String
+Library  Collections
 Library  DateTime
 Library  dzo_service.py
 
@@ -87,7 +89,7 @@ Login
   Input Text   name=data[minimalStep][amount]   ${minimalStep}
   Select From List By Value   name=data[value][currency]   ${tender_data.data.value.currency}
   Select From List By Value   name=data[value][valueAddedTaxIncluded]   ${tax.lower()}
-  Click Element   id=multiItems
+  Click Element   xpath=//section[@id="multiItems"]/a
   Додати предмет   ${items[0]}
   Input text   name=data[title]   ${tender_data.data.title}
   Input text   name=data[description]   ${tender_data.data.description}  
@@ -121,9 +123,9 @@ Login
   
 Input Date
   [Arguments]  ${elem_name_locator}  ${date}
-  ${date}=  convert_date_to_slash_format  ${date}
+  ${date}=   convert_date_to_slash_format   ${date}
   Focus   name=${elem_name_locator}
-  Execute Javascript   $("input[name|='${elem_name_locator}']").removeAttr('readonly');
+  Execute Javascript   $("input[name|='${elem_name_locator}']").removeAttr('readonly'); $("input[name|='${elem_name_locator}']").unbind();
   Input Text  ${elem_name_locator}  ${date}
 
 Завантажити документ
@@ -133,10 +135,8 @@ Input Date
   Click Element   xpath=//a[contains(text(),'Редагувати')]
   Wait Until Element Is Visible   xpath=//h3[contains(text(),'Документація до аукціону')]/following-sibling::a
   Click Element   xpath=//h3[contains(text(),'Документація до аукціону')]/following-sibling::a  
-  Execute Javascript   $('body > div').css({height: "20px", width: "40px"});
+  Execute Javascript   $('body > div').attr('style', '');
   Choose File   xpath=//div[1]/form/input[@name="upload"]  ${filepath}
-  Wait Until Element Is Visible   xpath=//div[@style="display: block;"]/descendant::input[@value="${filepath.split('/')[-1]}"]
-  Input Text   xpath=//div[@style="display: block;"]/descendant::input[@value="${filepath.split('/')[-1]}"]   ${filepath}
   Click Button   xpath=//button[@value='save']
 
 Пошук тендера по ідентифікатору
@@ -412,6 +412,7 @@ Input Date
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Wait Until Element Is Visible   xpath=//a[@class='button save bidToEdit']
   Click Element   xpath=//a[@class='button save bidToEdit']
+  Wait Until Element is Visible   name=data[value][amount]
   Input Text   name=data[value][amount]   ${fieldvalue}
   Click Element   xpath=//button[@value='save']
   Wait Until Page Contains   Підтвердіть зміни в пропозиції
@@ -424,7 +425,7 @@ Input Date
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Wait Until Page Contains   Ваша пропозиція   10
   Click Element   xpath=//a[@class='button save bidToEdit']
-  Wait Until Page Contains   Відкликати пропозицію   10
+  Wait Until Page Contains   Відкликати пропозицію   30
   Click Element   xpath=//button[@value='unbid']
   Wait Until Element Is Visible   xpath=//a[@class='jBtn green']
   Click Element   xpath=//a[@class='jBtn green']
@@ -440,19 +441,27 @@ Input Date
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Wait Until Page Contains   Ваша пропозиція   10
   Click Element   xpath=//a[@class='button save bidToEdit']
-  Execute Javascript   $("body > div").removeAttr("style");
-  Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
+  Execute Javascript   $('body > div').attr('style', '');
+  Choose File   xpath=//div[1]/form/input[@name='upload']   ${filePath}
   Click Element   xpath=//button[@value='save']
+  Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
+  Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
+  Wait Until Element Is Not Visible   id=jAlertBack
+  Click Element   xpath=//button[./text()='Надіслати']
 
 Змінити документ в ставці
   [Arguments]   ${username}  ${path}  ${bidid}  ${docid}
-  Reload Page
-  Wait Until Page Contains   Ваша пропозиція   10
+  wait until element is visible   xpath=//a[@class='button save bidToEdit']
   Click Element   xpath=//a[@class='button save bidToEdit']
-  Execute Javascript   $(".topFixed").remove(); $("body > div").removeAttr("style");
-  Sleep   1
-  Choose File   xpath=//input[@title='Завантажити оновлену версію']   ${path}
+  Execute Javascript   $(".topFixed").remove(); $('body > div').attr('style', '');
+  Wait Until Element Is Visible   xpath=//input[@title='Завантажити оновлену версію']
+  Choose File   xpath=//div[2]/form/input[@name='upload']   ${path}
   Click Element   xpath=//button[@value='save']
+  Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
+  Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
+  Wait Until Element Is Not Visible   id=jAlertBack
+  Click Element   xpath=//button[./text()='Надіслати']
+  Wait Until Element Is Not Visible   id=jAlertBack
 
 Отримати посилання на аукціон для глядача
   [Arguments]  ${username}  ${tenderId}
