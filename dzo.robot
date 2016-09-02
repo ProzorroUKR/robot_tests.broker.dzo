@@ -110,7 +110,6 @@ Login
   Select From List By Label   name=data[items][${index}][unit_id]   ${item.unit.name}
   Click Element   xpath=//input[@name='data[items][${index}][cpv_id]']/preceding-sibling::a
   Select Frame   xpath=//iframe[contains(@src,'/js/classifications/universal/index.htm?lang=uk&shema=CAV&relation=true')]
-  Input text   id=search   ${item.classification.description}
   Wait Until Page Contains   ${item.classification.id}
   Click Element   xpath=//a[contains(@id,'${item.classification.id.replace('-','_')}')]
   Click Element   xpath=//*[@id='select']
