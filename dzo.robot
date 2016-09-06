@@ -393,6 +393,7 @@ Input Date
   Click Button   name=pay
   Wait Until Element Is Visible   xpath=//a[./text()= 'OK']
   Click Element   xpath=//a[./text()= 'OK']
+  Wait Until Element Is Visible   xpath=//a[@class='button save bidToEdit']   30
   [return]  ${bid}
 
 ########## Видалити після встановлення коректних часових проміжків для періодів #######################
@@ -417,12 +418,13 @@ Input Date
   Wait Until Page Contains   Підтвердіть зміни в пропозиції
   Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input   203986723
   Click Element   xpath=//button[./text()='Надіслати']
+  Wait Until Element Is Visible   xpath=//a[@class='button save bidToEdit']   30
   [return]  ${fieldname}
 
 Скасувати цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${bid}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
-  Wait Until Page Contains   Ваша пропозиція   10
+  Wait Until Page Contains   Ваша пропозиція   30
   Click Element   xpath=//a[@class='button save bidToEdit']
   Wait Until Page Contains   Відкликати пропозицію   30
   Click Element   xpath=//button[@value='unbid']
@@ -430,10 +432,10 @@ Input Date
   Click Element   xpath=//a[@class='jBtn green']
   Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
   Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
-  Wait Until Element Is Not Visible   id=jAlertBack
   Click Element   xpath=//button[./text()='Надіслати']
   Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
   Click Element   xpath=//a[./text()= 'Закрити']
+  Wait Until Element Is Not Visible   id=jAlertBack
 
 Завантажити документ в ставку
   [Arguments]  ${username}  ${filePath}  ${tender_uaid}
@@ -447,6 +449,7 @@ Input Date
   Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
   Wait Until Element Is Not Visible   id=jAlertBack
   Click Element   xpath=//button[./text()='Надіслати']
+  Wait Until Element Is Visible   xpath=//a[@class='button save bidToEdit']   30
 
 Змінити документ в ставці
   [Arguments]   ${username}  ${path}  ${bidid}  ${docid}
