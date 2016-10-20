@@ -7,10 +7,10 @@ import os
 import urllib
 
 DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'кілограми': u'кг', u'метри': u'м', u'пара': u'пар',
-            u'літр': u'л', u'набір': u'наб', u'пачок': u'пач', u'послуга': u'посл', u'метри кубічні': u'м.куб',
+            u'літр': u'л', u'набір': u'наб', u'пачок': u'пач', u'послуга': u'послуги', u'метри кубічні': u'м.куб',
             u'тони': u'т', u'метри квадратні': u'м.кв', u'кілометри': u'км', u'штуки': u'шт', u'місяць': u'міс',
             u'пачка': u'пачка', u'упаковка': u'уп', u'гектар': u'Га', u'лот': u'лот', u"грн": u"UAH",
-            u"(з ПДВ)": u"True", u"(без ПДВ)": u"false", u"Код ДК 021-2015 (CPV)": u"CPV", u"Код ДК": u"ДКПП",
+            u"(з ПДВ)": u"True", u"(без ПДВ)": u"false", u"Код CAV": u"CAV", u"Код ДК": u"ДКПП",
             u"ДК": u"ДКПП", u"Відкриті торги": u"aboveThresholdUA",
             u"Відкриті торги з публікацією англ.мовою": u"aboveThresholdEU", u"Переможець": u"active",
             u"місто Київ": u"м. Київ", u"НЕЦІНОВІ КРИТЕРІЇ ДО ПРЕДМЕТУ ЗАКУПІВЛІ": u"item",
@@ -49,10 +49,7 @@ def convert_string_from_dict_dzo(string):
 
 def adapt_data_for_role(role_name, tender_data):
     if role_name == 'tender_owner':
-        tender_data = adapt_unit_names(tender_data)
-        tender_data = adapt_procuringEntity(tender_data)
-        tender_data = adapt_address(tender_data)
-        tender_data = adapt_delivery_end_date(tender_data)
+        tender_data = adapt_unit_names(adapt_procuringEntity(adapt_address(adapt_delivery_end_date(tender_data))))
     return tender_data
 
 
@@ -72,7 +69,7 @@ def adapt_one_item(item_data):
 
 
 def adapt_procuringEntity(tender_data):
-    tender_data['data']['procuringEntity']['name'] = u"ПрАТ <Комбайн Інк.>"
+    tender_data['data']['procuringEntity']['name'] = u"Володілець"
     tender_data['data']['procuringEntity']['contactPoint']['name'] = u"Той Кого Не Можна Називати"
     tender_data['data']['procuringEntity']['contactPoint']['telephone'] = u"+380878787887"
     tender_data['data']['procuringEntity']['contactPoint']['email'] = u"ovramet.s@gmail.com"
