@@ -237,6 +237,7 @@ Input Date
   [Arguments]  ${username}  ${tender_uaid}
   Switch browser   ${username}
   Go To   ${USERS.users['${username}'].homepage}
+  Execute Javascript   $(".topFixed").remove();
   Click Element   xpath=//a[text()='Аукціони']
   Wait Until Element Is Visible   xpath=//a[@href='/tenders/all']
   Click Element   xpath=//a[@href='/tenders/all']
@@ -798,7 +799,7 @@ Input Date
   Input Text   name=data[value][amount]   ${amount}
   Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
   Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
-  Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
+  Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
   Click Button   name=do
   Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
   Click Element   xpath=//a[./text()= 'Закрити']
@@ -810,7 +811,7 @@ Input Date
   Click Button   name=pay
   Wait Until Element Is Visible   xpath=//a[./text()= 'OK']
   Click Element   xpath=//a[./text()= 'OK']
-  Wait Until Element Is Not Visible   xpath=//button[@value="to_operator"]
+  Run Keyword And Ignore Error   Wait Until Element Is Not Visible   xpath=//button[@value="to_operator"]
   ${url}=   Log Location
   patch_tender_bid   ${url}
   Reload Page
@@ -841,7 +842,7 @@ Input Date
   Click Element   name=do
   Wait Until Element Is Visible   ${locator.ModalOK}
   Click Element   ${locator.ModalOK}
-  Wait Until Element Is Visible   xpath=//button[./text()='Надіслати']
+  Wait Until Element Is Not Visible   id=jAlertBack
   Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
   Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
   Click Element   xpath=//button[./text()='Надіслати']
@@ -853,7 +854,7 @@ Input Date
   Input Text   name=data[value][amount]   ${fieldvalue}
   Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
   Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
-  Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
+  Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
   Click Button   name=do
   Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
   Click Element   xpath=//a[./text()= 'Закрити']
@@ -895,7 +896,7 @@ Input Date
   Click Element   name=do
   Wait Until Element Is Visible   ${locator.ModalOK}
   Click Element   ${locator.ModalOK}
-  Wait Until Element Is Visible   xpath=//button[./text()='Надіслати']
+  Wait Until Element Is Not Visible   id=jAlertBack
   Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
   Click Element   xpath=//button[text()='Надіслати']
   Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
@@ -906,7 +907,7 @@ Input Date
   Input Text   name=data[value][amount]   ${amount}
   Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
   Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
-  Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
+  Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
   Click Button   name=do
   Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
   Click Element   xpath=//a[./text()= 'Закрити']
