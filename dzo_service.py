@@ -13,7 +13,7 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u"(з ПДВ)": u"True", u"(без ПДВ)": u"false", u"Код CAV": u"CAV", u"Переможець": u"active",
             u"місто Київ": u"м. Київ", u"ПЕРІОД УТОЧНЕНЬ": u"active.enquiries",
             u"ПОДАННЯ ПРОПОЗИЦІЙ": u"active.tendering", u"ПРЕДКВАЛІФІКАЦІЯ": u"active.pre-qualification",
-            u"АУКЦІОН": u"active.auction", u"НА РОЗГЛЯДІ": u"claim"}
+            u"АУКЦІОН": u"active.auction", u"КВАЛІФІКАЦІЯ ПЕРЕМОЖЦЯ": u"active.qualification", u"НА РОЗГЛЯДІ": u"claim"}
 
 
 def convert_date_to_slash_format(isodate):
@@ -133,6 +133,10 @@ def get_download_file_path():
     return os.path.join(os.getcwd(), 'test_output')
 
 
+def get_upload_file_path():
+    return os.path.join(os.getcwd(), 'src/robot_tests.broker.dzo/testFileForUpload.txt')
+
+
 def get_relatedItem_description(tender_data, item_id):
     for item in tender_data['data']['items']:
         if item_id == item['id']:
@@ -163,3 +167,10 @@ def check_path_exist(path):
 
 def check_file_exist(path):
     return os.path.isfile(path)
+
+
+def patch_tender_bid(url):
+    tender_id = url.split('/')[-1]
+    url = 'http://www.dz3.byustudio.in.ua/bidAply.php?tender_id={}'.format(tender_id)
+    status = urllib.urlopen(url)
+    return status.read(), url

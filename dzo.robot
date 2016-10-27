@@ -64,7 +64,7 @@ ${locator.supplier.companyName}  xpath=//div[@class="message"]//td[contains(text
 ${locator.supplier.id}           xpath=//div[@class="message"]//td[contains(text(), "Код в ЄДРПОУ / ІПН")]/following-sibling::td[1]
 ${locator.supplier.amount}       xpath=//div[@class="qualificationBidAmount"]/span[1]
 ${locator.supplier.currency}     xpath=//div[@class="qualificationBidAmount"]/span[2]
-${locator.auctionPeriod.startDate}     xpath=//td[contains(text(), 'Дата початку аукціону')]/following-sibling::td[1]
+${locator.auctionPeriod.startDate}     xpath=//td[contains(text(), 'Електронний аукціон відбудеться')]/following-sibling::td[1]/span
 
 
 *** Keywords ***
@@ -102,9 +102,9 @@ Login
   [Arguments]  ${username}
   Wait Until Page Contains Element   jquery=a[href="/cabinet"]
   Click Element   jquery=a[href="/cabinet"]
-  Sleep   1
   Wait Until Page Contains Element   name=email
   Input text   name=email   ${USERS.users['${username}'].login}
+  Execute Javascript   $('input[name="email"]').attr('rel','CHANGE');
   Wait Until Element Is Visible   name=psw
   Input text   name=psw   ${USERS.users['${username}'].password}
   Wait Until Element Is Visible   xpath=//button[contains(@class, 'btn')][./text()='Вхід в кабінет']
@@ -131,6 +131,7 @@ Login
   Wait Until Element Is Not Visible   id=jAlertBack   20
   Input Text   name=data[title]   ${tender_data.data.title}
   Input Text   name=data[description]   ${tender_data.data.description}
+  Input Text   name=data[dgfID]   ${tender_data.data.title}
   Ввести Цінові Дані   ${EMPTY}   ${tender_data.data.value.amount}   ${tender_data.data.value.valueAddedTaxIncluded}
   Input Text   name=data[guarantee][amount]   ${guarantee}
   Input Text   name=data[minimalStep][amount]   ${minimalStep}
@@ -766,7 +767,13 @@ Input Date
 
 Отримати інформацію про auctionPeriod.startDate
   ${auction_startDate}=    Get Text            ${locator.auctionPeriod.startDate}
+  ${auction_startDate}=   subtract_from_time    ${auction_startDate}   0   0
   [return]  ${auction_startDate}
+
+Отримати інформацію про auctionPeriod.endDate
+  ${auction_endDate}=    Get Text            ${locator.auctionPeriod.startDate}
+  ${auction_endDate}=   subtract_from_time    ${auction_endDate.split('-')[-1]}   0   0
+  [return]  ${auction_endDate}
   
 Отримати інформацію про complaintPeriod.endDate
   ${complaint_endDate}=   Get Text   
@@ -783,18 +790,33 @@ Input Date
 Подати цінову пропозицію
   [Arguments]   ${username}  ${tender_uaid}  ${bid}
   ${amount}=   add_second_sign_after_point   ${bid.data.value.amount}
+  ${filePath}=   get_upload_file_path
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Run keyword if   '${TEST NAME}' != 'Неможливість подати цінову пропозицію до початку періоду подачі пропозицій першим учасником'
   ...   Wait Until Keyword Succeeds   10 x   60 s   Дочекатися синхронізації для періоду подачі пропозицій
+  Execute Javascript   $(".topFixed").remove(); $("body > div").removeAttr("style");
   Input Text   name=data[value][amount]   ${amount}
+  Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
+  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
+  Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
   Click Button   name=do
   Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
   Click Element   xpath=//a[./text()= 'Закрити']
+  Перевірити і підтвердити пропозицію
+  [return]  ${bid}
+
+Перевірити і підтвердити пропозицію
   Wait Until Element Is Not Visible   id=jAlertBack
   Click Button   name=pay
   Wait Until Element Is Visible   xpath=//a[./text()= 'OK']
   Click Element   xpath=//a[./text()= 'OK']
-  [return]  ${bid}
+  Wait Until Element Is Not Visible   xpath=//button[@value="to_operator"]
+  ${url}=   Log Location
+  patch_tender_bid   ${url}
+  Reload Page
+  Click Button   name=pay
+  Wait Until Element Is Visible   xpath=//a[./text()= 'OK']
+  Click Element   xpath=//a[./text()= 'OK']
 
 
 ########## Видалити після встановлення коректних часових проміжків для періодів #######################
@@ -811,13 +833,31 @@ Input Date
 Змінити цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
   ${fieldvalue}=   add_second_sign_after_point   ${fieldvalue}
+  ${filePath}=   get_upload_file_path
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Wait Until Element Is Visible   xpath=//a[@class='button save bidToEdit']
   Click Element   xpath=//a[@class='button save bidToEdit']
-  Input Text   name=data[value][amount]   ${fieldvalue}
-  Click Element   xpath=//button[@value='save']
+  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
+  Click Element   name=do
+  Wait Until Element Is Visible   ${locator.ModalOK}
+  Click Element   ${locator.ModalOK}
+  Wait Until Element Is Visible   xpath=//button[./text()='Надіслати']
+  Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
+  Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
+  Click Element   xpath=//button[./text()='Надіслати']
   Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
   Click Element   xpath=//a[./text()= 'Закрити']
+  Run keyword if   '${TEST NAME}' != 'Неможливість подати цінову пропозицію до початку періоду подачі пропозицій першим учасником'
+  ...   Wait Until Keyword Succeeds   10 x   60 s   Дочекатися синхронізації для періоду подачі пропозицій
+  Execute Javascript   $(".topFixed").remove(); $("body > div").removeAttr("style");
+  Input Text   name=data[value][amount]   ${fieldvalue}
+  Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
+  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
+  Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
+  Click Button   name=do
+  Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
+  Click Element   xpath=//a[./text()= 'Закрити']
+  Перевірити і підтвердити пропозицію
   [return]  ${fieldname}
 
 Скасувати цінову пропозицію
@@ -849,10 +889,28 @@ Input Date
   [Arguments]  ${username}  ${filePath}  ${tender_uaid}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Wait Until Page Contains   Ваша пропозиція   10
+  ${amount}=   Get Text   xpath=//span[@class="bidAmountValue"]
   Click Element   xpath=//a[@class='button save bidToEdit']
-  Execute Javascript   $("body > div").removeAttr("style");
+  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
+  Click Element   name=do
+  Wait Until Element Is Visible   ${locator.ModalOK}
+  Click Element   ${locator.ModalOK}
+  Wait Until Element Is Visible   xpath=//button[./text()='Надіслати']
+  Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
+  Click Element   xpath=//button[text()='Надіслати']
+  Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
+  Click Element   xpath=//a[./text()= 'Закрити']
+  Run keyword if   '${TEST NAME}' != 'Неможливість подати цінову пропозицію до початку періоду подачі пропозицій першим учасником'
+  ...   Wait Until Keyword Succeeds   10 x   60 s   Дочекатися синхронізації для періоду подачі пропозицій
+  Execute Javascript   $(".topFixed").remove(); $("body > div").removeAttr("style");
+  Input Text   name=data[value][amount]   ${amount}
   Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
-  Click Element   xpath=//button[@value='save']
+  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
+  Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
+  Click Button   name=do
+  Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
+  Click Element   xpath=//a[./text()= 'Закрити']
+  Перевірити і підтвердити пропозицію
 
 Змінити документ в ставці
   [Arguments]  ${username}  ${tender_uaid}  ${path}  ${docid}
@@ -864,16 +922,55 @@ Input Date
   Click Element   xpath=//button[@value='save']
 
 Отримати посилання на аукціон для глядача
-  [Arguments]  ${username}  ${tender_uaid}
+  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}=${Empty}
   Sleep   120
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   ${url}=   Get Element Attribute   xpath=//section/h3/a[@class="reverse"]@href
   [return]  ${url}
 
 Отримати посилання на аукціон для учасника
-  [Arguments]  ${username}  ${tender_uaid}
+  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}=${Empty}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Click Element   xpath=//a[@class="reverse getAuctionUrl"]
   Sleep   3
   ${url}=   Get Element Attribute   xpath=//a[contains(text(),"Перейдіть до редукціону")]@href
   [return]  ${url}
+
+###############################################################################################################
+#########################################    КВАЛІФІКАЦІЯ   ###################################################
+###############################################################################################################
+
+Підтвердити постачальника
+  [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Wait Until Keyword Succeeds   15 x   1 m   Run Keywords
+  ...   Reload Page
+  ...   AND   Click Element   xpath=//a[@data-bid-action="protocol"]
+  Wait Until Element Is Visible   ${locator.ModalOK}
+  Click Element   ${locator.ModalOK}
+  Wait Until Page Contains   Підтвердження протоколу
+  Wait Until Keyword Succeeds   10 x   30 s   Run Keywords
+  ...   Reload Page
+  ...   AND   Click Element   xpath=//a[@data-bid-action="paid"]
+  Wait Until Element Is Visible   ${locator.ModalOK}
+  Click Element   ${locator.ModalOK}
+  Wait Until Page Contains   оплату отримано
+
+Підтвердити підписання контракту
+  [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
+  ${file_path}=   get_upload_file_path
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Click Element   xpath=//a[@data-bid-action="contract"]
+  Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
+  Sleep  3
+  Press Key   xpath=//input[@type="file"]   ${file_path}
+  Select From List By Value   name=documentType   contractSigned
+  Click Element   xpath=//button[text()="Додати"]
+  Click Element   ${locator.ModalOK}
+  Wait Until Element Is Not Visible   id=jAlertBack
+  Input Text   name=data[contractNumber]   777
+  Click Element   name=data[dateSigned]
+  Click Element   xpath=//td[contains(@class,'ui-datepicker-today')]
+  Click Element   xpath=//button[@class="bidAction"]
+  Click Element   ${locator.ModalOK}
+  Wait Until Element Is Not Visible   id=jAlertBack
