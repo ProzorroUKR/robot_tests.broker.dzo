@@ -116,7 +116,7 @@ Login
 
 Створити тендер
   [Arguments]  ${username}  ${tender_data}
-  ${guarantee}=   add_second_sign_after_point   ${tender_data.data.guarantee}
+  ${guarantee}=   add_second_sign_after_point   ${tender_data.data.guarantee.amount}
   ${minimalStep}=   add_second_sign_after_point   ${tender_data.data.minimalStep.amount}
   Selenium2Library.Switch Browser   ${username}
   Wait Until Page Contains Element   jquery=a[href="/tenders/new"]   30
@@ -127,7 +127,6 @@ Login
   ...   Select From List   name=tender_method   open_${tender_data.data.procurementMethodType}
   ...   AND   Wait Until Element Is Visible   ${locator.ModalOK}
   ...   AND   Click Element   ${locator.ModalOK}
-  Wait Until Element Is Not Visible   ${locator.ModalOK}
   Wait Until Element Is Not Visible   id=jAlertBack   20
   Input Text   name=data[title]   ${tender_data.data.title}
   Input Text   name=data[description]   ${tender_data.data.description}
