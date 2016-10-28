@@ -8,6 +8,7 @@ Library  dzo_service.py
 ${doc_index}                       0
 ${locator.tenderId}                xpath=//td[contains(text(),'Ідентифікатор аукціону')]/following-sibling::td[1]
 ${locator.title}                   xpath=//div[@class='topInfo']/h1
+${locator.dgfID}                   xpath=//h3[text()='Банк']/following-sibling::table/tbody/tr[4]/td[2]
 ${locator.description}             xpath=//h2[@class='tenderDescr']
 ${locator.value.amount}            xpath=//section[2]/h3[contains(text(),'Параметри аукціону')]/following-sibling::table//tr[1]/td[2]/span[1]
 ${locator.legalName}               xpath=//td[contains(text(),'Найменування організатора')]/following-sibling::td//span
@@ -130,7 +131,7 @@ Login
   Wait Until Element Is Not Visible   id=jAlertBack   20
   Input Text   name=data[title]   ${tender_data.data.title}
   Input Text   name=data[description]   ${tender_data.data.description}
-  Input Text   name=data[dgfID]   ${tender_data.data.title}
+  Input Text   name=data[dgfID]   ${tender_data.data.dgfID}
   Ввести Цінові Дані   ${EMPTY}   ${tender_data.data.value.amount}   ${tender_data.data.value.valueAddedTaxIncluded}
   Input Text   name=data[guarantee][amount]   ${guarantee}
   Input Text   name=data[minimalStep][amount]   ${minimalStep}
@@ -530,6 +531,10 @@ Input Date
   ${title}=   Отримати текст із поля і показати на сторінці   title
 #  ${title}=   convert_title_dzo    ${title}
   [return]  ${title}
+
+Отримати інформацію про dgfID
+  ${dgfID}=   Get Text   ${locator.dgfID}
+  [return]  ${dgfID}
 
 Отримати інформацію про title_en
   ${url}=    Get Location
