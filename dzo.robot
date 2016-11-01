@@ -965,10 +965,13 @@ Input Date
   [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
   ${file_path}=   get_upload_file_path
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
-  Click Element   xpath=//a[@data-bid-action="contract"]
+  Wait Until Keyword Succeeds   10 x   30 s   Run Keywords
+  ...   Reload Page
+  ...   AND   Click Element   xpath=//a[@data-bid-action="contract"]
+  Sleep  3
   Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
   Sleep  3
-  Press Key   xpath=//input[@type="file"]   ${file_path}
+  Choose File   xpath=//input[@type="file"]   ${file_path}
   Select From List By Value   name=documentType   contractSigned
   Click Element   xpath=//button[text()="Додати"]
   Click Element   ${locator.ModalOK}
