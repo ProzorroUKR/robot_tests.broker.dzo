@@ -847,8 +847,8 @@ Input Date
   Wait Until Element Is Visible   ${locator.ModalOK}
   Click Element   ${locator.ModalOK}
   Wait Until Element Is Not Visible   id=jAlertBack
-  Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
-  Wait Until Element Is Visible   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input
+  Wait Until Page Contains   Підтвердіть зміни в пропозиції
+  Input Text   xpath=//div[@id="contactForm"]/descendant::input[@name="checkMPhone"]    203986723
   Click Element   xpath=//button[./text()='Надіслати']
   Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
   Click Element   xpath=//a[./text()= 'Закрити']
@@ -901,7 +901,8 @@ Input Date
   Wait Until Element Is Visible   ${locator.ModalOK}
   Click Element   ${locator.ModalOK}
   Wait Until Element Is Not Visible   id=jAlertBack
-  Input Text   xpath=//div[2]/form/table/tbody/tr[1]/td[2]/div/input    203986723
+  Wait Until Page Contains   Підтвердіть зміни в пропозиції
+  Input Text   //div[@id="contactForm"]/descendant::input[@name="checkMPhone"]    203986723
   Click Element   xpath=//button[text()='Надіслати']
   Wait Until Element Is Visible   xpath=//a[./text()= 'Закрити']
   Click Element   xpath=//a[./text()= 'Закрити']
