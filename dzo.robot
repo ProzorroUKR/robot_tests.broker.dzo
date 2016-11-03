@@ -251,6 +251,23 @@ Input Date
   Wait Until Page Contains    ${tender_uaid}
   Execute Javascript   $(".topFixed").remove();
 
+###############################################################################################################
+##########################################    СКАСУВАННЯ    ###################################################
+###############################################################################################################
+
+Скасувати закупівлю
+  [Arguments]  ${username}  ${tender_uaid}  ${cancellation_reason}  ${document}  ${new_description}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Click Element   xpath=//a[contains(@class,'tenderCancelCommand')]
+  Підтвердити дію
+  Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
+  Choose File   xpath=//input[@type="file"]   ${document}
+  Input Text   name=title   ${new_description}
+  Click Element   xpath=//button[text()="Додати"]
+  Input Text  name=reason   ${cancellation_reason}
+  Click Element   xpath=//button[@class="bidAction"]
+  Wait Until Page Contains   Причини скасування аукціону
+
 
 ###############################################################################################################
 ###########################################    ПИТАННЯ    #####################################################
@@ -981,5 +998,13 @@ Input Date
   Click Element   name=data[dateSigned]
   Click Element   xpath=//td[contains(@class,'ui-datepicker-today')]
   Click Element   xpath=//button[@class="bidAction"]
+  Click Element   ${locator.ModalOK}
+  Wait Until Element Is Not Visible   id=jAlertBack
+
+
+##############################################################################################################
+
+Підтвердити дію
+  Wait Until Element Is Visible   ${locator.ModalOK}
   Click Element   ${locator.ModalOK}
   Wait Until Element Is Not Visible   id=jAlertBack
