@@ -171,8 +171,8 @@ def check_file_exist(path):
     return os.path.isfile(path)
 
 
-def patch_tender_bid(url):
+def patch_tender_bid(url, decline):
     tender_id = url.split('/')[-1]
-    url = 'http://www.dz3.byustudio.in.ua/bidAply.php?tender_id={}'.format(tender_id)
+    url = 'http://www.dz3.byustudio.in.ua/bidAply.php?tender_id={}{}'.format(tender_id, decline)
     status = urllib.urlopen(url)
     return status.read(), url
