@@ -966,6 +966,26 @@ Input Date
   Підтвердити дію
   Wait Until Page Contains   оплату отримано
 
+Завантажити протокол аукціону
+  [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Click Element   xpath=//span[text()="Моя пропозиція"]/..
+  Wait Until Page Contains   Документи пропозиції
+  Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
+  Choose File   xpath=//input[@type="file"]   ${file_path}
+  Select From List By Value   name=documentType   auctionProtocol
+  Click Element   xpath=//button[text()="Додати"]
+  Підтвердити дію
+  Click Element   xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds   10 x   60 s   Перевірити завантаження протоколу
+
+Перевірити завантаження протоколу
+  Reload Page
+  Execute Javascript   $(".topFixed").remove();
+  Click Element   xpath=//preceding-sibling::div[text()='На розгляді']/following-sibling::div/descendant::span[text()='Моя пропозиція']
+  Wait Until Page Contains   Документи пропозиції
+  Wait Until Page Does Not Contain Element   xpath=//span[@title="документ не завантажено в ЦБД"]
+
 Скасування рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
@@ -978,15 +998,22 @@ Input Date
 Отримати кількість документів в ставці
   [Arguments]  ${username}  ${tender_uaid}  ${bid_index}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
-  Wait Until Element Is Visible   xpath=//preceding-sibling::div[text()='На розгляді']/following-sibling::div/descendant::span[text()='Пропозиція']
-  Click Element   xpath=//preceding-sibling::div[text()='На розгляді']/following-sibling::div/descendant::span[text()='Пропозиція']
-  Wait Until Page Contains   Документи пропозиції
+  Wait Until Keyword Succeeds   15 x   1 m   Run Keywords
+  ...   Reload Page
+  ...   AND   Execute Javascript   $(".topFixed").remove();
+  ...   AND   Click Element   xpath=//preceding-sibling::div[text()='На розгляді']/following-sibling::div/descendant::span[text()='Пропозиція']
+  #Wait Until Element Is Visible   xpath=//preceding-sibling::div[text()='На розгляді']/following-sibling::div/descendant::span[text()='Пропозиція']
+  #Click Element   xpath=//preceding-sibling::div[text()='На розгляді']/following-sibling::div/descendant::span[text()='Пропозиція']
+  Wait Until Element Is Visible   xpath=//tr[@class="line docItem documents_url_documents"]
   ${bid_doc_number}=   Get Matching Xpath Count   //tr[@class="line docItem documents_url_documents"]
   [return]  ${bid_doc_number}
 
 Отримати дані із документу пропозиції
   [Arguments]  ${username}  ${tender_uaid}  ${bid_index}  ${document_index}  ${field}
-  Log   ${field}
+  ${status}  ${doc_value}=   Run Keyword And Ignore Error   Get Text   //tr[@class="line docItem documents_url_documents"][${document_index + 1}]/descendant::span[@class='docType']
+  ${doc_value}=   Set Variable If   '${status}' == 'FAIL'   Document type not assigned   ${doc_value}
+  ${doc_value}=   convert_string_from_dict_dzo   ${doc_value}
+  [return]  ${doc_value}
 
 Дискваліфікувати постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}  ${description}
