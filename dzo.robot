@@ -1,5 +1,6 @@
 *** Settings ***
 Library  Selenium2Screenshots
+Library  Selenium2Library
 Library  String
 Library  DateTime
 Library  dzo_service.py
@@ -829,7 +830,7 @@ Input Date
   Клікнути по елементу   name=pay
   Клікнути по елементу   xpath=//a[./text()= 'OK']
   Wait Until Page Contains Element   xpath=//div[@class="jContent"]
-  Клікнути по елементу   xpath=//a[./text()= 'Закрити']
+  Wait Until Keyword Succeeds   50 x   0.2 s   Клікнути по елементу   xpath=//a[./text()= 'Закрити']
   Run Keyword And Ignore Error   Wait Until Element Is Not Visible   xpath=//button[@value="to_operator"]
   ${url}=   Log Location
   patch_tender_bid   ${url}   ${qualified}
@@ -949,6 +950,7 @@ Input Date
 
 Завантажити протокол аукціону
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
+  Дочекатись синхронізації з майданчиком   ${username}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//span[text()="Моя пропозиція"]/..
   Wait Until Page Contains   Документи пропозиції
@@ -967,6 +969,7 @@ Input Date
   Wait Until Page Contains   Документи пропозиції
   Wait Until Page Does Not Contain Element   xpath=//span[@title="документ не завантажено в ЦБД"]
   Wait Until Page Does Not Contain Element   xpath=//span[@title="Поставлено в чергу на завантаження в ЦБД"]
+  capture page screenshot
 
 Скасування рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
@@ -1005,7 +1008,7 @@ Input Date
   Choose File   xpath=//input[@type="file"]   ${document}
   Клікнути по елементу   xpath=//button[text()="Додати"]
   Підтвердити дію
-  Wait Until Keyword Succeeds   20 x   20 s   Перевірити завантаження рішення кваліфікаційної комісії
+#  Wait Until Keyword Succeeds   20 x   20 s   Перевірити завантаження рішення кваліфікаційної комісії
 
 Дискваліфікувати постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}  ${description}
@@ -1013,6 +1016,12 @@ Input Date
   Ввести текст   name=data[description]   ${description}
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Підтвердити дію
+  Wait Until Keyword Succeeds   20 x   20 s   Дочекатися дискваліфікації учасника
+
+Дочекатися дискваліфікації учасника
+  Reload Page
+  Execute Javascript   $(".topFixed").remove();
+  Element Should Be Visible   xpath=//div[contains(@class,'qualificationItem')]/descendant::div[text()='Дискваліфіковано']
 
 Перевірити завантаження рішення кваліфікаційної комісії
   Reload Page
@@ -1044,6 +1053,12 @@ Input Date
   Клікнути по елементу   xpath=//td[contains(@class,'ui-datepicker-today')]
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Підтвердити дію
+  Wait Until Keyword Succeeds   20 x   20 s   Дочекатися активного статусу підписання контракту
+
+Дочекатися активного статусу підписання контракту
+  Reload Page
+  ${contract_status}=   Get Text   xpath=//a[text()='Контракт']/../preceding-sibling::div[contains(@class,'bstatus')]
+  Should Be Equal   ${contract_status}   Переможець
 
 ##############################################################################################################
 
