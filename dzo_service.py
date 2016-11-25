@@ -16,7 +16,7 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u"місто Київ": u"м. Київ", u"ПЕРІОД УТОЧНЕНЬ": u"active.enquiries",
             u"ПОДАННЯ ПРОПОЗИЦІЙ": u"active.tendering", u"ПРЕДКВАЛІФІКАЦІЯ": u"active.pre-qualification",
             u"АУКЦІОН": u"active.auction", u"КВАЛІФІКАЦІЯ ПЕРЕМОЖЦЯ": u"active.qualification",
-            u"ТОРГИ НЕ ВІДБУЛИСЯ": u"unsuccessful", u"ТОРГИ ЗАВЕРШЕНО": u"complete", u"НА РОЗГЛЯДІ": u"claim",
+            u"ТОРГИ НЕ ВІДБУЛИСЯ": u"unsuccessful", u"ТОРГИ ВІДМІНЕНО": u"cancelled", u"ТОРГИ ЗАВЕРШЕНО": u"complete", u"НА РОЗГЛЯДІ": u"claim",
             u"Протокол торгів": u"auctionProtocol"}
 
 
