@@ -272,7 +272,7 @@ Input Date
   Ввести текст  name=reason   ${cancellation_reason}
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Wait Until Page Contains   Причини скасування аукціону
-  Wait Until Keyword Succeeds  10 x   1 m   Звірити статус тендера   ${username}  ${tender_uaid}  ТОРГИ ВІДМІНЕНО
+  Wait Until Keyword Succeeds  10 x   1 m   Звірити статус тендера   ${username}  ${tender_uaid}  cancelled
 
 
 ###############################################################################################################
@@ -961,8 +961,9 @@ Input Date
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
 #  Дочекатись синхронізації з майданчиком   ${username}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Wait Until Keyword Succeeds   10 x   1 m   Звірити статус тендера   ${username}  ${tender_uaid}   active.qualification
   Клікнути по елементу   xpath=//span[text()="Моя пропозиція"]/..
-  Wait Until Page Contains   Документи пропозиції
+  Wait Until Element Is Visible  xpath=//button[@class="bidAction"]
   Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
   Choose File   xpath=//input[@type="file"]   ${file_path}
   Select From List By Value   name=documentType   auctionProtocol
@@ -1047,9 +1048,8 @@ Input Date
   ...   Reload Page
   ...   AND   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="contract"]
-  Sleep  3
+  Wait Until Element Is Visible  xpath=//button[@class="bidAction"]
   Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
-  Sleep  3
   Choose File   xpath=//input[@type="file"]   ${filepath}
   Select From List By Value   name=documentType   contractSigned
   Клікнути по елементу   xpath=//button[text()="Додати"]
@@ -1057,6 +1057,12 @@ Input Date
 
 Підтвердити підписання контракту
   [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Wait Until Keyword Succeeds   10 x   30 s   Run Keywords
+  ...   Reload Page
+  ...   AND   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
+  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="contract"]
+  Wait Until Element Is Visible  xpath=//button[@class="bidAction"]
   Ввести текст   name=data[contractNumber]   777
   Клікнути по елементу   name=data[dateSigned]
   Клікнути по елементу   xpath=//td[contains(@class,'ui-datepicker-today')]
