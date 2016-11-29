@@ -1059,7 +1059,7 @@ Input Date
   [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   ${filepath}=   get_upload_file_path
-  Завантажити угоду до тендера   ${username}  ${tender_uaid}  1  ${filepath}
+  dzo.Завантажити угоду до тендера   ${username}  ${tender_uaid}  1  ${filepath}
   Wait Until Keyword Succeeds   10 x   30 s   Run Keywords
   ...   Reload Page
   ...   AND   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
