@@ -17,13 +17,18 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u"ПОДАННЯ ПРОПОЗИЦІЙ": u"active.tendering", u"ПРЕДКВАЛІФІКАЦІЯ": u"active.pre-qualification",
             u"АУКЦІОН": u"active.auction", u"КВАЛІФІКАЦІЯ ПЕРЕМОЖЦЯ": u"active.qualification",
             u"ТОРГИ НЕ ВІДБУЛИСЯ": u"unsuccessful", u"ТОРГИ ВІДМІНЕНО": u"cancelled", u"ТОРГИ ЗАВЕРШЕНО": u"complete", u"НА РОЗГЛЯДІ": u"claim",
-            u"Протокол торгів": u"auctionProtocol"}
+            u"Протокол торгів": u"auctionProtocol", u"Продаж майна банків, що ліквідуються": u"dgfOtherAssets",
+            u"Продаж права вимоги за кредитними договорами": u"dgfFinancialAssets"}
 
 
 def convert_date_to_slash_format(isodate):
     iso_dt = parse_date(isodate)
     date_string = iso_dt.strftime("%d/%m/%Y")
     return date_string
+
+
+def convert_date_to_dash_format(date):
+    return datetime.strptime(date, "%d.%m.%Y").strftime("%Y-%m-%d")
 
 
 def subtract_from_time(date_time, subtr_min, subtr_sec):
