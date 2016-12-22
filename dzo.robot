@@ -182,18 +182,20 @@ Login
   Клікнути по елементу   xpath=//a[./text()='Редагувати']
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Клікнути по елементу   id=multiItems
-  Клікнути по елементу   xpath=//section[@id="multiItems"]/descendant::a[@class="addMultiItem"]
-  Додати предмет   ${item}
-  Клікнути по елементу   xpath=//button[@value="save"]
+  # Так зроблено через геніальну організацію роботи ЦБД
+  Run Keyword And Ignore Error  Клікнути по елементу   xpath=//section[@id="multiItems"]/descendant::a[@class="addMultiItem"]
+  Run Keyword And Ignore Error  Додати предмет   ${item}
+  Run Keyword And Ignore Error  Клікнути по елементу   xpath=//button[@value="save"]
   
 Видалити предмет закупівлі
   [Arguments]  ${username}  ${tender_uaid}  ${item_id}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[./text()='Редагувати']
   Execute Javascript   $(".topFixed").remove(); $('.blockedId').removeClass('blockedId');
-  Клікнути по елементу   xpath=//input[contains(@value, '${item_id}')]/ancestor::div[@class="tenderItemElement tenderItemPositionElement"]/descendant::a[@class="deleteMultiItem"]
-  Підтвердити дію
-  Клікнути по елементу   xpath=//button[@value="save"]
+  # Так зроблено через геніальну організацію роботи ЦБД
+  Run Keyword And Ignore Error  Клікнути по елементу   xpath=//input[contains(@value, '${item_id}')]/ancestor::div[@class="tenderItemElement tenderItemPositionElement"]/descendant::a[@class="deleteMultiItem"]
+  Run Keyword And Ignore Error  Підтвердити дію
+  Run Keyword And Ignore Error  Клікнути по елементу   xpath=//button[@value="save"]
 
 Input Date
   [Arguments]  ${elem_name_locator}  ${date}
@@ -613,7 +615,7 @@ Input Date
   [return]  ${eligibilityCriteria}
 
 Отримати інформацію про tenderAttempts
-  ${tenderAttempts}=   Get Text   ${locator.tenderAttempts}
+  ${tenderAttempts}=   Get Text   ${locator.tenderAttempts.split(' ')[-1]}
   ${tenderAttempts}=   Convert To Integer   ${tenderAttempts}
   [return]  ${tenderAttempts}
 
