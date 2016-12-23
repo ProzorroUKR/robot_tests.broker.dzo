@@ -1,5 +1,4 @@
 *** Settings ***
-Library  Selenium2Screenshots
 Library  Selenium2Library
 Library  String
 Library  DateTime
@@ -15,7 +14,7 @@ ${locator.dgfDecisionDate}         xpath=//*[@data-test="dgfDecisionDate"]
 ${locator.eligibilityCriteria}     xpath=//*[@data-test="eligibilityCriteria"]
 ${locator.tenderAttempts}          xpath=//*[@data-test="tenderAttempts"]
 ${locator.description}             xpath=//h2[@class='tenderDescr']
-${locator.value.amount}            xpath=//section[2]/h3[contains(text(),'Параметри аукціону'   )]/following-sibling::table//tr[1]/td[2]/span[1]
+${locator.value.amount}            xpath=//section[3]/h3[contains(text(),'Параметри аукціону'   )]/following-sibling::table//tr[1]/td[2]/span[1]
 ${locator.legalName}               xpath=//td[contains(text(),'Найменування організатора')]/following-sibling::td//span
 ${locator.minimalStep.amount}      xpath=//td[contains(text(),'Мінімальний крок аукціону')]/following-sibling::td/span[1]
 ${locator.enquiryPeriod.endDate}   xpath=//td[contains(text(),'Дата завершення періоду уточнень')]/following-sibling::td[1]
@@ -48,7 +47,7 @@ ${locator.complaint.complaintID}  /descendant::div[@class="date"]/span[3]
 ${locator.complaint.resolution}   /div[@class="answer relative"]/div[@class="text"]
 ${locator.complaint.cancellationReason}   /div[@class="answer relative"]/div[@class="text"]
 ${locator.bids}                      xpath=//div[@class="qualificationBidAmount"]/span
-${locator.currency}                  xpath=//section[2]/h3[contains(text(),'Параметри аукціону')]/following-sibling::table//tr[1]/td[2]/span[2]
+${locator.currency}                  xpath=//section[3]/h3[contains(text(),'Параметри аукціону')]/following-sibling::table//tr[1]/td[2]/span[2]
 ${locator.tax}                       xpath=//span[@class='taxIncluded']
 ${locator.procurementMethodType}     xpath=//td[contains(text(),'Процедура аукціону')]/following-sibling::td/div
 ${locator.cancellations[0].reason}   xpath=//div[@class="tenderCancelReason bidName"]
@@ -182,7 +181,6 @@ Login
   Клікнути по елементу   xpath=//a[./text()='Редагувати']
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Клікнути по елементу   id=multiItems
-  # Так зроблено через геніальну організацію роботи ЦБД
   Run Keyword And Ignore Error  Клікнути по елементу   xpath=//section[@id="multiItems"]/descendant::a[@class="addMultiItem"]
   Run Keyword And Ignore Error  Додати предмет   ${item}
   Run Keyword And Ignore Error  Клікнути по елементу   xpath=//button[@value="save"]
@@ -192,7 +190,6 @@ Login
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[./text()='Редагувати']
   Execute Javascript   $(".topFixed").remove(); $('.blockedId').removeClass('blockedId');
-  # Так зроблено через геніальну організацію роботи ЦБД
   Run Keyword And Ignore Error  Клікнути по елементу   xpath=//input[contains(@value, '${item_id}')]/ancestor::div[@class="tenderItemElement tenderItemPositionElement"]/descendant::a[@class="deleteMultiItem"]
   Run Keyword And Ignore Error  Підтвердити дію
   Run Keyword And Ignore Error  Клікнути по елементу   xpath=//button[@value="save"]
@@ -615,8 +612,8 @@ Input Date
   [return]  ${eligibilityCriteria}
 
 Отримати інформацію про tenderAttempts
-  ${tenderAttempts}=   Get Text   ${locator.tenderAttempts.split(' ')[-1]}
-  ${tenderAttempts}=   Convert To Integer   ${tenderAttempts}
+  ${tenderAttempts}=   Get Text   ${locator.tenderAttempts}
+  ${tenderAttempts}=   Convert To Integer   ${tenderAttempts.split(' ')[-1]}
   [return]  ${tenderAttempts}
 
 Отримати інформацію про title_en
