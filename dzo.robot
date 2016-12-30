@@ -215,6 +215,7 @@ Input Date
   [Arguments]  ${username}  ${filepath}  ${tender_uaid}  ${illustration}=False
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[contains(text(),'Редагувати')]
+  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Клікнути по елементу   xpath=//h3[contains(text(),'Документація до лоту')]/following-sibling::a
   Execute Javascript    $('body > div').attr('style', '');
   Choose File   xpath=//div[1]/form/input[@name="upload"]  ${filepath}
@@ -232,6 +233,7 @@ Input Date
   [Arguments]  ${username}  ${tender_uaid}  ${vdr_url}  ${title}=Sample Virtual Data Room
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[contains(text(),'Редагувати')]
+  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Клікнути по елементу   xpath=//h3[contains(text(),'Документація до лоту')]/following-sibling::a
   Клікнути по елементу   xpath=//a[contains(@class,'js-uploadLink')][1]
   Клікнути по елементу   xpath=//input[@value="virtualDataRoom"]/..
@@ -244,6 +246,7 @@ Input Date
   [Arguments]  ${username}  ${tender_uaid}  ${certificate_url}  ${title}=Public Asset Certificate
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[contains(text(),'Редагувати')]
+  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Клікнути по елементу   xpath=//h3[contains(text(),'Документація до лоту')]/following-sibling::a
   Клікнути по елементу   xpath=//a[contains(@class,'js-uploadLink')][1]
   Клікнути по елементу   xpath=//input[@value="x_dgfPublicAssetCertificate"]/..
@@ -256,6 +259,7 @@ Input Date
   [Arguments]  ${username}  ${tender_uaid}  ${accessDetails}  ${title}=Familiarization with bank asset
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[contains(text(),'Редагувати')]
+  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Клікнути по елементу   xpath=//h3[contains(text(),'Документація до лоту')]/following-sibling::a
   Клікнути по елементу   xpath=//a[@data-upload="accessDetails"]
   Ввести текст   name=accessDetails   ${accessDetails}
@@ -268,6 +272,7 @@ Input Date
   Switch Browser  ${username}
   dzo.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   Клікнути по елементу   xpath=//a[contains(text(),'Редагувати')]
+  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Клікнути по елементу   xpath=//h3[contains(text(),'Документація до лоту')]/following-sibling::a
   Execute Javascript    $('body > div').attr('style', '');
   Choose File   xpath=//div[1]/form/input[@name="upload"]  ${filepath}
@@ -305,9 +310,13 @@ Input Date
   Choose File   xpath=//input[@type="file"]   ${document}
   Ввести текст   name=title   ${document.split('/')[-1]}
   Клікнути по елементу   xpath=//button[text()="Додати"]
-  Клікнути по елементу   xpath=//span[text()='${cancellation_reason}']/../..
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Capture Page Screenshot
+  Клікнути по елементу   xpath=//span[text()='${cancellation_reason}']
   Клікнути по елементу   xpath=//button[@class="bidAction"]
-  Wait Until Page Contains   Причини скасування аукціону
+  Capture Page Screenshot
+  Wait Until Element Is Visible  xpath=//div[@class="mertBlock"]
+  Capture Page Screenshot
   Wait Until Keyword Succeeds  10 x   1 m   Звірити статус тендера   ${username}  ${tender_uaid}  cancelled
 
 
@@ -1036,6 +1045,7 @@ Input Date
   Choose File   xpath=//input[@type="file"]   ${file_path}
   Select From List By Value   name=documentType   auctionProtocol
   Клікнути по елементу   xpath=//button[text()="Додати"]
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Підтвердити дію
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds   10 x   60 s   Перевірити завантаження протоколу
@@ -1085,6 +1095,7 @@ Input Date
   Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
   Choose File   xpath=//input[@type="file"]   ${document}
   Клікнути по елементу   xpath=//button[text()="Додати"]
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Підтвердити дію
 #  Wait Until Keyword Succeeds   20 x   20 s   Перевірити завантаження рішення кваліфікаційної комісії
 
@@ -1092,7 +1103,9 @@ Input Date
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}  ${description}
   Клікнути по елементу   xpath=(//label[@class="relative inp empty"]/..)[1]
   Ввести текст   name=data[description]   ${description}
+  Capture Page Screenshot
   Клікнути по елементу   xpath=//button[@class="bidAction"]
+  Capture Page Screenshot
   Підтвердити дію
   Wait Until Keyword Succeeds   20 x   20 s   Дочекатися дискваліфікації учасника
 
@@ -1121,6 +1134,7 @@ Input Date
   Choose File   xpath=//input[@type="file"]   ${filepath}
   Select From List By Value   name=documentType   contractSigned
   Клікнути по елементу   xpath=//button[text()="Додати"]
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Підтвердити дію
 
 Підтвердити підписання контракту
