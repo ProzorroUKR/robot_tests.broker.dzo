@@ -1095,13 +1095,13 @@ Input Date
   Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
   Choose File   xpath=//input[@type="file"]   ${document}
   Клікнути по елементу   xpath=//button[text()="Додати"]
-  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
 #  Wait Until Keyword Succeeds   20 x   20 s   Перевірити завантаження рішення кваліфікаційної комісії
 
 Дискваліфікувати постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}  ${description}
-  Клікнути по елементу   xpath=(//label[@class="relative inp empty"]/..)[1]
+  Клікнути по елементу   xpath=(//label[@class="relative inp empty"]/..)[2]
   Ввести текст   name=data[description]   ${description}
   Capture Page Screenshot
   Клікнути по елементу   xpath=//button[@class="bidAction"]
