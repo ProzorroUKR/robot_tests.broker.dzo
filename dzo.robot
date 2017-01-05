@@ -49,7 +49,7 @@ ${locator.complaint.cancellationReason}   /div[@class="answer relative"]/div[@cl
 ${locator.bids}                      xpath=//div[@class="qualificationBidAmount"]/span
 ${locator.currency}                  xpath=//section[3]/h3[contains(text(),'Параметри аукціону')]/following-sibling::table//tr[1]/td[2]/span[2]
 ${locator.tax}                       xpath=//span[@class='taxIncluded']
-${locator.procurementMethodType}     xpath=//td[contains(text(),'Процедура аукціону')]/following-sibling::td/div
+${locator.procurementMethodType}     xpath=//td[contains(text(),'Тип оголошення')]/following-sibling::td/div
 ${locator.cancellations[0].reason}   xpath=//div[@class="tenderCancelReason bidName"]
 ${locator.cancellations[0].documents[0].title}   xpath=//span[@class="docTitle"]
 ${locator.ModalOK}                   xpath=//a[@class="jBtn green"]
@@ -109,7 +109,7 @@ Login
   Ввести текст   name=email   ${USERS.users['${username}'].login}
   Execute Javascript   $('input[name="email"]').attr('rel','CHANGE');
   Ввести текст   name=psw   ${USERS.users['${username}'].password}
-  Клікнути по елементу   xpath=//button[contains(@class, 'btn')][./text()='Вхід в кабінет']
+  Клікнути по елементу   xpath=//button[contains(text(),'Вхід')]
 
 ###############################################################################################################
 ######################################    СТВОРЕННЯ ТЕНДЕРУ    ################################################
@@ -622,7 +622,7 @@ Input Date
 
 Отримати інформацію про tenderAttempts
   ${tenderAttempts}=   Get Text   ${locator.tenderAttempts}
-  ${tenderAttempts}=   Convert To Integer   ${tenderAttempts.split(' ')[-1]}
+  ${tenderAttempts}=   Convert String From Dict Dzo   ${tenderAttempts}
   [return]  ${tenderAttempts}
 
 Отримати інформацію про title_en
@@ -1107,7 +1107,7 @@ Input Date
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Capture Page Screenshot
   Підтвердити дію
-  Wait Until Keyword Succeeds   20 x   20 s   Дочекатися дискваліфікації учасника
+  Wait Until Keyword Succeeds   20 x   60 s   Дочекатися дискваліфікації учасника
 
 Дочекатися дискваліфікації учасника
   Reload Page

@@ -7,7 +7,6 @@ from pytz import timezone
 import os
 import urllib
 
-
 DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'кілограми': u'кг', u'метри': u'м', u'пара': u'пар',
             u'літр': u'л', u'набір': u'наб', u'пачок': u'пач', u'послуга': u'послуги', u'метри кубічні': u'м.куб',
             u'тони': u'т', u'метри квадратні': u'м.кв', u'кілометри': u'км', u'штуки': u'шт', u'місяць': u'міс',
@@ -16,9 +15,11 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u"місто Київ": u"м. Київ", u"ПЕРІОД УТОЧНЕНЬ": u"active.enquiries",
             u"ПОДАННЯ ПРОПОЗИЦІЙ": u"active.tendering", u"ПРЕДКВАЛІФІКАЦІЯ": u"active.pre-qualification",
             u"АУКЦІОН": u"active.auction", u"КВАЛІФІКАЦІЯ ПЕРЕМОЖЦЯ": u"active.qualification",
-            u"ТОРГИ НЕ ВІДБУЛИСЯ": u"unsuccessful", u"ТОРГИ ВІДМІНЕНО": u"cancelled", u"ТОРГИ ЗАВЕРШЕНО": u"complete", u"НА РОЗГЛЯДІ": u"claim",
-            u"Протокол торгів": u"auctionProtocol", u"Продаж майна банків, що ліквідуються": u"dgfOtherAssets",
-            u"Продаж права вимоги за кредитними договорами": u"dgfFinancialAssets"}
+            u"ТОРГИ НЕ ВІДБУЛИСЯ": u"unsuccessful", u"ТОРГИ ВІДМІНЕНО": u"cancelled", u"ТОРГИ ЗАВЕРШЕНО": u"complete",
+            u"НА РОЗГЛЯДІ": u"claim", u"Протокол торгів": u"auctionProtocol",
+            u"Оголошення аукціону з продажу майна банків": u"dgfOtherAssets",
+            u"Оголошення аукціону з продажу прав вимоги за кредитами банків": u"dgfFinancialAssets", u'вперше': 1,
+            u'повторно (вдруге)': 2, u'повторно (втретє)': 3, u'повторно (вчетверте)': 4}
 
 
 def convert_date_to_slash_format(isodate):
