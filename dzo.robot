@@ -69,7 +69,7 @@ ${locator.supplier.companyName}  xpath=//div[@class="message"]//td[contains(text
 ${locator.supplier.id}           xpath=//div[@class="message"]//td[contains(text(), "Код в ЄДРПОУ / ІПН")]/following-sibling::td[1]
 ${locator.supplier.amount}       xpath=//div[@class="qualificationBidAmount"]/span[1]
 ${locator.supplier.currency}     xpath=//div[@class="qualificationBidAmount"]/span[2]
-${locator.auctionPeriod.startDate}     xpath=//td[contains(text(), 'Електронний аукціон відбудеться')]/following-sibling::td[1]/span
+${locator.auctionPeriod.startDate}     xpath=//td[contains(text(), 'Дата проведення аукціону')]/following-sibling::td[1]/span
 
 
 *** Keywords ***
@@ -241,6 +241,7 @@ Input Date
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Run Keyword And Ignore Error   Wait Until Element Is Not Visible   xpath=//button[@class="bidAction"]
   Клікнути по елементу   name=do
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
 
 Додати публічний паспорт активу
   [Arguments]  ${username}  ${tender_uaid}  ${certificate_url}  ${title}=Public Asset Certificate
@@ -254,6 +255,7 @@ Input Date
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Run Keyword And Ignore Error   Wait Until Element Is Not Visible   xpath=//button[@class="bidAction"]
   Клікнути по елементу   name=do
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
 
 Додати офлайн документ
   [Arguments]  ${username}  ${tender_uaid}  ${accessDetails}  ${title}=Familiarization with bank asset
@@ -266,6 +268,7 @@ Input Date
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Run Keyword And Ignore Error   Wait Until Element Is Not Visible   xpath=//button[@class="bidAction"]
   Клікнути по елементу   name=do
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
 
 Завантажити документ в тендер з типом
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${documentType}
@@ -279,6 +282,7 @@ Input Date
   Ввести текст   xpath=//div[@style="display: block;"]/descendant::input[@value="${filepath.split('/')[-1]}"]   ${filepath.replace('/tmp/', '')}
   Select From List By Value   xpath=(//*[@class='js-documentType'])[last()]   ${documentType}
   Click Button   xpath=//button[@value='save']
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
 
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
@@ -1032,6 +1036,7 @@ Input Date
   ...   AND   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="paid"]
   Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Wait Until Page Contains   оплату отримано
 
 Завантажити протокол аукціону
@@ -1047,6 +1052,7 @@ Input Date
   Клікнути по елементу   xpath=//button[text()="Додати"]
   Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds   10 x   60 s   Перевірити завантаження протоколу
 
@@ -1067,6 +1073,7 @@ Input Date
   ...   AND   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="award cancel"]
   Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
 
 Отримати кількість документів в ставці
   [Arguments]  ${username}  ${tender_uaid}  ${bid_index}
@@ -1107,6 +1114,7 @@ Input Date
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Capture Page Screenshot
   Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Wait Until Keyword Succeeds   20 x   60 s   Дочекатися дискваліфікації учасника
 
 Дочекатися дискваліфікації учасника
@@ -1136,6 +1144,7 @@ Input Date
   Клікнути по елементу   xpath=//button[text()="Додати"]
   Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
 
 Підтвердити підписання контракту
   [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
@@ -1152,6 +1161,7 @@ Input Date
   Клікнути по елементу   xpath=//td[contains(@class,'ui-datepicker-today')]
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Wait Until Keyword Succeeds   20 x   20 s   Дочекатися активного статусу підписання контракту
 
 Дочекатися активного статусу підписання контракту
