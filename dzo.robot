@@ -1108,7 +1108,8 @@ Input Date
 
 Дискваліфікувати постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}  ${description}
-  Клікнути по елементу   xpath=(//label[@class="relative inp empty"]/..)[2]
+  Execute Javascript  $(".message").scrollTop(1000)
+  Клікнути по елементу   xpath=(//label[@class="relative inp empty"]/input)[2]
   Ввести текст   name=data[description]   ${description}
   Capture Page Screenshot
   Клікнути по елементу   xpath=//button[@class="bidAction"]
