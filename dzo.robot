@@ -7,7 +7,7 @@ Library  dzo_service.py
 *** Variables ***
 ${doc_index}                       0
 ${locator.tenderId}                xpath=//td[contains(text(),'Ідентифікатор аукціону')]/following-sibling::td[1]
-${locator.title}                   xpath=//div[@class='topInfo']/h1
+${locator.title}                   xpath=//div[contains(@class, "tenderHead")]/descendant::h1
 ${locator.dgfID}                   xpath=//*[@data-test="dgfID"]
 ${locator.dgfDecisionID}           xpath=//*[@data-test="dgfDecisionID"]
 ${locator.dgfDecisionDate}         xpath=//*[@data-test="dgfDecisionDate"]
@@ -20,22 +20,18 @@ ${locator.minimalStep.amount}      xpath=//td[contains(text(),'Мінімаль�
 ${locator.enquiryPeriod.endDate}   xpath=//td[contains(text(),'Дата завершення періоду уточнень')]/following-sibling::td[1]
 ${locator.tenderPeriod.endDate}    xpath=//td[contains(text(),'Кінцевий строк подання пропозицій')]/following-sibling::td[1]
 ${locator.tenderPeriod.startDate}  xpath=//td[contains(text(),'Дата початку прийому пропозицій')]/following-sibling::td[1]
-${locator.items.Description}       /tr[1]/td[2]
-${locator.items.deliveryAddress.countryName}      /tr[5]/td[2]
-${locator.items.deliveryAddress.postalCode}       /tr[5]/td[2]
-${locator.items.deliveryAddress.locality}         /tr[5]/td[2]
-${locator.items.deliveryAddress.streetAddress}    /tr[5]/td[2]
-${locator.items.deliveryAddress.region}           /tr[5]/td[2]
-${locator.items.deliveryDate.endDate}             /tr[6]/td[2]
-${locator.items.classification.scheme}            /tr[2]/td[1]
-${locator.items.classification.id}                /tr[2]/td[2]/span[1]
-${locator.items.classification.description}       /tr[2]/td[2]/span[2]
-${locator.items.additionalClassifications[0].scheme}        /tr[3]/td[1]
-${locator.items.additionalClassifications[0].id}            /tr[3]/td[2]/span[1]
-${locator.items.additionalClassifications[0].description}   /tr[3]/td[2]/span[2]
-${locator.items.quantity}         /tr[3]/td[2]/span[1]
-${locator.items.unit.code}        /tr[3]/td[2]/span[2]
-${locator.items.unit.name}        /tr[3]/td[2]/span[2]
+${locator.items.Description}       /td/div[1]
+${locator.items.deliveryAddress.countryName}      /td/div[3]/span[2]
+${locator.items.deliveryAddress.postalCode}       /td/div[3]/span[2]
+${locator.items.deliveryAddress.locality}         /td/div[3]/span[2]
+${locator.items.deliveryAddress.streetAddress}    /td/div[3]/span[2]
+${locator.items.deliveryAddress.region}           /td/div[3]/span[2]
+${locator.items.classification.scheme}            /td/div[2]/span[1]
+${locator.items.classification.id}                /td/div[2]/span[2]
+${locator.items.classification.description}       /td/div[2]/span[3]
+${locator.items.quantity}         /td[3]/span[1]
+${locator.items.unit.code}        /td[3]/span[2]
+${locator.items.unit.name}        /td[3]/span[2]
 ${locator.questions.title}        
 ${locator.questions.description}  /following-sibling::div[@class="text"]
 ${locator.questions.date}         /preceding-sibling::div[@class="date"]
@@ -47,9 +43,9 @@ ${locator.complaint.complaintID}  /descendant::div[@class="date"]/span[3]
 ${locator.complaint.resolution}   /div[@class="answer relative"]/div[@class="text"]
 ${locator.complaint.cancellationReason}   /div[@class="answer relative"]/div[@class="text"]
 ${locator.bids}                      xpath=//div[@class="qualificationBidAmount"]/span
-${locator.currency}                  xpath=//section[3]/h3[contains(text(),'Параметри аукціону')]/following-sibling::table//tr[1]/td[2]/span[2]
-${locator.tax}                       xpath=//span[@class='taxIncluded']
-${locator.procurementMethodType}     xpath=//td[contains(text(),'Тип оголошення')]/following-sibling::td/div
+${locator.currency}                  xpath=//*[@data-test="tender_value_amount"]/following-sibling::span[@class="small"][2]/span[1]
+${locator.tax}                       xpath=//*[@data-test="tender_value_amount"]/following-sibling::span[@class="small"][2]/span[2]
+${locator.procurementMethodType}     xpath=//div[@class="tenderMethod"]/span[1]
 ${locator.cancellations[0].reason}   xpath=//div[@class="tenderCancelReason bidName"]
 ${locator.cancellations[0].documents[0].title}   xpath=//span[@class="docTitle"]
 ${locator.ModalOK}                   xpath=//a[@class="jBtn green"]
@@ -70,6 +66,7 @@ ${locator.supplier.id}           xpath=//div[@class="message"]//td[contains(text
 ${locator.supplier.amount}       xpath=//div[@class="qualificationBidAmount"]/span[1]
 ${locator.supplier.currency}     xpath=//div[@class="qualificationBidAmount"]/span[2]
 ${locator.auctionPeriod.startDate}     xpath=//td[contains(text(), 'Дата проведення аукціону')]/following-sibling::td[1]/span
+${locator.auctionPeriod.endDate}     xpath=//*[@data-test="auctionPeriod_endDate"]
 
 
 *** Keywords ***
@@ -297,7 +294,7 @@ Input Date
   Клікнути по елементу   xpath=//button[@class='btn not_toExtend'][./text()='Пошук']
   Wait Until Page Contains   ${tender_uaid}   10
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
-  Клікнути по елементу   xpath=//span[contains('${tender_uaid}', text()) and contains(text(), '${tender_uaid}')]/../preceding-sibling::h2/a
+  Клікнути по елементу   xpath=//*[contains('${tender_uaid}', text()) and contains(text(), '${tender_uaid}')]/ancestor::div[@class="item relative"]/ descendant::a[@class="reverse tenderLink"]
   Wait Until Page Does Not Contain Element   xpath=//form[@name="filter"]
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
 
@@ -481,7 +478,7 @@ Input Date
 Отримати інформацію із предмету
   [Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${field_name}
   Пошук тендера у разі наявності змін   ${TENDER['LAST_MODIFICATION_DATE']}   ${username}   ${tender_uaid}
-  ${item_value}=   Get Text   xpath=//td[contains(text(), '${item_id}')]/../..${locator.items.${field_name}}
+  ${item_value}=   Get Text   xpath=//div[contains(text(), '${item_id}')]/ancestor::tr[@class="tenderFullListElement"]${locator.items.${field_name}}
   ${item_value}=   adapt_items_data   ${field_name}   ${item_value}
   [return]  ${item_value}
   
@@ -550,7 +547,7 @@ Input Date
 Отримати кількість документів в тендері
   [Arguments]  ${username}  ${tender_uaid}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
-  ${number_of_documents}=  Get Matching Xpath Count  //tr[@class="line docItem"]
+  ${number_of_documents}=  Get Matching Xpath Count  //tr[contains(@class,"docItem")]
   [return]  ${number_of_documents}
 
 Отримати кількість предметів в тендері
@@ -562,7 +559,7 @@ Input Date
 Отримати інформацію із документа по індексу
   [Arguments]  ${username}  ${tender_uaid}  ${document_index}  ${field}
   dzo.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-  ${doc_value}=  Get Element Attribute   xpath=(//tr[@class="line docItem"])[${document_index + 1}]@data-documenttype
+  ${doc_value}=  Get Element Attribute   xpath=(//tr[contains(@class,"docItem")])[${document_index + 1}]@data-documenttype
   [return]  ${doc_value}
 
 Отримати інформацію із пропозиції
@@ -662,9 +659,11 @@ Input Date
   [return]  ${tenderId}
 
 Отримати інформацію про value.amount
-  ${valueAmount}=   Отримати текст із поля і показати на сторінці   value.amount
-  ${valueAmount}=   Replace String      ${valueAmount}   `   ${EMPTY}
-  ${valueAmount}=   Convert To Number   ${valueAmount}
+  Wait Until Keyword Succeeds   20 x  0.5 s   Xpath Should Match X Times   //*[@data-test="tender_value_amount"]/following-sibling::span[@class="small"]   2
+  ${first_part_amount}=   Get Text   xpath=//*[@data-test="tender_value_amount"]
+  ${second_part_amount}=   Get Text   xpath=(//*[@data-test="tender_value_amount"]/following-sibling::span[@class="small"])[1]
+  ${first_part_amount}=   Replace String      ${first_part_amount}   `   ${EMPTY}
+  ${valueAmount}=   Convert To Number   ${first_part_amount}.${second_part_amount}
   [return]  ${valueAmount}
 
 Отримати інформацію про minimalStep.amount
@@ -861,8 +860,11 @@ Input Date
   [return]  ${auction_startDate}
 
 Отримати інформацію про auctionPeriod.endDate
-  ${auction_endDate}=    Get Text            ${locator.auctionPeriod.startDate}
-  ${auction_endDate}=   subtract_from_time    ${auction_endDate.split('-')[-1]}   0   0
+  Wait Until Keyword Succeeds   15 x  60 s  Run Keywords
+  ...   Reload Page
+  ...   AND   Wait Until Element Is Visible   ${locator.auctionPeriod.endDate}
+  ${auction_endDate}=   Get Text   ${locator.auctionPeriod.endDate}
+  ${auction_endDate}=   subtract_from_time   ${auction_endDate.split('-')[-1]}   0   0
   [return]  ${auction_endDate}
   
 Отримати інформацію про complaintPeriod.endDate
