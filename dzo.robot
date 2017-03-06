@@ -1056,7 +1056,7 @@ Input Date
   ...  Wait Until Keyword Succeeds  10 x  60 s  Звірити статус тендера  ${username}  ${tender_uaid}  active.qualification
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Click Element  xpath=//*[@data-bid-action="protocol"]
-  Підтвердити дію
+  Wait Until Element Is Visible  xpath=//button[text()='Додати']
   Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
   Choose File   xpath=//input[@type="file"]   ${file_path}
   Клікнути по елементу   xpath=//button[text()="Додати"]
@@ -1064,7 +1064,6 @@ Input Date
   Підтвердити дію
   Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Клікнути по елементу   xpath=//button[@class="bidAction"]
-  Run Keyword And Ignore Error  Підтвердити дію
   Capture Page Screenshot
   Wait Until Keyword Succeeds   10 x   60 s   Перевірити завантаження протоколу
 
