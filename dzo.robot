@@ -1052,7 +1052,7 @@ Input Date
 
 Завантажити протокол аукціону в авард
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
-  Run Keyword If  """Відображення статусу 'оплачено, очікується підписання договору'""" in """${PREV TEST NAME}"""
+  Run Keyword If  """Відображення статусу 'оплачено, очікується підписання договору'""" not in """${PREV TEST NAME}"""
   ...  Wait Until Keyword Succeeds  10 x  60 s  Звірити статус тендера  ${username}  ${tender_uaid}  active.qualification
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Click Element  xpath=//*[@data-bid-action="protocol"]
@@ -1065,7 +1065,7 @@ Input Date
   Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Capture Page Screenshot
-  Wait Until Keyword Succeeds   10 x   60 s   Перевірити завантаження протоколу
+  Wait Until Keyword Succeeds   10 x   60 s   dzo.Підтвердити наявність протоколу аукціону  ${username}  ${tender_uaid}  ${award_index}
 
 Підтвердити наявність протоколу аукціону
   [Arguments]  ${username}  ${tender_uaid}  ${award_index}
@@ -1132,12 +1132,14 @@ Input Date
   ...  Wait Until Keyword Succeeds  10 x  60 s  Звірити статус тендера  ${username}  ${tender_uaid}  active.qualification
   ...  AND  dzo.Завантажити документ рішення кваліфікаційної комісії  ${username}  ${document}  ${tender_uaid}  ${award_num}
   Execute Javascript  $(".message").scrollTop(1000)
-  Клікнути по елементу   xpath=(//label[@class="relative inp empty"])[2]
+  Клікнути по елементу   xpath=//a[@data-bid-action="cancel"]
+  Клікнути По Елементу   xpath=(//label[@class="relative inp empty"])[2]
   Ввести текст   name=data[description]   ${description}
   Capture Page Screenshot
-  Клікнути по елементу   xpath=//button[@class="bidAction"]
-  Capture Page Screenshot
-  Підтвердити дію
+  Wait Until Keyword Succeeds  10 x  2 s  Run Keywords
+  ...   Клікнути по елементу   xpath=//button[@class="bidAction"]
+  ...   AND   Capture Page Screenshot
+  ...   AND   Підтвердити дію
   Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Run Keyword And Ignore Error  Підтвердити дію
   Wait Until Keyword Succeeds   20 x   60 s   Дочекатися дискваліфікації учасника
