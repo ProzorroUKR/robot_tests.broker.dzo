@@ -785,10 +785,12 @@ Input Date
   ${doc_title}=   Отримати текст із поля і показати на сторінці   documents.title
   [return]  ${doc_title}
 
-Отримати інформацію про awards[0].status
-  ${awards_status}=    Get Text    xpath=//div[@class="clear"]/div[@class="bstatus l"]
-  ${awards_status}=    convert_string_from_dict_dzo    ${awards_status}
-  [return]  ${awards_status}
+Отримати інформацію про awards[${award_index}].status
+  ${award_index}=   Convert To Integer   ${award_index}
+  Wait Until Element Is Visible   xpath=//div[contains(text(), '${award_index + 1}') and contains(@class, 'num')]/ancestor::div[@class="item relative"]/descendant::div[contains(@class, "bstatus")]
+  ${awards_status}=   Get Text   xpath=//div[contains(text(), '${award_index + 1}') and contains(@class, 'num')]/ancestor::div[@class="item relative"]/descendant::div[contains(@class, "bstatus")]
+  ${awards_status}=   convert_string_from_dict_dzo   ${awards_status}
+  [return]  ${awards_status.split(" ")[-1]}
 
 Отримати інформацію про awards[0].suppliers[0].address.countryName
   Клікнути по елементу   xpath=//a[@class="biderInfo"]
@@ -960,11 +962,9 @@ Input Date
 
 Скасувати цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}
-  #dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[@class='button save bidToEdit']
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Клікнути по елементу   xpath=//button[@value="unbid"]
-#  Клікнути по елементу   xpath=//a[./text()= 'Закрити']
   Підтвердити дію
   Ввести текст   xpath=//div[@id="contactForm"]/descendant::input[@name="checkMPhone"]    203986723
   Клікнути по елементу   xpath=//button[./text()='Надіслати']
@@ -1030,16 +1030,8 @@ Input Date
   Wait Until Keyword Succeeds   15 x   1 m   Run Keywords
   ...   Reload Page
   ...   AND   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
-  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="protocol"]
+  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-question="sure_award_paid"]
   Підтвердити дію
-  Wait Until Page Contains   Підтвердження протоколу
-  Wait Until Keyword Succeeds   10 x   30 s   Run Keywords
-  ...   Reload Page
-  ...   AND   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
-  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="paid"]
-  Підтвердити дію
-  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
-  Wait Until Page Contains   оплату отримано
 
 Завантажити протокол аукціону
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
@@ -1058,11 +1050,37 @@ Input Date
   Клікнути по елементу   xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds   10 x   60 s   Перевірити завантаження протоколу
 
+Завантажити протокол аукціону в авард
+  [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
+  Run Keyword If  """Відображення статусу 'оплачено, очікується підписання договору'""" in """${PREV TEST NAME}"""
+  ...  Wait Until Keyword Succeeds  10 x  60 s  Звірити статус тендера  ${username}  ${tender_uaid}  active.qualification
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Click Element  xpath=//*[@data-bid-action="protocol"]
+  Підтвердити дію
+  Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
+  Choose File   xpath=//input[@type="file"]   ${file_path}
+  Клікнути по елементу   xpath=//button[text()="Додати"]
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Клікнути по елементу   xpath=//button[@class="bidAction"]
+  Run Keyword And Ignore Error  Підтвердити дію
+  Capture Page Screenshot
+  Wait Until Keyword Succeeds   10 x   60 s   Перевірити завантаження протоколу
+
+Підтвердити наявність протоколу аукціону
+  [Arguments]  ${username}  ${tender_uaid}  ${award_index}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  ${award_index}=  Convert To Integer  ${award_index}
+  ${awards_status}=    Get Text    xpath=//div[contains(text(), '${award_index + 1}') and contains(@class, 'num')]/ancestor::div[@class="item relative"]/descendant::div[contains(@class, "bstatus")]
+  ${actual_award_status}=    convert_string_from_dict_dzo    ${awards_status.split(" ")[-1]}
+  Should Be Equal  ${actual_award_status}  pending.payment
+
 Перевірити завантаження протоколу
   Reload Page
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
-  Клікнути по елементу   xpath=//preceding-sibling::div[text()='На розгляді']/following-sibling::div/descendant::span[text()='Моя пропозиція']
-  Wait Until Page Contains   Документи пропозиції
+  Клікнути по елементу   xpath=//a[contains(text(), "Протокол")]
+  Wait Until Page Contains   Протокол торгів
   Wait Until Page Does Not Contain Element   xpath=//span[@title="документ не завантажено в ЦБД"]
   Wait Until Page Does Not Contain Element   xpath=//span[@title="Поставлено в чергу на завантаження в ЦБД"]
   capture page screenshot
@@ -1073,7 +1091,7 @@ Input Date
   Wait Until Keyword Succeeds   5 x   1 m   Run Keywords
   ...   Reload Page
   ...   AND   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
-  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="award cancel"]
+  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="bid_cancel"]
   Підтвердити дію
   Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
 
@@ -1110,6 +1128,10 @@ Input Date
 
 Дискваліфікувати постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}  ${description}
+  ${document}=  get_upload_file_path
+  Run Keyword If  """Відображення статусу 'оплачено, очікується підписання договору'""" not in """${PREV TEST NAME}"""  Run Keywords
+  ...  Wait Until Keyword Succeeds  10 x  60 s  Звірити статус тендера  ${username}  ${tender_uaid}  active.qualification
+  ...  AND  dzo.Завантажити документ рішення кваліфікаційної комісії  ${username}  ${document}  ${tender_uaid}  ${award_num}
   Execute Javascript  $(".message").scrollTop(1000)
   Клікнути по елементу   xpath=(//label[@class="relative inp empty"])[2]
   Ввести текст   name=data[description]   ${description}
@@ -1118,9 +1140,11 @@ Input Date
   Capture Page Screenshot
   Підтвердити дію
   Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Run Keyword And Ignore Error  Підтвердити дію
   Wait Until Keyword Succeeds   20 x   60 s   Дочекатися дискваліфікації учасника
 
 Дочекатися дискваліфікації учасника
+  Capture Page Screenshot
   Reload Page
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Element Should Be Visible   xpath=//div[contains(@class,'qualificationItem')]/descendant::div[text()='Дискваліфіковано']

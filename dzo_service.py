@@ -6,6 +6,7 @@ from iso8601 import parse_date
 from pytz import timezone
 import os
 import urllib
+import json
 
 DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'кілограми': u'кг', u'метри': u'м', u'пара': u'пар',
             u'літр': u'л', u'набір': u'наб', u'пачок': u'пач', u'послуга': u'послуги', u'метри кубічні': u'м.куб',
@@ -19,7 +20,8 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u"НА РОЗГЛЯДІ": u"claim", u"Протокол торгів": u"auctionProtocol",
             u"Оголошення аукціону з продажу майна банків": u"dgfOtherAssets",
             u"Оголошення аукціону з продажу прав вимоги за кредитами банків": u"dgfFinancialAssets", u'вперше': 1,
-            u'повторно (вдруге)': 2, u'повторно (втретє)': 3, u'повторно (вчетверте)': 4}
+            u'повторно (вдруге)': 2, u'повторно (втретє)': 3, u'повторно (вчетверте)': 4,
+            u'Попередню кваліфікацію скасовано': u'cancelled', u'Дискваліфіковано': u'unsuccessful'}
 
 
 def convert_date_to_slash_format(isodate):
@@ -184,3 +186,9 @@ def patch_tender_bid(url, decline):
     url = 'http://www.dz3.byustudio.in.ua/bidAply.php?tender_id={}{}'.format(tender_id, decline)
     status = urllib.urlopen(url)
     return status.read(), url
+
+
+def get_award_legal_name(internal_id, award_index):
+    r = urllib.urlopen('https://lb.api-sandbox.ea.openprocurement.org/api/2.4/auctions/{}'.format(internal_id)).read()
+    auction = json.loads(r)
+    return auction['data']['awards'][int(award_index)]["suppliers"][0]['name']
