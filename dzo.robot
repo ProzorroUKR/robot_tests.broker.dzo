@@ -1132,7 +1132,7 @@ Input Date
   ...  Wait Until Keyword Succeeds  10 x  60 s  Звірити статус тендера  ${username}  ${tender_uaid}  active.qualification
   ...  AND  dzo.Завантажити документ рішення кваліфікаційної комісії  ${username}  ${document}  ${tender_uaid}  ${award_num}
   Execute Javascript  $(".message").scrollTop(1000)
-  Клікнути по елементу   xpath=//a[@data-bid-action="cancel"]
+  Run Keyword And Ignore Error  Клікнути по елементу   xpath=//a[@data-bid-action="cancel"]
   Клікнути По Елементу   xpath=(//label[@class="relative inp empty"])[2]
   Ввести текст   name=data[description]   ${description}
   Capture Page Screenshot
