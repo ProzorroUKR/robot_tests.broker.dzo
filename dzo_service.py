@@ -21,7 +21,7 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u"Оголошення аукціону з продажу майна банків": u"dgfOtherAssets",
             u"Оголошення аукціону з продажу прав вимоги за кредитами банків": u"dgfFinancialAssets", u'вперше': 1,
             u'повторно (вдруге)': 2, u'повторно (втретє)': 3, u'повторно (вчетверте)': 4,
-            u'Попередню кваліфікацію скасовано': u'cancelled', u'Дискваліфіковано': u'unsuccessful'}
+            u'Попередню кваліфікацію скасовано': u'cancelled', u'Дискваліфіковано': u'unsuccessful', u'?:tender method open_dgfInsider': u'dgfInsider'}
 
 
 def convert_date_to_slash_format(isodate):
