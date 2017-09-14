@@ -888,13 +888,12 @@ Input Date
 
 Подати цінову пропозицію
   [Arguments]   ${username}  ${tender_uaid}  ${bid}
-  ${amount}=   add_second_sign_after_point   ${bid.data.value.amount}
+  ${amount}=  Run Keyword If  '${MODE}' != 'dgfInsider'  add_second_sign_after_point   ${bid.data.value.amount}
   ${status}=   Get From Dictionary   ${bid['data']}   qualified
   ${qualified}=   Set Variable If   ${status}   ${EMPTY}   &bad=1
   ${filePath}=   get_upload_file_path
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
-  capture page screenshot
-  ${bid_status}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//div[@class="priceFormated"]
+  ${bid_status}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//button[@value="save"]
   Run keyword if   ${bid_status}   Click Element  xpath=//a[contains(@class,'bidToEdit')]
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   ${status_doc_upload}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//select[@class="documents_url"]
@@ -903,12 +902,12 @@ Input Date
   ...   AND   Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
   ...   AND   Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
   ...   AND   Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
-  Clear Element Text   name=data[value][amount]
-  Input Text   name=data[value][amount]   ${amount}
+  Run Keyword If  '${MODE}' != 'dgfInsider'  Run Keywords
+  ...  Clear Element Text   name=data[value][amount]
+  ...  AND  Input Text   name=data[value][amount]   ${amount}
   Клікнути по елементу   name=do
   Клікнути по елементу   xpath=//a[./text()= 'Закрити']
-  Перевірити і підтвердити пропозицію   ${qualified}
-  Wait Until Page Contains   Гарантійний платіж сплачено
+  Run Keyword If  '${MODE}' != 'dgfInsider'  Перевірити і підтвердити пропозицію   ${qualified}
   [return]  ${bid}
 
 Перевірити і підтвердити пропозицію
@@ -924,6 +923,7 @@ Input Date
   Reload Page
   Клікнути по елементу   name=pay
   Підтвердити дію
+  Wait Until Page Contains   Гарантійний платіж сплачено
 
 Завантажити фінансову ліцензію
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}
@@ -957,7 +957,6 @@ Input Date
   Клікнути по елементу   name=do
   Клікнути по елементу   xpath=//a[./text()= 'Закрити']
   Перевірити і підтвердити пропозицію   ${EMPTY}
-  Wait Until Page Contains   Гарантійний платіж сплачено
   [return]  ${fieldname}
 
 Скасувати цінову пропозицію
@@ -984,12 +983,14 @@ Input Date
   [Arguments]  ${username}  ${filePath}  ${tender_uaid}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Wait Until Page Contains   Ваша пропозиція   10
-  ${amount}=   Get Text   xpath=//span[@class="bidAmountValue"]
-  ${bid_status}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//div[@class="priceFormated"]
-  Run keyword if   ${bid_status}   dzo.Скасувати цінову пропозицію   ${username}   ${tender_uaid}
+  ${amount}=  Run Keyword If  '${MODE}' != 'dgfInsider'  Get Text   xpath=//span[@class="bidAmountValue"]
+  ${bid_status}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//button[@value="save"]
+  Run keyword if   ${bid_status} and '${MODE}' != 'dgfInsider'   dzo.Скасувати цінову пропозицію   ${username}   ${tender_uaid}
+  ...  ELSE IF  ${bid_status}  Click Element  xpath=//a[contains(@class,'bidToEdit')]
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
-  Clear Element Text   name=data[value][amount]
-  Input Text   name=data[value][amount]   ${amount}
+  Run Keyword If  '${MODE}' != 'dgfInsider'  Run Keywords
+  ...  Clear Element Text   name=data[value][amount]
+  ...  AND  Input Text   name=data[value][amount]   ${amount}
   Run Keyword And Ignore Error   Click Element   xpath=//a[@class="uploadFile"]
   ${doc_status}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//select[@class="documents_url"]
   Run Keyword If   ${doc_status}   Run Keywords
@@ -999,7 +1000,6 @@ Input Date
   Клікнути по елементу   name=do
   Клікнути по елементу   xpath=//a[./text()= 'Закрити']
   Перевірити і підтвердити пропозицію   ${EMPTY}
-  Wait Until Page Contains   Гарантійний платіж сплачено
 
 Змінити документ в ставці
   [Arguments]  ${username}  ${tender_uaid}  ${path}  ${docid}
