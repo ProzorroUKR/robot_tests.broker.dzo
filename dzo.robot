@@ -79,8 +79,9 @@ ${locator.auctionPeriod.endDate}     xpath=//*[@data-test="auctionPeriod_endDate
 Підготувати клієнт для користувача
   [Arguments]  ${username}
   Set Global Variable   ${DZO_MODIFICATION_DATE}   ${EMPTY}
+  Set Suite Variable  ${my_alias}  ${username + 'CUSTOM'}
   Run Keyword If   "${USERS.users['${username}'].browser}" == "Firefox"   Створити драйвер для Firefox   ${username}
-  ...   ELSE   Open Browser   ${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${username}
+  ...   ELSE   Open Browser   ${USERS.users['${username}'].homepage}   ${USERS.users['${username}'].browser}   alias=${my_alias}
   Set Window Size   @{USERS.users['${username}'].size}
   Set Window Position   @{USERS.users['${username}'].position}
   Run Keyword If   'Viewer' not in '${username}'   Login   ${username}
@@ -97,7 +98,7 @@ ${locator.auctionPeriod.endDate}     xpath=//*[@data-test="auctionPeriod_endDate
   Call Method   ${profile}   set_preference   browser.helperApps.neverAsk.openFile   application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf
   Call Method   ${profile}   set_preference   browser.helperApps.neverAsk.saveToDisk   application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf
   Call Method   ${profile}   set_preference   pdfjs.disabled  ${True}
-  Create WebDriver   ${USERS.users['${username}'].browser}   alias=${username}   firefox_profile=${profile}
+  Create WebDriver   ${USERS.users['${username}'].browser}   alias=${my_alias}   firefox_profile=${profile}
   Go To   ${USERS.users['${username}'].homepage}
 
 Login
@@ -119,7 +120,7 @@ Login
   ${items}=   Get From Dictionary   ${tender_data.data}   items
   ${number_of_items}=  Get Length  ${items}
   ${tenderAttempts}=   Convert To String   ${tender_data.data.tenderAttempts}
-  Selenium2Library.Switch Browser   ${username}
+  Switch Browser  ${my_alias}
   Клікнути по елементу   jquery=a[href="/tenders/new"]
   Wait Until Page Contains Element   name=data[title]   30
   Run Keyword And Ignore Error   Click Element   xpath=//a[@class="close icons"]
@@ -269,7 +270,7 @@ Input Date
 
 Завантажити документ в тендер з типом
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${documentType}
-  Switch Browser  ${username}
+  Switch Browser  ${my_alias}
   dzo.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   Клікнути по елементу   xpath=//a[contains(text(),'Редагувати')]
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
@@ -283,7 +284,7 @@ Input Date
 
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
-  Switch browser   ${username}
+  Switch Browser  ${my_alias}
   Go To   ${USERS.users['${username}'].homepage}
   Клікнути по елементу   xpath=//a[text()='Аукціони']
   Клікнути по елементу   xpath=//a[@href='/tenders/all']
@@ -461,7 +462,7 @@ Input Date
 
 Оновити сторінку з тендером
   [Arguments]  ${username}  ${tender_uaid}
-  Selenium2Library.Switch Browser   ${username}
+  Switch Browser  ${my_alias}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Reload Page
 
@@ -472,6 +473,7 @@ Input Date
 Пошук тендера у разі наявності змін
   [Arguments]  ${last_mod_date}  ${username}  ${tender_uaid}
   ${status}=   Run Keyword And Return Status   Should Not Be Equal   ${DZO_MODIFICATION_DATE}   ${last_mod_date}
+  Switch Browser  ${my_alias}
   Run Keyword If   ${status}   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Set Global Variable   ${DZO_MODIFICATION_DATE}   ${last_mod_date}
 
@@ -583,7 +585,7 @@ Input Date
   [Documentation]
   ${doc_index}=         Get Substring    ${field_name}    10   11
   Set Test Variable     ${doc_index}     ${doc_index}
-  Switch browser        ${username}
+  Switch Browser  ${my_alias}
   Run Keyword And Return  Отримати інформацію про ${field_name}
 
 Отримати текст із поля і показати на сторінці
@@ -892,6 +894,7 @@ Input Date
   ${status}=   Get From Dictionary   ${bid['data']}   qualified
   ${qualified}=   Set Variable If   ${status}   ${EMPTY}   &bad=1
   ${filePath}=   get_upload_file_path
+  Switch Browser  ${my_alias}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   ${bid_status}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//button[@value="save"]
   Run keyword if   ${bid_status}   Click Element  xpath=//a[contains(@class,'bidToEdit')]
@@ -919,7 +922,8 @@ Input Date
   Wait Until Keyword Succeeds   50 x   0.2 s   Клікнути по елементу   xpath=//a[./text()= 'Закрити']
   Run Keyword And Ignore Error   Wait Until Element Is Not Visible   xpath=//button[@value="to_operator"]
   ${url}=   Log Location
-  patch_tender_bid   ${url}   ${qualified}
+  ${user_id}=  Get Text  xpath=//div[@class="userID"]/span[2]
+  patch_tender_bid  ${url}  ${qualified}  ${user_id}
   Reload Page
   Клікнути по елементу   name=pay
   Підтвердити дію
@@ -927,6 +931,7 @@ Input Date
 
 Завантажити фінансову ліцензію
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}
+  Switch Browser  ${my_alias}
   dzo.Завантажити документ в ставку   ${username}  ${filepath}  ${tender_uaid}
 
 ########## Видалити після встановлення коректних часових проміжків для періодів #######################
@@ -986,7 +991,7 @@ Input Date
   ${amount}=  Run Keyword If  '${MODE}' != 'dgfInsider'  Get Text   xpath=//span[@class="bidAmountValue"]
   ${bid_status}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//button[@value="save"]
   Run keyword if   ${bid_status} and '${MODE}' != 'dgfInsider'   dzo.Скасувати цінову пропозицію   ${username}   ${tender_uaid}
-  ...  ELSE IF  ${bid_status}  Click Element  xpath=//a[contains(@class,'bidToEdit')]
+  ...  ELSE IF  ${bid_status}  Scroll And Click  xpath=//a[contains(@class,'bidToEdit')]
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Run Keyword If  '${MODE}' != 'dgfInsider'  Run Keywords
   ...  Clear Element Text   name=data[value][amount]
@@ -1007,13 +1012,14 @@ Input Date
 
 Отримати посилання на аукціон для глядача
   [Arguments]  ${username}  ${tender_uaid}  ${lot_id}=${Empty}
-  Sleep   120
+  Switch Browser  ${my_alias}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   ${url}=   Get Element Attribute   xpath=//section/h3/a[@class="reverse"]@href
   [return]  ${url}
 
 Отримати посилання на аукціон для учасника
   [Arguments]  ${username}  ${tender_uaid}  ${lot_id}=${Empty}
+  Switch Browser  ${my_alias}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[@class="reverse getAuctionUrl"]
   Wait Until Page Contains Element   xpath=//a[contains(text(),"Перейдіть до аукціону")]
@@ -1211,4 +1217,14 @@ Input Date
 Клікнути по елементу
   [Arguments]  ${locator}
   Wait Until Element Is Visible   ${locator}   20
-  Click Element   ${locator}
+  Scroll And Click   ${locator}
+
+Scroll To Element
+  [Arguments]  ${locator}
+  ${elem_vert_pos}=  Get Vertical Position  ${locator}
+  Execute Javascript  window.scrollTo(0,${elem_vert_pos - 200});
+
+Scroll And Click
+  [Arguments]  ${locator}
+  Scroll To Element  ${locator}
+  Click Element  ${locator}
