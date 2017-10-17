@@ -792,7 +792,7 @@ Input Date
   Wait Until Element Is Visible   xpath=//div[contains(text(), '${award_index + 1}') and contains(@class, 'num')]/ancestor::div[@class="item relative"]/descendant::div[contains(@class, "bstatus")]
   ${awards_status}=   Get Text   xpath=//div[contains(text(), '${award_index + 1}') and contains(@class, 'num')]/ancestor::div[@class="item relative"]/descendant::div[contains(@class, "bstatus")]
   ${awards_status}=   convert_string_from_dict_dzo   ${awards_status}
-  [return]  ${awards_status.split(" ")[-1]}
+  [return]  ${awards_status}
 
 Отримати інформацію про awards[0].suppliers[0].address.countryName
   Клікнути по елементу   xpath=//a[@class="biderInfo"]
