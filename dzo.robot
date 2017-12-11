@@ -15,6 +15,7 @@ ${locator.eligibilityCriteria}     xpath=//*[@data-test="eligibilityCriteria"]
 ${locator.tenderAttempts}          xpath=//*[@data-test="tenderAttempts"]
 ${locator.description}             xpath=//h2[@class='tenderDescr']
 ${locator.value.amount}            xpath=//section[3]/h3[contains(text(),'Параметри аукціону'   )]/following-sibling::table//tr[1]/td[2]/span[1]
+${locator.guarantee.amount}        xpath=//td[contains(text(),'Гарантійний внесок')]/following-sibling::td/span[1]
 ${locator.legalName}               xpath=//td[contains(text(),'Найменування організатора')]/following-sibling::td//span
 ${locator.minimalStep.amount}      xpath=//td[contains(text(),'Мінімальний крок аукціону')]/following-sibling::td/span[1]
 ${locator.enquiryPeriod.endDate}   xpath=//td[contains(text(),'Дата завершення періоду уточнень')]/following-sibling::td[1]
@@ -26,13 +27,16 @@ ${locator.items.deliveryAddress.postalCode}       /td/div[3]/span[2]
 ${locator.items.deliveryAddress.locality}         /td/div[3]/span[2]
 ${locator.items.deliveryAddress.streetAddress}    /td/div[3]/span[2]
 ${locator.items.deliveryAddress.region}           /td/div[3]/span[2]
-${locator.items.classification.scheme}            /td/div[2]/span[1]
+${locator.items.classification.scheme}            /td/div[2]/span[1]@data-classification-scheme
 ${locator.items.classification.id}                /td/div[2]/span[2]
 ${locator.items.classification.description}       /td/div[2]/span[3]
+${locator.items.additionalClassifications.description}       /td/div[3]/span[3]
 ${locator.items.quantity}         /td[3]/span[1]
 ${locator.items.unit.code}        /td[3]/span[2]
 ${locator.items.unit.name}        /td[3]/span[2]
-${locator.questions.title}        
+${locator.items.contractPeriod.startDate}        /td/div[5]/span[2]
+${locator.items.contractPeriod.endDate}        /td/div[5]/span[4]
+${locator.questions.title}
 ${locator.questions.description}  /following-sibling::div[@class="text"]
 ${locator.questions.date}         /preceding-sibling::div[@class="date"]
 ${locator.questions.answer}       /../following-sibling::div[@class="answer relative"]/div[@class="text"]
@@ -46,6 +50,7 @@ ${locator.bids}                      xpath=//div[@class="qualificationBidAmount"
 ${locator.currency}                  xpath=//*[@data-test="tender_value_amount"]/following-sibling::span[@class="small"][2]/span[1]
 ${locator.tax}                       xpath=//*[@data-test="tender_value_amount"]/following-sibling::span[@class="small"][2]/span[2]
 ${locator.procurementMethodType}     xpath=//div[@class="tenderMethod"]/span[1]
+${locator.minNumberOfQualifiedBids}     xpath=//*[@data-test="minNumberOfQualifiedBids"]
 ${locator.cancellations[0].reason}   xpath=//div[@class="tenderCancelReason bidName"]
 ${locator.cancellations[0].documents[0].title}   xpath=//span[@class="docTitle"]
 ${locator.ModalOK}                   xpath=//a[@class="jBtn green"]
@@ -120,13 +125,16 @@ Login
   ${items}=   Get From Dictionary   ${tender_data.data}   items
   ${number_of_items}=  Get Length  ${items}
   ${tenderAttempts}=   Convert To String   ${tender_data.data.tenderAttempts}
+  ${minNumberOfQualifiedBids}=   Convert To String   ${tender_data.data.minNumberOfQualifiedBids}
   Switch Browser  ${my_alias}
   Клікнути по елементу   jquery=a[href="/tenders/new"]
   Wait Until Page Contains Element   name=data[title]   30
   Run Keyword And Ignore Error   Click Element   xpath=//a[@class="close icons"]
-  Run Keyword If   '${tender_data.data.procurementMethodType}' != 'dgfOtherAssets'   Run Keywords
-  ...   Select From List   name=tender_method   open_${tender_data.data.procurementMethodType}
-  ...   AND   Підтвердити дію
+#  Run Keyword If   '${tender_data.data.procurementMethodType}' != 'dgfOtherAssets'   Run Keywords
+#  ...   Select From List   name=tender_method   open_${tender_data.data.procurementMethodType}
+#  ...   AND   Підтвердити дію
+  Select From List   name=tender_method   open_dgfOtherAssetsPA01_2
+  Підтвердити дію
   Ввести текст   name=data[title]   ${tender_data.data.title}
   Ввести текст   name=data[description]   ${tender_data.data.description}
   Ввести текст   name=data[dgfID]   ${tender_data.data.dgfID}
@@ -134,9 +142,8 @@ Login
   Ввести текст   name=data[guarantee][amount]   ${guarantee}
   Ввести текст   name=data[minimalStep][amount]   ${minimalStep}
   Ввести Текст   name=data[dgfID]   ${tender_data.data.dgfID}
-  Ввести Текст   name=data[dgfDecisionID]   ${tender_data.data.dgfDecisionID}
   Select From List By Value   name=data[tenderAttempts]   ${tenderAttempts}
-  Input Date   data[dgfDecisionDate]   ${tender_data.data.dgfDecisionDate}
+  Run Keyword If  ${tender_data.data.minNumberOfQualifiedBids}  Select From List By Value   name=data[minNumberOfQualifiedBids]  ${minNumberOfQualifiedBids}
   Клікнути по елементу   xpath=//section[@id="multiItems"]/a
   :FOR  ${index}  IN RANGE  ${number_of_items}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[@id="multiItems"]/descendant::a[@class="addMultiItem"]
@@ -152,25 +159,30 @@ Login
   ${item_description_en}=   Set Variable If   "${mode}" == "openeu"   ${item.description_en} 
   ${unit_name}=   convert_string_from_dict_dzo   ${item.unit.name}
   ${region}=   convert_string_from_dict_dzo   ${item.deliveryAddress.region}
-  ${delivery_end_date}=   dzo_service.convert_date_to_slash_format   ${item.deliveryDate.endDate}
+  ${contract_period_start_date}=  dzo_service.convert_date_to_slash_format  ${item.contractPeriod.startDate}
+  ${contract_period_end_date}=  dzo_service.convert_date_to_slash_format  ${item.contractPeriod.endDate}
   ${index}=   Get Element Attribute   xpath=(//div[@class="tenderItemElement tenderItemPositionElement"])[last()]@data-multiline
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Ввести текст   name=data[items][${index}][description]   ${item.description}
   Ввести текст   name=data[items][${index}][quantity]   ${item.quantity}
-  Select From List By Label   name=data[items][${index}][unit_id]   ${unit_name}
   Focus   name=data[items][${index}][quantity]
-  Клікнути по елементу   xpath=//input[@name='data[items][${index}][cav_id]']/preceding-sibling::a
-  Select Frame   xpath=//iframe[contains(@src,'/js/classifications/universal/index.htm?lang=uk&shema=CAV&relation=true')]
+  Клікнути по елементу   xpath=(//input[@name='data[items][${index}][cav_id]']/preceding-sibling::a)[2]
+  Select Frame   xpath=//iframe[contains(@src,'/js/classifications/universal/index.htm?lang=uk&shema=CPV;CAV-PS&relation=true')]
   Run Keyword If   '000000' not in '${item.classification.id}'   Ввести текст   id=search   ${item.classification.description}
   Wait Until Page Contains   ${item.classification.id}
   Клікнути по елементу   xpath=//a[contains(@id,'${item.classification.id.replace('-','_')}')]
   Клікнути по елементу   xpath=//*[@id='select']
   Unselect Frame
+  Select From List By Label   name=data[items][${index}][unit_id]   ${unit_name}
   Select From List By Label   name=data[items][${index}][country_id]   ${item.deliveryAddress.countryName}
   Select From List By Label   name=data[items][${index}][region_id]    ${region}
   Ввести текст   name=data[items][${index}][address][locality]   ${item.deliveryAddress.locality}
   Ввести текст   name=data[items][${index}][address][streetAddress]   ${item.deliveryAddress.streetAddress}
   Ввести текст   name=data[items][${index}][address][postalCode]   ${item.deliveryAddress.postalCode}
+  Input Date  data[items][${index}][contractPeriod][startDate]  ${item.contractPeriod.startDate}
+  Input Date  data[items][${index}][contractPeriod][endDate]  ${item.contractPeriod.endDate}
+  Input Text  name=data[items][${index}][contractPeriodTime][startTime]  00:00
+  Input Text  name=data[items][${index}][contractPeriodTime][endTime]  00:00
 
 Додати предмет закупівлі
   [Arguments]  ${username}  ${tender_uaid}  ${item}
@@ -448,7 +460,7 @@ Input Date
 Внести зміни в тендер
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
   ${field_locator}=   get_field_locator   ${fieldname}
-  ${fieldvalue}=   adapt_data_for_document   ${fieldname}   ${fieldvalue}
+  ${fieldvalue}=   adapt_data_editing   ${fieldname}   ${fieldvalue}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[@class='button save'][./text()='Редагувати']
   sleep   1
@@ -480,7 +492,9 @@ Input Date
 Отримати інформацію із предмету
   [Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${field_name}
   Пошук тендера у разі наявності змін   ${TENDER['LAST_MODIFICATION_DATE']}   ${username}   ${tender_uaid}
-  ${item_value}=   Get Text   xpath=//div[contains(text(), '${item_id}')]/ancestor::tr[@class="tenderFullListElement"]${locator.items.${field_name}}
+  ${item_value}=  Run Keyword If  "scheme" in "${field_name}"
+  ...  Get Element Attribute   xpath=//div[contains(text(), '${item_id}')]/ancestor::tr[@class="tenderFullListElement"]${locator.items.${field_name.replace("[0]","")}}
+  ...  ELSE  Get Text   xpath=//div[contains(text(), '${item_id}')]/ancestor::tr[@class="tenderFullListElement"]${locator.items.${field_name.replace("[0]","")}}
   ${item_value}=   adapt_items_data   ${field_name}   ${item_value}
   [return]  ${item_value}
   
@@ -542,7 +556,7 @@ Input Date
   Пошук тендера у разі наявності змін   ${TENDER['LAST_MODIFICATION_DATE']}   ${username}   ${tender_uaid}
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   ${file_name}=   Get Text   xpath=//span[contains(text(),'${doc_id}')]
-  ${url}=   Get Element Attribute   xpath=//span[contains(text(),'${doc_id}')]/..@href
+  ${url}=   Get Element Attribute   //*[contains(text(),'${doc_id}')]/ancestor::*[@class="tenderFullListElement docItem"]/descendant::a@href
   dzo_download_file   ${url}  ${file_name.split('/')[-1]}  ${OUTPUT_DIR}
   [return]  ${file_name.split('/')[-1]}
 
@@ -716,6 +730,17 @@ Input Date
   ${tax}=   convert_string_from_dict_dzo                    ${tax}
   ${tax}=   Convert To Boolean                              ${tax}
   [return]  ${tax}
+
+Отримати інформацію про guarantee.amount
+  ${guarantee}=   Отримати текст із поля і показати на сторінці   guarantee.amount
+  ${guarantee}=   Replace String      ${guarantee}   `   ${EMPTY}
+  ${guarantee}=   Convert To Number   ${guarantee.split(' ')[0]}
+  [return]  ${guarantee}
+
+Отримати інформацію про minNumberOfQualifiedBids
+  ${minNumberOfQualifiedBids}=   Отримати текст із поля і показати на сторінці   minNumberOfQualifiedBids
+  ${minNumberOfQualifiedBids}=   Convert To Integer   ${minNumberOfQualifiedBids.replace("minNumberOfQualifiedBids ","").split(' ')[1]}
+  [return]  ${minNumberOfQualifiedBids}
 
 Отримати інформацію про procurementMethodType
   ${procurementMethodType}=   Отримати текст із поля і показати на сторінці    procurementMethodType
@@ -1069,7 +1094,7 @@ Input Date
   Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
   Підтвердити дію
   Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
-  Клікнути по елементу   xpath=//button[@class="bidAction"]
+#  Клікнути по елементу   xpath=//button[@class="bidAction"]
   Capture Page Screenshot
   Wait Until Keyword Succeeds   10 x   60 s   dzo.Підтвердити наявність протоколу аукціону  ${username}  ${tender_uaid}  ${award_index}
 
@@ -1078,7 +1103,7 @@ Input Date
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   ${award_index}=  Convert To Integer  ${award_index}
   ${awards_status}=    Get Text    xpath=//div[contains(text(), '${award_index + 1}') and contains(@class, 'num')]/ancestor::div[@class="item relative"]/descendant::div[contains(@class, "bstatus")]
-  ${actual_award_status}=    convert_string_from_dict_dzo    ${awards_status.split(" ")[-1]}
+  ${actual_award_status}=    convert_string_from_dict_dzo    ${awards_status}
   Should Be Equal  ${actual_award_status}  pending.payment
 
 Перевірити завантаження протоколу
