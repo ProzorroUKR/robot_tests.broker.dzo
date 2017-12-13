@@ -165,7 +165,7 @@ Login
   ${index}=   Get Element Attribute   xpath=(//div[@class="tenderItemElement tenderItemPositionElement"])[last()]@data-multiline
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   Ввести текст   name=data[items][${index}][description]   ${item.description}
-  Ввести текст   name=data[items][${index}][quantity]   ${item.quantity}
+  Ввести текст   name=data[items][${index}][quantity]   ${quantity}
   Focus   name=data[items][${index}][quantity]
   Клікнути по елементу   xpath=(//input[@name='data[items][${index}][cav_id]']/preceding-sibling::a)[2]
   Select Frame   xpath=//iframe[contains(@src,'/js/classifications/universal/index.htm?lang=uk&shema=CPV;CAV-PS&relation=true')]
