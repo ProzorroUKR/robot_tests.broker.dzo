@@ -34,8 +34,8 @@ ${locator.items.additionalClassifications.description}       /td/div[3]/span[3]
 ${locator.items.quantity}         /td[3]/span[1]
 ${locator.items.unit.code}        /td[3]/span[2]
 ${locator.items.unit.name}        /td[3]/span[2]
-${locator.items.contractPeriod.startDate}        /td/div[5]/span[2]
-${locator.items.contractPeriod.endDate}        /td/div[5]/span[4]
+${locator.items.contractPeriod.startDate}        /descendant::*[text()="Орієнтовний період договору оренди"]/../span[2]
+${locator.items.contractPeriod.endDate}        /descendant::*[text()="Орієнтовний період договору оренди"]/../span[4]
 ${locator.questions.title}
 ${locator.questions.description}  /following-sibling::div[@class="text"]
 ${locator.questions.date}         /preceding-sibling::div[@class="date"]
@@ -158,6 +158,7 @@ Login
   [Arguments]  ${item}
   ${item_description_en}=   Set Variable If   "${mode}" == "openeu"   ${item.description_en} 
   ${unit_name}=   convert_string_from_dict_dzo   ${item.unit.name}
+  ${quantity}=  Convert To String  ${item.quantity}
   ${region}=   convert_string_from_dict_dzo   ${item.deliveryAddress.region}
   ${contract_period_start_date}=  dzo_service.convert_date_to_slash_format  ${item.contractPeriod.startDate}
   ${contract_period_end_date}=  dzo_service.convert_date_to_slash_format  ${item.contractPeriod.endDate}
