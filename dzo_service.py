@@ -139,7 +139,7 @@ def adapt_data_editing(field, value):
         value = convert_date_to_slash_format(value)
     if field == 'minimalStep.amount':
         value = add_second_sign_after_point(value)
-    return value
+    return str(value)
 
 
 def get_field_locator(fieldname):
