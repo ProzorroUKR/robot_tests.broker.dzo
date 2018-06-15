@@ -24,9 +24,9 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u'ОПУБЛІКОВАНО. ОЧІКУВАННЯ ІНФОРМАЦІЙНОГО ПОВІДОМЛЕННЯ': u'pending',
             u'ОПУБЛІКОВАНО': u'pending',
             u'PENDING DELETED': u'pending.deleted',
-            u'об’єкт реєструється': u'registering',
+            u'Об’єкт реєструється': u'registering',
             u'об\'єкт зареєстровано': u'complete',
-            u'об’єкт зареєстровано': u'complete',
+            u'Об’єкт зареєстровано': u'complete',
             u'ТИП АУКЦІОНУ: SELLOUT ENGLISH': u'sellout.english',
             u'ТИП АУКЦІОНУ: SELLOUT INSIDER': u'sellout.insider',
             u'СТАТУС АУКЦІОНУ: ЗАПЛАНОВАНО.': u'scheduled',
@@ -131,6 +131,13 @@ def adapt_data_from_lot(field, value, role):
         value = value.replace('P1M', 'P30D')
     else:
         value = convert_string_from_dict_dzo(value)
+    return value
+
+
+def adapt_edrpou(value):
+    value = str(value)
+    if len(value) == 7:
+        value += '0'
     return value
 
 

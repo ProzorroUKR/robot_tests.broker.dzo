@@ -6,9 +6,8 @@ Library  dzo_service.py
 
 *** Variables ***
 ${doc_index}                       0
-${locator.tenderId}                xpath=//td[contains(text(),'Ідентифікатор аукціону')]/following-sibling::td[1]
-${locator.assetId}                 xpath=//td[contains(text(),'Ідентифікатор аукціону')]/following-sibling::td[1]/a/span
-${locator.lotID}                 xpath=//td[contains(text(),'Ідентифікатор аукціону')]/following-sibling::td[1]/a/span
+${locator.assetId}                 xpath=//td[contains(text(),"Ідентифікатор Об'єкту")]/following-sibling::td[1]/a/span
+${locator.lotID}                   xpath=//td[contains(text(),'Ідентифікатор Інформаційного повідомлення')]/following-sibling::td[1]/a/span
 ${locator.date}                    xpath=(//div[@class="statusDate"])[1]/span
 ${locator.title}                   xpath=//div[contains(@class, "tenderHead")]/descendant::h1
 ${locator.tenderAttempts}          xpath=//*[@data-test="tenderAttempts"]
@@ -376,17 +375,15 @@ Login
   ${date}=  auction_date
   Input Date  data[auctions][0][auctionPeriod][startDate]  ${date}
 
-  Input Text  name=data[auctions][1][value][amount]  10
-  Input Text  name=data[auctions][1][minimalStep][amount]  10
-  Input Text  name=data[auctions][1][guarantee][amount]  10
+  Input Text  name=data[auctions][0][bankAccount][bankName]  PrivatBank
+  Input Text  name=data[auctions][0][bankAccount][accountIdentification][0][id]  00000000
+  Input Text  name=data[auctions][0][bankAccount][accountIdentification][1][id]  000000
+  Input Text  name=data[auctions][0][bankAccount][accountIdentification][2][id]  0000000000
+
   Select From List By Value  name=data[auctions][1][tenderingDuration]  30
 
-  Input Text  name=data[auctions][2][value][amount]  10
-  Input Text  name=data[auctions][2][minimalStep][amount]  10
-  Input Text  name=data[auctions][2][guarantee][amount]  10
-
   Клікнути по елементу  xpath=//button[@value="publicate"]
-  ${lot_id}=  Get Text  ${locator.tenderId}
+  ${lot_id}=  Get Text  ${locator.lotID}
   [Return]  ${lot_id}
 
 
@@ -405,6 +402,9 @@ Login
   Input Text  name=data[auctions][0][minimalStep][amount]  ${minimalStep_amount}
   Input Text  name=data[auctions][0][guarantee][amount]  ${guarantee_amount}
   Ввести auctionPeriod.startDate  0  ${auction.auctionPeriod.startDate}
+  Input Text  name=data[auctions][0][bankAccount][bankName]  ${auction.bankAccount.bankName}
+  ${bank_id}=  adapt_edrpou  ${auction.bankAccount.accountIdentification[0].id}
+  Input Text  name=data[auctions][0][bankAccount][accountIdentification][0][id]  ${bank_id}
 
 
 Заповнити дані для другого аукціону
@@ -412,7 +412,7 @@ Login
   ${duration}=  convert_duration  ${auction.tenderingDuration}
   Select From List By Value  name=data[auctions][1][tenderingDuration]  ${duration}
   Клікнути по елементу  xpath=//button[@value="save"]
-  Wait Until Element Is Visible  ${locator.tenderId}
+  Wait Until Element Is Visible  ${locator.lotID}
 
 
 Додати умови проведення аукціону
@@ -498,7 +498,7 @@ Login
   Wait Until Page Contains   ${tender_uaid}   20
   Клікнути по елементу   xpath=//*[contains('${tender_uaid}', text()) and contains(text(), '${tender_uaid}')]/ancestor::div[@class="item relative"]/ descendant::a[@class="reverse tenderLink"]
   Wait Until Page Does Not Contain Element   xpath=//form[@name="filter"]
-  ${tender_uaid}=   Get Text   ${locator.assetId}
+  ${tender_uaid}=   Get Text   ${locator.lotID}
   [Return]  ${tender_uaid}
 
 
@@ -524,12 +524,13 @@ Login
   Клікнути по елементу  xpath=//section[@id="multiItems"]/a
   Run Keyword If   '${field_name}' == 'quantity'  Ввести текст  xpath=//input[contains(@value, "${item_id}")]/../../../following-sibling::tr/descendant::input[contains(@name, "quantity")]  ${quantity}
   Клікнути по елементу   xpath=//button[@value='save']
-  Wait Until Element Is Visible  ${locator.assetId}
+  Wait Until Element Is Visible  ${locator.lotID}
 
 
 Внести зміни в умови проведення аукціону
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}  ${index}
   dzo.Пошук лоту по ідентифікатору  ${username}  ${tender_uaid}
+  ${fieldvalue}=   adapt_data_for_edit   ${fieldname}   ${fieldvalue}
   Execute Javascript   $(".bottomFixed").remove();
   Click Element  xpath=//a[@class='button save'][./text()='Редагувати']
   Клікнути по елементу  xpath=//h3[contains(text(), "ПАРАМЕТРИ АУКЦІОНІВ")]/following-sibling::a
@@ -539,7 +540,7 @@ Login
   ...  ELSE IF  '${fieldname}' == 'registrationFee.amount'  Execute Javascript  $("input[name='data[auctions][${index}][registrationFee][amount]']").val("${fieldvalue}");
   ...  ELSE IF  '${fieldname}' == 'auctionPeriod.startDate'  Ввести auctionPeriod.startDate  ${index}  ${fieldvalue}
   Клікнути по елементу   xpath=//button[@value='save']
-  Wait Until Element Is Visible  ${locator.assetId}
+  Wait Until Element Is Visible  ${locator.lotID}
 
 
 Ввести auctionPeriod.startDate
@@ -582,9 +583,9 @@ Login
   [Arguments]  ${field}
   ${index}=  Set Variable  ${field.split('[')[1].split(']')[0]}
   ${index}=  Convert To Integer  ${index}
-  ${value}=  Run Keyword If  'title' in '${field}'  Get Text  xpath=//h3[@class="title"][contains(text(), "Найменування рішення про приватизацію лоту")]/../descendant::td[@class="itemNum"]/span[contains(text(), "${index + 1}")]/../following-sibling::td/div[1]
-  ...  ELSE IF  'decisionDate' in '${field}'  Get Text  xpath=(//h3[@class="title"][contains(text(), "Найменування рішення про приватизацію лоту")]/following-sibling::div/descendant::span[contains(text(), "від")])[${index + 1}]/following-sibling::span
-  ...  ELSE IF  'decisionID' in '${field}'  Get Text  xpath=(//h3[@class="title"][contains(text(), "Найменування рішення про приватизацію лоту")]/following-sibling::div/descendant::span[contains(text(), "від")])[${index + 1}]/preceding-sibling::span
+  ${value}=  Run Keyword If  'title' in '${field}'  Get Text  xpath=//h3[@class="title"][contains(text(), "Найменування рішення про приватизацію об'єкту")]/../descendant::td[@class="itemNum"]/span[contains(text(), "${index + 1}")]/../following-sibling::td/div[1]
+  ...  ELSE IF  'decisionDate' in '${field}'  Get Text  xpath=(//h3[@class="title"][contains(text(), "Найменування рішення про приватизацію об'єкту")]/following-sibling::div/descendant::span[contains(text(), "від")])[${index + 1}]/following-sibling::span
+  ...  ELSE IF  'decisionID' in '${field}'  Get Text  xpath=(//h3[@class="title"][contains(text(), "Найменування рішення про приватизацію об'єкту")]/following-sibling::div/descendant::span[contains(text(), "від")])[${index + 1}]/preceding-sibling::span
   ${value}=  convert_decision_data  ${value}  ${field}
   [Return]  ${value}
 
@@ -707,20 +708,16 @@ Input Date
 Клікнути по елементу
   [Arguments]  ${locator}
   Wait Until Element Is Visible   ${locator}   20
-  Scroll And Click   ${locator}
+  Scroll To Element  ${locator}
+  Click Element  ${locator}
 
 Scroll To Element
   [Arguments]  ${locator}
   ${elem_vert_pos}=  Get Vertical Position  ${locator}
   Execute Javascript  window.scrollTo(0,${elem_vert_pos - 200});
 
-Scroll And Click
-  [Arguments]  ${locator}
-  Scroll To Element  ${locator}
-  Click Element  ${locator}
-
 Input Amount
     [Arguments]  ${locator}  ${value}
-    ${value}=  Convert To String  ${value}
+    ${value}=  add_second_sign_after_point  ${value}
     Clear Element Text  ${locator}
     Input Text  ${locator}  ${value}
