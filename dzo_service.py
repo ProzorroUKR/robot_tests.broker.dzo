@@ -1,30 +1,50 @@
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
-
 from datetime import datetime, timedelta
 from iso8601 import parse_date
 from pytz import timezone
 import os
 import urllib
-import json
+import re
 
 DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'кілограми': u'кг', u'метри': u'м', u'пара': u'пар',
             u'літр': u'л', u'набір': u'наб', u'пачок': u'пач', u'послуга': u'послуги', u'метри кубічні': u'м.куб',
             u'тони': u'т', u'метри квадратні': u'м.кв', u'кілометри': u'км', u'штуки': u'шт', u'місяць': u'міс',
             u'пачка': u'пачка', u'упаковка': u'уп', u'гектар': u'Га', u'лот': u'лот', u"грн": u"UAH",
-            u"(з ПДВ)": u"True", u"(без ПДВ)": u"false", u"Код CPV": u"CPV", u"Переможець": u"active",
-            u"місто Київ": u"м. Київ", u"ПЕРІОД УТОЧНЕНЬ": u"active.enquiries",
-            u"ПОДАННЯ ПРОПОЗИЦІЙ": u"active.tendering", u"ПРЕДКВАЛІФІКАЦІЯ": u"active.pre-qualification",
-            u"АУКЦІОН": u"active.auction", u"КВАЛІФІКАЦІЯ ПЕРЕМОЖЦЯ": u"active.qualification",
-            u"ТОРГИ НЕ ВІДБУЛИСЯ": u"unsuccessful", u"ТОРГИ ВІДМІНЕНО": u"cancelled", u"ТОРГИ ЗАВЕРШЕНО": u"complete",
-            u"НА РОЗГЛЯДІ": u"claim", u"Протокол торгів": u"auctionProtocol",
-            u"Оголошення аукціону з продажу майна": u"dgfOtherAssets",
-            u"Оголошення аукціону з продажу прав вимоги за кредитами банків": u"dgfFinancialAssets", u'вперше': 1,
-            u'повторно (вдруге)': 2, u'повторно (втретє)': 3, u'повторно (вчетверте)': 4,
-            u'Попередню кваліфікацію скасовано': u'cancelled', u'Дискваліфіковано': u'unsuccessful',
-            u'?:tender method open_dgfInsider': u'dgfInsider', u'Очікування протоколу': u'pending.verification',
-            u'Очікування оплати': u'pending.payment', u'В черзі': u'pending.waiting',
-            u'Пропозицію відкликано': u'cancelled'}
+            u"з ПДВ": u"True", u"без ПДВ": u"false", u"Код CPV": u"CPV", u"Переможець": u"active",
+            u"місто Київ": u"м. Київ",
+            u"ПОДАННЯ ПРОПОЗИЦІЙ": u"active.tendering",
+            u"АУКЦІОН": u"active.auction",
+            u"ТОРГИ НЕ ВІДБУЛИСЯ": u"unsuccessful",
+            u"ТОРГИ ВІДМІНЕНО": u"cancelled",
+            u"ТОРГИ ЗАВЕРШЕНО": u"complete",
+            u'В черзі': u'pending.waiting',
+            u'ВИКЛЮЧЕНО З ПЕРЕЛІКУ': u'deleted',
+            u'ОБ’ЄКТ ВИКЛЮЧЕНО': u'deleted',
+            u'ОПУБЛІКОВАНО. ОЧІКУВАННЯ ІНФОРМАЦІЙНОГО ПОВІДОМЛЕННЯ': u'pending',
+            u'ОПУБЛІКОВАНО': u'pending',
+            u'PENDING DELETED': u'pending.deleted',
+            u'Об’єкт реєструється': u'registering',
+            u'об\'єкт зареєстровано': u'complete',
+            u'Об’єкт зареєстровано': u'complete',
+            u'ТИП АУКЦІОНУ: SELLOUT ENGLISH': u'sellout.english',
+            u'ТИП АУКЦІОНУ: SELLOUT INSIDER': u'sellout.insider',
+            u'СТАТУС АУКЦІОНУ: ЗАПЛАНОВАНО.': u'scheduled',
+            u'Інформація про оприлюднення інформаційного повідомлення': u'informationDetails'}
+
+
+def convert_duration(duration):
+    if duration == u'P1M':
+        duration = u'P30D'
+    days = re.search('\d+D|$', duration).group()
+    if len(days) > 0:
+        days = days[:-1]
+    return days
+
+
+def auction_date():
+    date = datetime.now() + timedelta(days=30)
+    return timezone('Europe/Kiev').localize(date).strftime('%Y-%m-%dT%H:%M:%S.%f%z')
 
 
 def convert_date_to_slash_format(isodate):
@@ -33,26 +53,25 @@ def convert_date_to_slash_format(isodate):
     return date_string
 
 
-def convert_date_to_template_format(date, template_in, template_out):
-    return datetime.strptime(date, template_in).strftime(template_out)
+def convert_date_from_asset(date):
+    date = datetime.strptime(date.replace('.18', '.2018'), "%d.%m.%Y")
+    return timezone('Europe/Kiev').localize(date).strftime('%Y-%m-%dT%H:%M:%S.%f%z')
 
 
-def subtract_from_time(date_time, subtr_min=0, subtr_sec=0):
+def convert_decision_data(data, field):
+    if 'Date' in field:
+        data = convert_date_from_asset(data)
+    return data
+
+
+def convert_date_for_decision(date):
+    date = datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%Y')
+    return '{}'.format(date)
+
+
+def convert_rectification(date_time):
     sub = datetime.strptime(date_time, "%d.%m.%Y %H:%M")
-    sub = (sub - timedelta(minutes=int(subtr_min),
-                           seconds=int(subtr_sec)))
     return timezone('Europe/Kiev').localize(sub).strftime('%Y-%m-%dT%H:%M:%S%f%z')
-
-
-def subtract_from_time_questions(date_time, subtr_min, subtr_sec):
-    sub = datetime.strptime(date_time, "%d.%m.%Y, %H:%M")
-    sub = (sub - timedelta(minutes=int(subtr_min),
-                           seconds=int(subtr_sec))).isoformat()
-    return sub
-
-
-def convert_title_dzo(string):
-    return string.replace(string[14:], string[14:].lower())
 
 
 def convert_string_from_dict_dzo(string):
@@ -60,86 +79,66 @@ def convert_string_from_dict_dzo(string):
 
 
 def adapt_data_for_role(role_name, tender_data):
-    if role_name == 'tender_owner':
-        tender_data = adapt_unit_names(adapt_procuringEntity(adapt_address(tender_data)))
+    if role_name == 'tender_owner' and 'assetCustodian' in tender_data['data']:
+        tender_data = adapt_unit_names_asset(adapt_assetCustodian(tender_data))
     return tender_data
 
 
-def adapt_unit_names(tender_data):
+def adapt_unit_names_asset(tender_data):
     if 'unit' in tender_data['data']['items'][0]:
         for i in tender_data['data']['items']:
             i['unit']['name'] = DZO_dict[i['unit']['name']]
-            i['contractPeriod']['endDate'] = "{}T00:00:00+02:00".format(
-                (datetime.strptime(i['contractPeriod']['endDate'].split("T")[0], "%Y-%m-%d")
-                 + timedelta(days=2)).strftime("%Y-%m-%d"))
-            i['contractPeriod']['startDate'] = "{}T00:00:00+02:00".format(
-                (datetime.strptime(i['contractPeriod']['startDate'].split("T")[0], "%Y-%m-%d")
-                 + timedelta(days=1)).strftime("%Y-%m-%d"))
     return tender_data
 
 
-def adapt_one_item(item_data):
-    if 'unit' in item_data:
-        item_data['unit']['name'] = DZO_dict.get(item_data['unit']['name'])
-    if item_data['deliveryAddress']['region'] == u'місто Київ':
-        item_data['deliveryAddress']['region'] = u'м. Київ'
-    return item_data
-
-
-def adapt_procuringEntity(tender_data):
-    tender_data['data']['procuringEntity']['name'] = u"Байстрюкович і Ко"
-    return tender_data
-
-
-def adapt_address(tender_data):
-    for item in tender_data['data']['items']:
-        if item['deliveryAddress']['region']:
-            item['deliveryAddress']['region'] = u'м. Київ'
+def adapt_assetCustodian(tender_data):
+    tender_data['data']['assetCustodian']['name'] = u'ТОВ ПРИВАТИЗАТОР'
+    tender_data['data']['assetCustodian']['identifier']['id'] = u'12345678'
+    tender_data['data']['assetCustodian']['identifier']['legalName'] = u'ТОВ ПРИВАТИЗАТОР'
+    tender_data['data']['assetCustodian']['contactPoint']['name'] = u'Гоголь Микола Васильович'
+    tender_data['data']['assetCustodian']['contactPoint']['telephone'] = u'+380210520120'
+    tender_data['data']['assetCustodian']['contactPoint']['email'] = u'testprozorroyowner@gmail.com'
     return tender_data
 
 
 def add_second_sign_after_point(amount):
-    amount = str(repr(amount))
+    amount = str(amount)
     if '.' in amount and len(amount.split('.')[1]) == 1:
         amount += '0'
     return amount
 
 
-def switch_to_en(url):
-    url = url.split('.ua/')
-    return url[0] + '.ua/en/' + url[1]
-
-
-def get_street_from_tuple(string):
-    return ','.join(string).strip()
-
-
 def adapt_items_data(field_name, value):
-    if field_name == 'deliveryAddress.countryName':
-        value = value.split(',')[1].strip()
-    elif field_name == 'deliveryAddress.postalCode':
-        value = value.split(',')[0].strip()
-    elif field_name == 'deliveryAddress.locality':
-        value = value.split(',')[3].strip()
-    elif field_name == 'deliveryAddress.streetAddress':
-        value = get_street_from_tuple(value.split(',')[4:])
-    elif field_name == 'deliveryAddress.region':
-        value = value.split(',')[2].strip()
-    elif field_name == 'quantity':
+    if field_name == 'quantity':
         value = float(value)
-    elif 'contractPeriod' in field_name:
-        value = "{}T00:00:00+02:00".format(convert_date_to_template_format(value, "%d.%m.%Y %H:%M", "%Y-%m-%d"))
-    elif field_name != 'deliveryAddress.region' and field_name != 'unit.name':
+    elif field_name != 'unit.name':
         value = convert_string_from_dict_dzo(value)
     return value
 
 
-def adapt_data_editing(field, value):
-    if field == 'tenderPeriod.endDate':
-        value = convert_date_to_slash_format(value)
-    if field == 'minimalStep.amount':
+def adapt_data_for_edit(field, value):
+    if 'amount' in field:
         value = add_second_sign_after_point(value)
-    return str(value)
+    return value
+
+
+def adapt_data_from_lot(field, value, role):
+    if 'tenderAttempts' in field:
+        value = int(value)
+    elif 'amount' in field:
+        value = float(value)
+    elif 'tenderingDuration' in field and 'owner' in role:
+        value = value.replace('P1M', 'P30D')
+    else:
+        value = convert_string_from_dict_dzo(value)
+    return value
+
+
+def adapt_edrpou(value):
+    value = str(value)
+    if len(value) == 7:
+        value += '0'
+    return value
 
 
 def get_field_locator(fieldname):
@@ -147,61 +146,9 @@ def get_field_locator(fieldname):
     return field_locator
 
 
-def get_claim_status(class_incl):
-    for elem in class_incl.split(' '):
-        if elem.startswith('compStatus'):
-            status = elem.split('_')[1]
-    return status
-
-
 def get_download_file_path():
     return os.path.join(os.getcwd(), 'test_output')
 
 
-def get_upload_file_path():
-    return os.path.join(os.getcwd(), 'src/robot_tests.broker.dzo/testFileForUpload.txt')
-
-
-def get_relatedItem_description(tender_data, item_id):
-    for item in tender_data['data']['items']:
-        if item_id == item['id']:
-            return item['description']
-
-
-def get_doc_content(file_name):
-    file_name = file_name.replace('/tmp/', '_tmp_')
-    path_to_file = get_download_file_path() + '/' + file_name
-    downloaded_file = open(path_to_file)
-    doc_content = downloaded_file.read()
-    downloaded_file.close()
-    return str(doc_content), path_to_file
-
-
-def delete_doc(path_to_file):
-    if os.path.exists(path_to_file):
-        os.remove(path_to_file)
-
-
 def dzo_download_file(url, file_name, output_dir):
     urllib.urlretrieve(url, ('{}/{}'.format(output_dir, file_name)))
-
-
-def check_path_exist(path):
-    return os.path.exists(path)
-
-
-def check_file_exist(path):
-    return os.path.isfile(path)
-
-
-def patch_tender_bid(url, decline, user_id):
-    tender_id = url.split('/')[-1]
-    url = 'http://www.dz3.byustudio.in.ua/bidAply.php?tender_id={}{}&user_id={}'.format(tender_id, decline, user_id)
-    status = urllib.urlopen(url)
-    return status.read(), url
-
-
-def get_award_legal_name(internal_id, award_index):
-    r = urllib.urlopen('https://lb.api-sandbox.ea.openprocurement.org/api/2.4/auctions/{}'.format(internal_id)).read()
-    auction = json.loads(r)
-    return auction['data']['awards'][int(award_index)]["suppliers"][0]['name']
