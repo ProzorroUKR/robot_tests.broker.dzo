@@ -190,8 +190,7 @@ Login
   dzo.Пошук об’єкта МП по ідентифікатору  ${username}  ${tender_uaid}
   Клікнути по елементу   xpath=//a[@class='button save'][./text()='Редагувати']
   Wait Until Element Is Visible  xpath=//input[contains(@name, "data[title]")]
-  Run Keyword If   '${fieldname}' == 'title'   Ввести текст   ${field_locator}   ${fieldvalue}
-  ...   ELSE  Ввести текст  ${field_locator}   ${fieldvalue}
+  Ввести текст   ${field_locator}   ${fieldvalue}
   sleep   1
   Клікнути по елементу   xpath=//button[@value='save']
 
@@ -509,8 +508,7 @@ Login
   dzo.Пошук лоту по ідентифікатору  ${username}  ${tender_uaid}
   Клікнути по елементу   xpath=//a[@class='button save'][./text()='Редагувати']
   Wait Until Element Is Visible  xpath=//input[contains(@name, "data[title]")]
-  Run Keyword If   '${fieldname}' == 'title'   Ввести текст   ${field_locator}   ${fieldvalue}
-  ...   ELSE  Ввести текст  ${field_locator}   ${fieldvalue}
+  Ввести текст   ${field_locator}   ${fieldvalue}
   sleep   1
   Клікнути по елементу   xpath=//button[@value='save']
 
