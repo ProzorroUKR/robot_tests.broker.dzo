@@ -27,9 +27,12 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u'Об’єкт реєструється': u'registering',
             u'об\'єкт зареєстровано': u'complete',
             u'Об’єкт зареєстровано': u'complete',
-            u'ТИП АУКЦІОНУ: SELLOUT ENGLISH': u'sellout.english',
-            u'ТИП АУКЦІОНУ: SELLOUT INSIDER': u'sellout.insider',
+            u'Аукціон': u'sellout.english',
+            u'ТИП АУКЦІОНУ : АУКЦІОН': u'sellout.english',
+            u'ТИП АУКЦІОНУ: АУКЦІОН ІЗ ЗНИЖЕННЯМ СТАРТОВОЇ ЦІНИ': u'sellout.english',
+            u'ТИП АУКЦІОНУ: АУКЦІОН ЗА МЕТОДОМ ПОКРОКОВОГО ЗНИЖЕННЯ СТАРТОВОЇ ЦІНИ ТА ПОДАЛЬШОГО ПОДАННЯ ЦІНОВИХ ПРОПОЗИЦІЙ': u'sellout.insider',
             u'СТАТУС АУКЦІОНУ: ЗАПЛАНОВАНО.': u'scheduled',
+            u'СТАТУС АУКЦІОНУ: В ПРОЦЕСІ.': u'active',
             u'Інформація про оприлюднення інформаційного повідомлення': u'informationDetails'}
 
 
@@ -138,6 +141,8 @@ def adapt_edrpou(value):
     value = str(value)
     if len(value) == 7:
         value += '0'
+    elif len(value) == 6:
+        value += '00'
     return value
 
 
@@ -152,3 +157,10 @@ def get_download_file_path():
 
 def dzo_download_file(url, file_name, output_dir):
     urllib.urlretrieve(url, ('{}/{}'.format(output_dir, file_name)))
+
+
+def patch_tender_bid(url, decline, user_id):
+    tender_id = url.split('/')[-1]
+    url = 'http://www.dz3.byustudio.in.ua/bidAply.php?tender_id={}{}&user_id={}'.format(tender_id, decline, user_id)
+    status = urllib.urlopen(url)
+    return status.read(), url
