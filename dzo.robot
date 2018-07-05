@@ -753,7 +753,8 @@ Input Amount
   Клікнути по елементу   xpath=//select[@name='filter[object]']/option[@value='auctionID']
   Ввести текст   xpath=//input[@name='filter[search]']   ${tender_uaid}
   Wait Until Keyword Succeeds   30 x   10 s  Run Keywords
-  ...  Клікнути по елементу   xpath=//button[@class='btn not_toExtend'][./text()='Пошук']
+  ...  Execute Javascript  $(".jivo_shadow").remove()
+  ...  AND  Клікнути по елементу   xpath=//button[@class='btn not_toExtend'][./text()='Пошук']
   ...  AND  Wait Until Page Contains   ${tender_uaid}  5
   Клікнути по елементу   xpath=//*[contains('${tender_uaid}', text()) and contains(text(), '${tender_uaid}')]/ancestor::div[@class="item relative"]/ descendant::a[@class="reverse tenderLink"]
   Wait Until Page Does Not Contain Element   xpath=//form[@name="filter"]
