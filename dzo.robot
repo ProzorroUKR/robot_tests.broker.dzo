@@ -50,6 +50,8 @@ ${locator.questions.title}
 ${locator.questions.description}  /following-sibling::div[@class="text"]
 ${locator.questions.date}         /preceding-sibling::div[@class="date"]
 ${locator.questions.answer}       /../following-sibling::div[@class="answer relative"]/div[@class="text"]
+${locator.auctionPeriod.startDate}     xpath=//td[contains(text(), 'Дата проведення аукціону')]/following-sibling::td[1]/span[1]
+${locator.auctionPeriod.endDate}  xpath=//span[@data-test="auctionPeriod_endDate"]
 
 
 *** Keywords ***
@@ -384,7 +386,7 @@ Login
   Input Text  name=data[auctions][0][minimalStep][amount]  10
   Input Text  name=data[auctions][0][guarantee][amount]  10
   ${date}=  auction_date
-  Input Date  data[auctions][0][auctionPeriod][startDate]  ${date}
+  Ввести auctionPeriod.startDate  0  ${date}
 
   Input Text  name=data[auctions][0][bankAccount][bankName]  PrivatBank
   Input Text  name=data[auctions][0][bankAccount][accountIdentification][0][id]  00000000
@@ -418,7 +420,7 @@ Login
   Ввести auctionPeriod.startDate  0  ${auction.auctionPeriod.startDate}
   Input Text  name=data[auctions][0][bankAccount][bankName]  ${auction.bankAccount.bankName}
   ${bank_id}=  adapt_edrpou  ${auction.bankAccount.accountIdentification[0].id}
-  Input Text  name=data[auctions][0][bankAccount][accountIdentification][0][id]  ${bank_id}
+  Input Text  name=data[auctions][0][bankAccount][accountIdentification][0][id]  ${bank_id[:8]}
 
 
 Заповнити дані для другого аукціону
@@ -775,6 +777,10 @@ Input Amount
 
 Отримати інформацію із тендера
   [Arguments]  ${username}  ${tender_uaid}  ${field}
+  Run Keyword If  """Можливість звірити статус процедури в період кваліфікації""" in """${TEST NAME}""" and 'status' in '${field}'
+  ...  Wait Until Keyword Succeeds  60 x  10 s  Run Keywords
+    ...  Reload Page
+    ...  AND  Wait Until Page Contains Element  xpath=//div[contains(@class, "statusItem active")]/descendant::div[contains(text(), "Кваліфікація переможця")]
   ${value}=  Run Keyword  dzo.Отримати інформацію про ${field}
   [Return]  ${value}
 
@@ -959,7 +965,7 @@ Input Amount
   [Return]  ${status}
 
 Отримати посилання на аукціон для учасника
-  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}=${Empty}
+  [Arguments]  ${username}  ${tender_uaid}
   Switch Browser  ${my_alias}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Клікнути по елементу   xpath=//a[@class="reverse getAuctionUrl"]
@@ -968,7 +974,7 @@ Input Amount
   [Return]  ${url}
 
 Отримати посилання на аукціон для глядача
-  [Arguments]  ${username}  ${tender_uaid}
+  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}=${Empty}
   Switch Browser  ${my_alias}
   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   ${url}=   Get Element Attribute   xpath=//section/h3/a[@class="reverse"]@href
@@ -1033,3 +1039,185 @@ Input Amount
   ${tenderPeriodEndDate}=   convert_rectification    ${tenderPeriodEndDate}
   [Return]  ${tenderPeriodEndDate}
 
+##################################################### AWARDING + CONTRACTING ###########################################################
+
+Отримати кількість авардів в тендері
+  [Arguments]  ${username}  ${tender_uaid}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  ${awards_number}=   Get Matching Xpath Count   //a[@class="biderInfo"]
+  ${awards_number}=  Convert To Integer  ${awards_number}
+  [Return]  ${awards_number}
+
+Завантажити протокол погодження в авард
+  [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Клікнути по елементу  xpath=//*[@data-bid-action="admission"]
+  Підтвердити дію
+  Wait Until Element Is Visible  xpath=//button[text()='Додати']
+  Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
+  Choose File   xpath=//input[@type="file"]   ${file_path}
+  Клікнути по елементу   xpath=//button[text()="Додати"]
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+
+
+Активувати кваліфікацію учасника
+  [Arguments]  ${username}  ${tender_uaid}
+  dzo.Пошук Тендера По Ідентифікатору  ${username}  ${tender_uaid}
+  Клікнути по елементу  xpath=//*[@data-bid-action="admission"]
+  Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Клікнути по елементу  xpath=//button[@class="bidAction"]
+  Wait Until Element Is Visible  xpath=//div[@class="cronTabProcess"]
+
+
+
+Завантажити протокол аукціону в авард
+  [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Click Element  xpath=//*[@data-bid-question="sure_award_aply"]
+  Підтвердити дію
+  Wait Until Element Is Visible  xpath=//button[text()='Додати']
+  Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
+  Choose File   xpath=//input[@type="file"]   ${file_path}
+  Select From List By Value  xpath=//select[@name="documentType"]  auctionProtocol
+  Клікнути по елементу   xpath=//button[text()="Додати"]
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+
+
+Підтвердити постачальника
+  [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+  dzo.Пошук Тендера По Ідентифікатору  ${username}  ${tender_uaid}
+  Клікнути по елементу  xpath=//*[@data-bid-question="sure_award_aply"]
+  Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Клікнути по елементу  xpath=//button[@class="bidAction"]
+  Run Keyword And Ignore Error  Підтвердити дію
+  Wait Until Element Is Visible  xpath=//div[@class="cronTabProcess"]
+
+
+Завантажити протокол дискваліфікації в авард
+  [Arguments]  ${username}  ${tender_uaid}  ${file_path}  ${award_index}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Клікнути по елементу   xpath=//a[@data-bid-action="cancel"]
+  Wait Until Page Contains   Дискваліфікація учасника
+  Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
+  Choose File   xpath=//input[@type="file"]   ${file_path}
+  Select From List By Value  xpath=//select[@name="documentType"]  rejectionProtocol
+  Клікнути по елементу   xpath=//button[text()="Додати"]
+  Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+
+Дискваліфікувати постачальника
+  [Arguments]  ${username}  ${tender_uaid}  ${award_num}  ${description}
+  Execute Javascript  $(".message").scrollTop(1000)
+  Run Keyword And Ignore Error  Клікнути по елементу   xpath=//a[@data-bid-action="cancel"]
+  Клікнути По Елементу   xpath=(//label[@class="relative inp empty"])[2]
+  Ввести текст   name=data[description]   ${description}
+  Wait Until Keyword Succeeds  10 x  2 s  Run Keywords
+  ...   Клікнути по елементу   xpath=//button[@class="bidAction"]
+  ...   AND   Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Run Keyword And Ignore Error  Підтвердити дію
+  Wait Until Keyword Succeeds   20 x   10 s   Run Keywords
+  ...  Reload Page
+  ...  AND  Execute Javascript   $(".bottomFixed").remove();
+  ...  AND  Element Should Be Visible   xpath=//div[contains(@class,'qualificationItem')]/descendant::div[text()='Дискваліфіковано']
+
+Скасування рішення кваліфікаційної комісії
+  [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Wait Until Keyword Succeeds   30 x   10 s   Run Keywords
+  ...   Reload Page
+  ...   AND   Execute Javascript   $(".bottomFixed").remove();
+  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="bid_cancel"]
+  Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+
+Завантажити протокол скасування в контракт
+  [Arguments]  ${username}  ${tender_uaid}  ${file_path}  ${award_index}
+  dzo.Завантажити протокол дискваліфікації в авард  ${username}  ${tender_uaid}  ${file_path}  ${award_index}
+
+
+Скасувати контракт
+  [Arguments]  ${username}  ${tender_uaid}  ${number}
+  Execute Javascript  $(".message").scrollTop(1000)
+  Run Keyword And Ignore Error  Клікнути по елементу   xpath=//a[@data-bid-action="cancel"]
+  Wait Until Keyword Succeeds  10 x  2 s  Run Keywords
+  ...   Клікнути по елементу   xpath=//button[@class="bidAction"]
+  ...   AND   Підтвердити дію
+  Run Keyword And Ignore Error  Підтвердити дію
+  Wait Until Keyword Succeeds   20 x   10 s   Run Keywords
+  ...  Reload Page
+  ...  AND  Execute Javascript   $(".bottomFixed").remove();
+  ...  AND  Element Should Be Visible   xpath=//div[contains(@class,'qualificationItem')]/descendant::div[text()='Дискваліфіковано']
+
+Встановити дату підписання угоди
+  [Arguments]  ${username}  ${tender_uaid}  ${index}  ${date}
+  dzo.Пошук Тендера По Ідентифікатору  ${username}  ${tender_uaid}
+  Wait Until Keyword Succeeds   10 x   1 s   Run Keywords
+  ...   Reload Page
+  ...   AND   Execute Javascript   $(".bottomFixed").remove();
+  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="contract"]
+  Wait Until Element Is Visible  xpath=//button[@class="bidAction"]
+  Input Date  data[dateSigned]  ${date}
+  Клікнути по елементу   xpath=//button[@class="bidAction"]
+
+
+Завантажити угоду до тендера
+  [Arguments]  ${username}  ${tender_uaid}  ${contract_num}  ${filepath}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Wait Until Keyword Succeeds   10 x   1 s   Run Keywords
+  ...   Reload Page
+  ...   AND   Execute Javascript   $(".bottomFixed").remove();
+  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="contract"]
+  Wait Until Element Is Visible  xpath=//button[@class="bidAction"]
+  Execute Javascript   $("input[type|='file']").css({height: "20px", width: "40px", opacity: 1, left: 0, top: 0, position: "static"});
+  Choose File   xpath=//input[@type="file"]   ${filepath}
+  Select From List By Value   name=documentType   contractSigned
+  Клікнути по елементу   xpath=//button[text()="Додати"]
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+
+Підтвердити підписання контракту
+  [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
+  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Wait Until Keyword Succeeds   10 x   1 s   Run Keywords
+  ...   Reload Page
+  ...   AND   Execute Javascript   $(".bottomFixed").remove();
+  ...   AND   Клікнути по елементу   xpath=//a[@data-bid-action="contract"]
+  Wait Until Element Is Visible  xpath=//button[@class="bidAction"]
+  Ввести текст   name=data[contractNumber]   777
+  Клікнути по елементу   name=data[dateSigned]
+  Клікнути по елементу   xpath=//td[contains(@class,'ui-datepicker-today')]
+  Клікнути по елементу   xpath=//button[@class="bidAction"]
+  Підтвердити дію
+  Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+  Wait Until Keyword Succeeds   30 x   20 s   Run Keywords
+  ...  Reload Page
+  ...  AND  Wait Until Page Contains Element  xpath=//div[contains(@class, "statusItem active")]/descendant::div[contains(text(), "Торги завершено")]
+
+Отримати інформацію про awards[${award_index}].status
+  ${award_index}=   Convert To Integer   ${award_index}
+  Reload Page
+  Wait Until Element Is Visible   xpath=//div[contains(text(), '${award_index + 1}') and contains(@class, 'num')]/ancestor::div[@class="item relative"]/descendant::div[contains(@class, "bstatus")]
+  ${awards_status}=   Get Text   xpath=//div[contains(text(), '${award_index + 1}') and contains(@class, 'num')]/ancestor::div[@class="item relative"]/descendant::div[contains(@class, "bstatus")]
+  ${awards_status}=   convert_string_from_dict_dzo   ${awards_status}
+  [Return]  ${awards_status}
+
+Отримати інформацію про auctionPeriod.startDate
+  ${auction_startDate}=  Get Text  ${locator.auctionPeriod.startDate}
+  ${auction_startDate}=  convert_rectification  ${auction_startDate}
+  [Return]  ${auction_startDate}
+
+Отримати інформацію про auctionPeriod.endDate
+  Wait Until Keyword Succeeds   15 x  60 s  Run Keywords
+  ...   Reload Page
+  ...   AND   Wait Until Element Is Visible   ${locator.auctionPeriod.endDate}
+  ${auction_endDate}=  Get Text  ${locator.auctionPeriod.endDate}
+  ${auction_endDate}=  convert_rectification  ${auction_endDate}
+  [Return]  ${auction_endDate}
