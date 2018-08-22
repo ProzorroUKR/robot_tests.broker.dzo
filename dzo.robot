@@ -9,6 +9,7 @@ ${doc_index}                       0
 ${locator.assetId}                 xpath=//td[contains(text(),"Ідентифікатор Об'єкту")]/following-sibling::td[1]/a/span
 ${locator.lotID}                   xpath=//td[contains(text(),'Ідентифікатор Інформаційного повідомлення')]/following-sibling::td[1]/a/span
 ${locator.auctionID}               xpath=//td[contains(text(), 'Ідентифікатор аукціону')]/following-sibling::td[1]/a/span
+${locator.ContractID}                 xpath=//td[contains(@class, "nameField") and (contains(text(), "ContractID"))]/following-sibling::td[1]
 ${locator.date}                    xpath=(//div[@class="statusDate"])[1]/span
 ${locator.title}                   xpath=//div[contains(@class, "tenderHead")]/descendant::h1
 ${locator.tenderAttempts}          xpath=//*[@data-test="tenderAttempts"]
@@ -70,6 +71,7 @@ ${locator.auctionPeriod.endDate}  xpath=//span[@data-test="auctionPeriod_endDate
   Set Window Size   @{USERS.users['${username}'].size}
   Set Window Position   @{USERS.users['${username}'].position}
   Run Keyword If   'Viewer' not in '${username}'   Login   ${username}
+
   
 Створити драйвер для Firefox
   [Arguments]  ${username}
@@ -1221,3 +1223,170 @@ Input Amount
   ${auction_endDate}=  Get Text  ${locator.auctionPeriod.endDate}
   ${auction_endDate}=  convert_rectification  ${auction_endDate}
   [Return]  ${auction_endDate}
+
+
+##################################################### CONTRACT MANAGEMENT ###########################################################
+
+Активувати контракт
+    [Arguments]  ${username}  ${contract_uaid}
+    Sleep  300
+
+
+Пошук договору по ідентифікатору
+    [Arguments]  ${username}  ${contract_uaid}
+    Switch Browser  ${my_alias}
+    Go To   ${USERS.users['${username}'].homepage}
+    Wait Until Page Contains Element   xpath=//a[@href="/tenders/contracts"]
+    Клікнути по елементу   xpath=//a[@href="/tenders/contracts"]
+    Wait Until Page Contains Element   xpath=//select[@name='filter[object]']/option[@value='contractID']  20
+    Клікнути по елементу   xpath=//select[@name='filter[object]']/option[@value='contractID']
+    Ввести текст   xpath=//input[@name='filter[search]']   ${contract_uaid}
+    Клікнути по елементу   xpath=//button[@class='btn not_toExtend'][./text()='Пошук']
+    Wait Until Keyword Succeeds  30 x   20 s   Run Keywords
+    ...  Reload Page
+    ...  AND  Wait Until Page Contains   ${contract_uaid}   10
+    Клікнути по елементу   xpath=//*[contains('${contract_uaid}', text()) and contains(text(), '${contract_uaid}')]/ancestor::div[@class="item relative"]/ descendant::a[@class="reverse tenderLink"]
+    Wait Until Page Does Not Contain Element   xpath=//form[@name="filter"]
+    Wait Until Page Contains Element  ${locator.contractID}
+
+
+Отримати інформацію із договору
+    [Arguments]  ${username}  ${contract_uaid}  ${field}
+    dzo.Пошук договору по ідентифікатору  ${username}  ${contract_uaid}
+    ${value}=  Get Text  xpath=//div[@id="tenderStatus"]/div[contains(@class, "active")]/descendant::div[@class="statusName"]
+    ${value}=  convert_string_from_dict_dzo  ${value}
+    [Return]  ${value}
+
+
+Отримати інформацію з активу в договорі
+    [Arguments]  ${username}  ${contract_uaid}  ${item_id}  ${field_name}
+    dzo.Пошук договору по ідентифікатору  ${username}  ${contract_uaid}
+    ${item_value}=  Get Text  xpath=//div[contains(text(), '${item_id}')]/ancestor::tr[@class="tenderFullListElement"]${locator.items.${field_name.replace("[0]","")}}
+    [Return]  ${item_value}
+
+
+Вказати дату отримання оплати
+    [Arguments]  ${username}  ${contract_uaid}  ${dateMet}  ${index}
+    dzo.Пошук договору по ідентифікатору  ${username}  ${contract_uaid}
+    Wait Until Keyword Succeeds  30 x   20 s  Run Keywords
+    ...  Reload Page
+    ...  AND  Клікнути по елементу  xpath=//a[contains(@class, "contractTerminateCommand")]
+    Підтвердити дію
+    Клікнути по елементу  xpath=(//input[@name="data[status]"])[1]/..
+    Wait Until Element Is Visible  name=data[dateMet]
+    Input Date  data[dateMet]  ${dateMet}
+    Wait Until Keyword Succeeds  10 x   1 s  Run Keywords
+    ...  Клікнути по елементу  xpath=//button[@class="bidAction"]
+    ...  AND  Wait Until Element Is Visible  ${locator.ModalOK}
+    Підтвердити дію
+    Wait Until Page Contains Element  xpath=//div[@class="cronTabProcess"]
+    Run Keyword And Ignore Error  Wait Until Keyword Succeeds  10 x   20 s   Run Keywords
+    ...  Reload Page
+    ...  AND  Wait Until Page Contains Element  xpath=(//td[@class="nameField"][contains(text(), "?:contract milestone dateMet")])[1]
+
+
+Підтвердити відсутність оплати
+    [Arguments]  ${username}  ${contract_uaid}  ${index}
+    dzo.Пошук договору по ідентифікатору  ${username}  ${contract_uaid}
+    Wait Until Keyword Succeeds  30 x   20 s  Run Keywords
+    ...  Reload Page
+    ...  AND  Клікнути по елементу  xpath=//a[contains(@class, "contractTerminateCommand")]
+    Підтвердити дію
+    Клікнути по елементу  xpath=(//input[@name="data[status]"])[2]/..
+    Клікнути по елементу  xpath=//button[@class="bidAction"]
+    Підтвердити дію
+    Wait Until Page Contains Element  xpath=//div[@class="cronTabProcess"]
+    Run Keyword And Ignore Error  Wait Until Keyword Succeeds  10 x   20 s   Run Keywords
+    ...  Reload Page
+    ...  AND  Wait Until Page Does Not Contain Element  xpath=//a[contains(@class, "contractTerminateCommand")]
+
+
+Завантажити наказ про завершення приватизації
+    [Arguments]  ${username}  ${contract_uaid}  ${file_path}
+    dzo.Пошук договору по ідентифікатору  ${username}  ${contract_uaid}
+    Клікнути по елементу  xpath=//a[contains(@class, "contractTerminateCommand")]
+    Підтвердити дію
+    Choose File   xpath=//input[@type="file"]  ${file_path}
+    Select From List By Value   name=documentType  approvalProtocol
+    Клікнути по елементу   xpath=//button[text()="Додати"]
+    Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+    Підтвердити дію
+    Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+
+
+Вказати дату прийняття наказу
+    [Arguments]  ${username}  ${contract_uaid}  ${dateMet}
+    Клікнути по елементу  xpath=(//input[@name="data[status]"])[1]/..
+    Input Date  data[dateMet]  ${dateMet}
+    Клікнути по елементу  xpath=//button[@class="bidAction"]
+    Підтвердити дію
+    Wait Until Page Contains Element  xpath=//div[@class="cronTabProcess"]
+    Run Keyword And Ignore Error  Wait Until Keyword Succeeds  10 x   20 s   Run Keywords
+    ...  Reload Page
+    ...  AND  Wait Until Page Contains Element  xpath=(//td[@class="nameField"][contains(text(), "?:contract milestone dateMet")])[2]
+
+
+Підтвердити відсутність наказу про приватизацію
+    [Arguments]  ${username}  ${contract_uaid}  ${file_path}
+    dzo.Пошук договору по ідентифікатору  ${username}  ${contract_uaid}
+    Клікнути по елементу  xpath=//a[contains(@class, "contractTerminateCommand")]
+    Підтвердити дію
+    Wait Until Element Is Visible  xpath=(//input[@name="data[status]"])[2]/..
+    Choose File   xpath=//input[@type="file"]  ${file_path}
+    Select From List By Value   name=documentType  rejectionProtocol
+    Клікнути по елементу   xpath=//button[text()="Додати"]
+    Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+    Підтвердити дію
+    Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+    Клікнути по елементу  xpath=(//input[@name="data[status]"])[2]/..
+    Клікнути по елементу  xpath=//button[@class="bidAction"]
+    Підтвердити дію
+    Wait Until Page Contains Element  xpath=//div[@class="cronTabProcess"]
+    Run Keyword And Ignore Error  Wait Until Keyword Succeeds  10 x   20 s   Run Keywords
+    ...  Reload Page
+    ...  AND  Wait Until Page Does Not Contain Element  xpath=//a[contains(@class, "contractTerminateCommand")]
+
+
+Вказати дату виконання умов контракту
+    [Arguments]  ${username}  ${contract_uaid}  ${dateMet}
+    dzo.Пошук договору по ідентифікатору  ${username}  ${contract_uaid}
+    Клікнути по елементу  xpath=//a[contains(@class, "contractTerminateCommand")]
+    Підтвердити дію
+    ${filePath}=   get_upload_file_path
+    Choose File   xpath=//input[@type="file"]  ${filePath}
+    Select From List By Value   name=documentType  contractNotice
+    Клікнути по елементу   xpath=//button[text()="Додати"]
+    Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+    Підтвердити дію
+    Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+    Клікнути по елементу  xpath=(//input[@name="data[status]"])[1]/..
+    Wait Until Element Is Visible  name=data[dateMet]
+    Input Date  data[dateMet]  ${dateMet}
+    Клікнути по елементу  xpath=//button[@class="bidAction"]
+    Підтвердити дію
+    Wait Until Page Contains Element  xpath=//div[@class="cronTabProcess"]
+    Run Keyword And Ignore Error  Wait Until Keyword Succeeds  10 x   20 s   Run Keywords
+    ...  Reload Page
+    ...  AND  Wait Until Page Contains Element  xpath=(//td[@class="nameField"][contains(text(), "?:contract milestone dateMet")])[3]
+
+
+Підтвердити невиконання умов приватизації
+    [Arguments]  ${username}  ${contract_uaid}
+    dzo.Пошук договору по ідентифікатору  ${username}  ${contract_uaid}
+    Клікнути по елементу  xpath=//a[contains(@class, "contractTerminateCommand")]
+    Підтвердити дію
+    Wait Until Element Is Visible  xpath=(//input[@name="data[status]"])[2]/..
+    ${filePath}=   get_upload_file_path
+    Choose File   xpath=//input[@type="file"]  ${filePath}
+    Select From List By Value   name=documentType  rejectionProtocol
+    Клікнути по елементу   xpath=//button[text()="Додати"]
+    Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+    Підтвердити дію
+    Wait Until Element Is Not Visible  xpath=/html/body[@class="blocked"]
+    Клікнути по елементу  xpath=(//input[@name="data[status]"])[2]/..
+    Клікнути по елементу  xpath=//button[@class="bidAction"]
+    Підтвердити дію
+    Wait Until Page Contains Element  xpath=//div[@class="cronTabProcess"]
+    Run Keyword And Ignore Error  Wait Until Keyword Succeeds  10 x   20 s   Run Keywords
+    ...  Reload Page
+    ...  AND  Wait Until Page Does Not Contain Element  xpath=//a[contains(@class, "contractTerminateCommand")]
