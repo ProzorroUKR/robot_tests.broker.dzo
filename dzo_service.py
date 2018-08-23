@@ -179,4 +179,4 @@ def patch_tender_bid(url, decline, user_id):
 
 
 def get_upload_file_path():
-    return os.path.join(os.getcwd(), 'src/robot_tests.broker.dto/testFileForUpload.txt')
+    return os.path.join(os.getcwd(), 'src/robot_tests.broker.dzo/testFileForUpload.txt')
