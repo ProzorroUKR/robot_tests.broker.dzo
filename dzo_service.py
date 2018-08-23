@@ -39,13 +39,13 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u'СТАТУС АУКЦІОНУ: ЗАПЛАНОВАНО.': u'scheduled',
             u'СТАТУС АУКЦІОНУ: В ПРОЦЕСІ.': u'active',
             u'Інформація про оприлюднення інформаційного повідомлення': u'informationDetails',
-            u'?:CONTRACT STATUS 2': u'active.payment',
-            u'?:CONTRACT STATUS 3': u'active.approval',
-            u'?:CONTRACT STATUS 4': u'active',
-            u'?:CONTRACT STATUS 5': u'pending.terminated',
-            u'?:CONTRACT STATUS 6': u'terminated',
-            u'?:CONTRACT STATUS 7': u'pending.unsuccessful',
-            u'?:CONTRACT STATUS 9': u'unsuccessful'}
+            u'ОЧІКУЄТЬСЯ ОПЛАТА': u'active.payment',
+            u'ДОГОВІР ОПЛАЧЕНО. ОЧІКУЄТЬСЯ НАКАЗ': u'active.approval',
+            u'ПЕРІОД ВИКОНАННЯ УМОВ ПРОДАЖУ (ПЕРІОД ОСКАРЖЕННЯ)': u'active',
+            u'ПРИВАТИЗАЦІЯ ОБ’ЄКТА ЗАВЕРШЕНА': u'pending.terminated',
+            u'ПРИВАТИЗАЦІЯ ОБ’ЄКТА ЗАВЕРШЕНА.': u'terminated',
+            u'ПРИВАТИЗАЦІЯ ОБ’ЄКТА НЕУСПІШНА': u'pending.unsuccessful',
+            u'ПРИВАТИЗАЦІЯ ОБ’ЄКТА НЕУСПІШНА.': u'unsuccessful'}
 
 
 def convert_duration(duration):
