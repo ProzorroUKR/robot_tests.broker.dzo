@@ -38,7 +38,14 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u'ТИП АУКЦІОНУ: АУКЦІОН ЗА МЕТОДОМ ПОКРОКОВОГО ЗНИЖЕННЯ СТАРТОВОЇ ЦІНИ ТА ПОДАЛЬШОГО ПОДАННЯ ЦІНОВИХ ПРОПОЗИЦІЙ': u'sellout.insider',
             u'СТАТУС АУКЦІОНУ: ЗАПЛАНОВАНО.': u'scheduled',
             u'СТАТУС АУКЦІОНУ: В ПРОЦЕСІ.': u'active',
-            u'Інформація про оприлюднення інформаційного повідомлення': u'informationDetails'}
+            u'Інформація про оприлюднення інформаційного повідомлення': u'informationDetails',
+            u'ОЧІКУЄТЬСЯ ОПЛАТА': u'active.payment',
+            u'ДОГОВІР ОПЛАЧЕНО. ОЧІКУЄТЬСЯ НАКАЗ': u'active.approval',
+            u'ПЕРІОД ВИКОНАННЯ УМОВ ПРОДАЖУ (ПЕРІОД ОСКАРЖЕННЯ)': u'active',
+            u'ПРИВАТИЗАЦІЯ ОБ’ЄКТА ЗАВЕРШЕНА': u'pending.terminated',
+            u'ПРИВАТИЗАЦІЯ ОБ’ЄКТА ЗАВЕРШЕНА.': u'terminated',
+            u'ПРИВАТИЗАЦІЯ ОБ’ЄКТА НЕУСПІШНА': u'pending.unsuccessful',
+            u'ПРИВАТИЗАЦІЯ ОБ’ЄКТА НЕУСПІШНА.': u'unsuccessful'}
 
 
 def convert_duration(duration):
@@ -169,3 +176,7 @@ def patch_tender_bid(url, decline, user_id):
     url = 'http://www.dz3.byustudio.in.ua/bidAply.php?tender_id={}{}&user_id={}'.format(tender_id, decline, user_id)
     status = urllib.urlopen(url)
     return status.read(), url
+
+
+def get_upload_file_path():
+    return os.path.join(os.getcwd(), 'src/robot_tests.broker.dto/testFileForUpload.txt')
