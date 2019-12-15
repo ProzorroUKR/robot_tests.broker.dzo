@@ -1,8 +1,8 @@
 *** Settings ***
-Library  Selenium2Screenshots
 Library  String
 Library  DateTime
 Library  dzo_service.py
+Library  Selenium2Library
 
 *** Variables ***
 ${locator.tenderId}                  xpath=//td[./text()='TenderID']/following-sibling::td[1]
@@ -27,42 +27,187 @@ ${locator.questions[0].description}  xpath = //div[@class='text']
 ${locator.questions[0].date}         xpath = //div[@class='date']
 ${locator.questions[0].answer}       xpath=//div[@class = 'answer relative']//div[@class = 'text']
 
+##################
+${plan.view.status}=  xpath=//div[@class="statusName"]
+${tender.view.budget.amount}=  xpath=//td[text()="Очікувана вартість"]/following-sibling::td[1]/span
+${plan.edit.budget.description}=  xpath=//input[@name="data[budget][description]"]
+${plan.edit.budget.amount}=  xpath=//input[@name="data[budget][amount]"]
+${plan.edit.items[0].deliveryDate.endDate}=  data[items][0][deliveryDate][endDate]
+${plan.edit.items[0].quantity}=  xpath=//input[@name="data[items][0][quantity]"]
+${plan.edit.budget.period}=  data[tender][tenderPeriod][startDate]
+
 *** Keywords ***
 Підготувати клієнт для користувача
-  [Arguments]  @{ARGUMENTS}
-  [Documentation]  Відкрити браузер, створити об’єкт api wrapper, тощо
-  ...      ${ARGUMENTS[0]} ==  username
-  Open Browser
-  ...      ${USERS.users['${ARGUMENTS[0]}'].homepage}
-  ...      ${USERS.users['${ARGUMENTS[0]}'].browser}
-  ...      alias=${ARGUMENTS[0]}
-  Set Window Size       @{USERS.users['${ARGUMENTS[0]}'].size}
-  Set Window Position   @{USERS.users['${ARGUMENTS[0]}'].position}
-  Run Keyword And Ignore Error       Pre Login   ${ARGUMENTS[0]}
-  Wait Until Page Contains Element   jquery=a[href="/cabinet"]
-  Click Element                      jquery=a[href="/cabinet"]
-  Run Keyword If                     '${username}' != 'DZO_Viewer'   Login
+  [Arguments]  ${username}
+  ${chrome_options}=  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys
+  Set Global Variable  ${DZO_MODIFICATION_DATE}  ${EMPTY}
+  Call Method  ${chrome_options}  add_argument  --headless
+  Create Webdriver  Chrome  alias=${username}  chrome_options=${chrome_options}
+  Go To  ${USERS.users['${username}'].homepage}
+#  Open Browser  ${USERS.users['${username}'].homepage}  ${USERS.users['${username}'].browser}  alias=${username}
+  Set Window Size  @{USERS.users['${username}'].size}
+  Set Window Position  @{USERS.users['${username}'].position}
+  Run Keyword If  'Viewer' not in '${username}'  Login  ${username}
 
 Login
-  [Arguments]  @{ARGUMENTS}
-  Wait Until Page Contains Element   name=email   10
-  Sleep  1
-  Input text                         name=email      ${USERS.users['${username}'].login}
-  Sleep  2
-  Input text                         name=psw        ${USERS.users['${username}'].password}
-  Wait Until Page Contains Element   xpath=//button[contains(@class, 'btn')][./text()='Вхід в кабінет']   20
-  Click Element                      xpath=//button[contains(@class, 'btn')][./text()='Вхід в кабінет']
+  [Arguments]  ${username}
+  Клікнути по елементу  xpath=//div[@class="authBtn"]/a
+  Ввести текст  name=email  ${USERS.users['${username}'].login}
+  Execute Javascript  $('input[name="email"]').attr('rel','CHANGE');
+  Ввести текст  name=psw  ${USERS.users['${username}'].password}
+  Клікнути по елементу  xpath=//button[contains(@class, 'btn')][./text()='Вхід']
 
-Pre Login
-  [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
-  ${login}=     Get Broker Property By Username  ${ARGUMENTS[0]}  login
-  ${password}=  Get Broker Property By Username  ${ARGUMENTS[0]}  password
-  Wait Until Page Contains Element  name=siteLogin  10
-  Input Text                        name=siteLogin  ${login}
-  Input Text                        name=sitePass   ${password}
-  Click Button                      xpath=.//*[@id='table1']/tbody/tr/td/form/p[3]/input
+Підготувати дані для оголошення тендера
+  [Arguments]  ${username}  ${tender_data}  ${role_name}
+  ${tender_data}=  adapt_data_for_role  ${role_name}  ${tender_data}
+  [Return]  ${tender_data}
+
+###############################################################################################################
+######################################    СТВОРЕННЯ ПЛАНУ    ##################################################
+###############################################################################################################
+
+Створити план
+  [Arguments]  ${username}  ${plan_data}
+  Switch Browser  ${username}
+  ${amount}=  add_second_sign_after_point  ${plan_data.data.budget.amount}
+  ${breakdowns_length}=  Get Length  ${plan_data.data.budget.breakdown}
+  ${items}=  Get From Dictionary  ${plan_data.data}  items
+  ${items_length}=  Get Length  ${items}
+  Click Element  xpath=//div[contains(text(),"Меню користувача")]
+  Click Element  xpath=//a[@href="/cabinet/plans"]
+  Click Element  xpath=//a[@href="/cabinet/plans/nulled"]
+  Click Element  xpath=//a[@href="/plans/new"]
+  Select From List By Value  name=plan_method  open_${plan_data.data.tender.procurementMethodType}
+  Input Text  name=data[budget][amount]  ${amount}
+  Select From List By Value  name=data[budget][currency]  ${plan_data.data.budget.breakdown[0].value.currency}
+  Wait And Click  xpath=//a[@data-class="ДК021"]
+  Select CPV  ${plan_data.data.classification.id}
+  Wait And Input Text  xpath=//input[@name="data[budget][description]"]  ${plan_data.data.budget.description}
+
+  :FOR  ${index}  IN RANGE  ${items_length}
+  \  Add Plan Item  ${items[${index}]}  ${index}
+
+  Click Element  xpath=//section[@id="multiBreakdowns"]/a
+  :FOR  ${index}  IN RANGE  ${breakdowns_length}
+  \  Add Plan Breakdown  ${plan_data.data.budget.breakdown}  ${index}
+
+  Input Date  data[tender][tenderPeriod][startDate]  ${plan_data.data.tender.tenderPeriod.startDate}
+  Click Element  xpath=//section[contains(@class, "datesBlock")]
+  Wait Until Element Is Not Visible  xpath=//div[@id="ui-datepicker-div"]
+  Wait And Click  xpath=//button[@value="publicate"]
+  Wait And Click  xpath=//a[contains(@class, "tenderSignCommand")]
+  Select Window  NEW
+  Wait And Click  xpath=//a[@class="js-oldPageLink"]
+  ${status}=  Run Keyword And Return Status  Wait Until Keyword Succeeds  30 x  1 s  Page Should Contain  Оберіть файл з особистим ключем (зазвичай з ім'ям Key-6.dat) та вкажіть пароль захисту
+  Run Keyword If  ${status}  Wait Until Keyword Succeeds  30 x  20 s  Run Keywords
+#  ...  Wait And Select From List By Label  id=CAsServersSelect  Тестовий ЦСК АТ "ІІТ"
+  ...  Wait And Select From List By Label  id=CAsServersSelect  АЦСК ПАТ КБ «ПРИВАТБАНК»
+  ...  AND  Execute Javascript  var element = document.getElementById('PKeyFileInput'); element.style.visibility="visible";
+#  ...  AND  Choose File  id=PKeyFileInput  ${CURDIR}/Key-6.dat
+#  ...  AND  Input text  id=PKeyPassword  12345677
+  ...  AND  Choose File  id=PKeyFileInput  ${CURDIR}/TO_DEL.jks
+  ...  AND  Input text  id=PKeyPassword  serge84tureckiy
+  ...  AND  Wait And Click  id=PKeyReadButton
+  ...  AND  Wait Until Page Contains  Ключ успішно завантажено  10
+  Wait And Click  id=SignDataButton
+  Wait Until Keyword Succeeds  60 x  1 s  Page Should Contain  Підпис успішно накладено та передано у ЦБД
+  Select Window  MAIN
+
+  ${plan_uaid}=  Get Text  xpath=//td[text()="Ідентифікатор плану"]/following-sibling::td
+
+  Wait Until Keyword Succeeds  60 x  1 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Element Should Be Visible  xpath=//a[@data-plan-action="scheduled"]
+  Click Element  xpath=//a[@data-plan-action="scheduled"]
+  Wait And Click  xpath=//a[@data-msg="jAlert OK"]
+
+  [Return]  ${plan_uaid}
+
+Add Plan Item
+  [Arguments]  ${item}  ${index}
+  ${quantity}=  add_second_sign_after_point  ${item.quantity}
+  ${unit_id}=  convert_unit_id  ${item.unit.code}
+  Wait And Click  xpath=//section[@id="multiItems"]/descendant::a[@class="addMultiItem"]
+  Wait And Input Text  xpath=//input[@name="data[items][${index}][description]"]  ${item.description}
+  Input Text  xpath=//input[@name="data[items][${index}][quantity]"]  ${quantity}
+  Select From List By Value  xpath=//select[@name="data[items][${index}][unit_id]"]  ${unit_id}
+  Click Element  xpath=//div[contains(@class, "tenderItemPositionElement")][@data-multiline="${index}"]/descendant::a[@data-class="ДК021"]
+  Select CPV  ${item.classification.id}
+  Input Date  data[items][${index}][deliveryDate][endDate]  ${item.deliveryDate.endDate}
+
+Add Plan Breakdown
+  [Arguments]  ${breakdowns}  ${index}
+  ${amount}=  add_second_sign_after_point  ${breakdowns[${index}].value.amount}
+  Wait And Click  xpath=//section[@id="multiBreakdowns"]/descendant::a[@class="addMultiItem"]
+  Select From List By Value  xpath=//select[@name="data[budget][breakdown][${index}][title]"]  ${breakdowns[${index}].title}
+  Input Text  xpath=//input[@name="data[budget][breakdown][${index}][description]"]  ${breakdowns[${index}].description}
+  Input Text  xpath=//input[@name="data[budget][breakdown][${index}][value][amount]"]  ${amount}
+
+Select CPV
+  [Arguments]  ${classification_id}
+  Select Frame  xpath=//iframe[contains(@src,'/js/classifications/universal/index.htm?lang=uk&shema=%D0%94%D0%9A021&relation=true')]
+  Wait And Input Text  xpath=//input[@id="search"]  ${classification_id}
+  Wait And Click  xpath=//a[contains(@id, "${classification_id.replace("-", "_")}")]
+  Click Element  xpath=//a[@id="select"]
+  Unselect Frame
+
+Внести зміни в план
+  [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
+  ${value}=  Run Keyword And Return If  "amount" in "${fieldname}" or "quantity" in "${fieldname}"  Convert To String  ${fieldvalue}
+  ${fieldvalue}=  Set Variable If  ${value}  ${value}  ${fieldvalue}
+  Wait And Click  xpath=//a[@class="button save"]
+  Run Keyword If  "date" in "${fieldname}"  Input Date  ${plan.edit.${fieldname}}  ${fieldvalue}
+  ...  ELSE IF  "period" in "${fieldname}"  Select From List By Value  data[budget][period][endDate]  ${fieldvalue["endDate"].split("-")[0]}
+  ...  ELSE  Input Text  ${plan.edit.${fieldname}}  ${fieldvalue}
+  Wait And Click  xpath=//button[@name="do"]
+
+Додати предмет закупівлі в план
+  [Arguments]  ${username}  ${tender_uaid}  ${item}
+  Wait And Click  xpath=//a[@class="button save"]
+  ${index}=  Get Matching Xpath Count  xpath=//div[@class="tenderItemElement tenderItemPositionElement"]
+  ${index}=  Convert To Integer  ${index}
+  Add Plan Item  ${item}  ${index - 1}
+  Wait And Click  xpath=//button[@name="do"]
+
+Видалити предмет закупівлі плану
+  [Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${lot_id}=${Empty}
+  Wait And Click  xpath=//a[@class="button save"]
+  Wait And Click  xpath=//input[contains(@value, "${item_id}")]/ancestor::div[contains(@class, "tenderItemElement")]/descendant::a[@class="deleteMultiItem"]
+  Wait And Click  xpath=//a[@data-msg="jAlert OK"]
+  Wait Until Element Is Not Visible  xpath=//div[@id="jAlertBack"]
+  Wait And Click  xpath=//button[@name="do"]
+
+Оновити сторінку з планом
+  [Arguments]  ${username}  ${plan_uaid}
+  Reload Page
+
+Пошук плану по ідентифікатору
+  [Arguments]  ${username}  ${plan_uaid}
+  Go To  http://www.dzo.byustudio.in.ua/tenders/plans
+  Select From List By Value  xpath=//select[@name="filter[object]"]  planID
+  Input Text  xpath=//input[@name="filter[search]"]  ${plan_uaid}
+  Click Element  xpath=//button[contains(@class,"not_toExtend")]
+  Wait Until Keyword Succeeds  10 x  1 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]  1
+  Click Element  xpath=//a[contains(@class, "tenderLink")]
+
+###############################################################################################################
+###################################    ВІДОБРАЖЕННЯ ПЛАНУ    ##################################################
+###############################################################################################################
+
+Отримати інформацію із плану
+  [Arguments]  ${username}  ${plan_uaid}  ${field_name}
+  ${text}=  Get Text  ${plan.view.${field_name}}
+  ${value}=  convert_dzo_data  ${text}  ${field_name}
+  [Return]  ${value}
+
+Отримати інформацію із тендера
+  [Arguments]  ${username}  ${tender_uaid}  ${field_name}
+  ${text}=  Get Text  ${tender.view.${field_name}}
+  ${value}=  convert_dzo_data  ${text}  ${field_name}
+#  ${value}=  Set Variable If  "amount" in "${field_name}"  ${value.replace("`", "")}  ${value}
+  [Return]  ${value}
+
+
 
 Створити тендер
   [Arguments]  @{ARGUMENTS}
@@ -361,13 +506,7 @@ Set Multi Ids
   dzo.Пошук тендера по ідентифікатору    ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Reload Page
 
-отримати інформацію із тендера
-  [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  fieldname
-  Switch browser   ${ARGUMENTS[0]}
-  Run Keyword And Return  Отримати інформацію про ${ARGUMENTS[1]}
+
 
 Отримати текст із поля і показати на сторінці
   [Arguments]   ${fieldname}
@@ -507,3 +646,62 @@ Set Multi Ids
 
 отримати інформацію про items[0].unit.name
   Log       | Viewer can't see this information on DZO        console=yes
+
+
+#####################################################################################
+
+Підтвердити дію
+  Клікнути по елементу  ${locator.ModalOK}
+  Wait Until Element Is Not Visible  id=jAlertBack
+
+Ввести текст
+  [Arguments]  ${locator}  ${text}
+  Wait Until Element Is Visible  ${locator}  20
+  Input Text  ${locator}  ${text}
+
+Клікнути по елементу
+  [Arguments]  ${locator}
+  Wait Until Element Is Visible  ${locator}  20
+  Click Element  ${locator}
+
+Wait And Click
+  [Arguments]  ${locator}
+  Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  ${locator}
+  Scroll To Element  ${locator}
+  Click Element  ${locator}
+
+Wait And Input Text
+  [Arguments]  ${locator}  ${text}
+  Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  ${locator}
+  Scroll To Element  ${locator}
+  Input Text  ${locator}  ${text}
+
+Wait And Select From List By Label
+  [Arguments]  ${locator}  ${value}
+  Wait Until Keyword Succeeds  10 x  1 s  Select From List By Label  ${locator}  ${value}
+
+Input Date
+  [Arguments]  ${elem_name_locator}  ${date}
+  ${date}=  dzo_service.convert_date_to_slash_format  ${date}
+  Scroll To Element  name=${elem_name_locator}
+  Focus  name=${elem_name_locator}
+  Execute Javascript  $("input[name|='${elem_name_locator}']").removeAttr('readonly'); $("input[name|='${elem_name_locator}']").unbind();
+  Ввести текст  ${elem_name_locator}  ${date}
+
+Scroll To Element
+  [Arguments]  ${locator}
+  Wait Until Page Contains Element  ${locator}  10
+  ${elem_vert_pos}=  Get Vertical Position  ${locator}
+  Execute Javascript  window.scrollTo(0,${elem_vert_pos - 300});
+
+Wait Element Animation
+  [Arguments]  ${locator}
+  Set Test Variable  ${prev_vert_pos}  0
+  Wait Until Keyword Succeeds  20 x  500 ms  Position Should Equals  ${locator}
+
+Position Should Equals
+  [Arguments]  ${locator}
+  ${current_vert_pos}=  Get Vertical Position  ${locator}
+  ${status}=  Run Keyword And Return Status  Should Be Equal  ${prev_vert_pos}  ${current_vert_pos}
+  Set Test Variable  ${prev_vert_pos}  ${current_vert_pos}
+  Should Be True  ${status}
