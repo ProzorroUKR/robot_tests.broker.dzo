@@ -44,7 +44,8 @@ def adapt_data_for_role(role_name, tender_data):
             date = parse_date(item['deliveryDate']['endDate'])
             date = date.replace(hour=16, minute=0, second=0)
             item['deliveryDate']['endDate'] = "{}{}".format(date.strftime("%Y-%m-%dT%H:%M:%S"), "+02:00")
-            item['deliveryAddress']['region'] = item['deliveryAddress']['region'].replace(u"місто Київ", u"м. Київ")
+            if "deliveryAddress" in item:
+                item['deliveryAddress']['region'] = item['deliveryAddress']['region'].replace(u"місто Київ", u"м. Київ")
             if item['classification']['id'] == "99999999-9":
                 item['classification']['description'] = u"Не визначено"
 
@@ -79,7 +80,7 @@ def convert_dzo_data(value, field_name):
         value_for_return = float(value.replace("`", ""))
     else:
         value_for_return = {
-            u'ЗАПЛАНОВАНИЙ': "sheduled",
+            u'ЗАПЛАНОВАНИЙ': "scheduled",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",
             u'виконання робіт': "executionOfWorks",
