@@ -229,8 +229,8 @@ Select CPV
 Пошук плану по ідентифікатору
   [Arguments]  ${username}  ${plan_uaid}
   Switch Browser  ${username}
-  ${url}=  Set Variable If  'Viewer' in '${username}'  http://www.dzo.byustudio.in.ua/tenders/plans?test_mode=0  http://www.dzo.byustudio.in.ua/tenders/plans
-  Go To  ${url}
+#  ${url}=  Set Variable If  'Viewer' in '${username}'  http://www.dzo.byustudio.in.ua/tenders/plans?test_mode=0  http://www.dzo.byustudio.in.ua/tenders/plans
+  Go To  http://www.dzo.byustudio.in.ua/tenders/plans
   Select From List By Value  xpath=//select[@name="filter[object]"]  planID
   Input Text  xpath=//input[@name="filter[search]"]  ${plan_uaid}
   Click Element  xpath=//button[contains(@class,"not_toExtend")]
