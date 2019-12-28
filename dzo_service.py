@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timedelta
+import urllib
+
 from iso8601 import parse_date
 
 
@@ -99,7 +101,10 @@ def convert_dzo_data(value, field_name):
             u'Допорогові закупівлі': "belowThreshold",
             u'грн': "UAH",
             u'Код в ЄДРПОУ / ІПН': "UA-EDR",
-            u'Класифікація за ДК 021-2015 (CPV)': u"ДК021"
+            u'Класифікація за ДК 021-2015 (CPV)': u"ДК021",
+            u'послуги': 'services',
+            u"(з ПДВ)": u"True",
+            u"(без ПДВ)": u"false"
     }.get(value, value)
     return value_for_return
 
@@ -128,3 +133,6 @@ def adapt_items_data(field_name, value):
     elif field_name != 'deliveryAddress.region' and field_name != 'unit.name':
         value = convert_string_from_dict_dzo(value)
     return value
+
+def dzo_download_file(url, file_name, output_dir):
+    urllib.urlretrieve(url, ('{}/{}'.format(output_dir, file_name)))

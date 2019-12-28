@@ -52,7 +52,7 @@ ${tender.view.description}=  xpath=//h2[@class='tenderDescr']
 ${tender.view.mainProcurementCategory}=  xpath=//td[text()="Вид предмету закупівлі"]/following-sibling::td[1]
 ${tender.view.value.currency}=  xpath=//span[@class="price"]/span[@class="small"][2]/span[1]
 ${tender.view.value.valueAddedTaxIncluded}=  xpath=//span[@class="taxIncluded"]/span
-${tender.view.tenderID}=  xpath=//span[@id="tender_id"]
+${tender.view.tenderID}=  xpath=//span[@class="js-apiID"]
 ${tender.view.procuringEntity.name}=  xpath=//td[text()="Найменування організації"]/following-sibling::td/span
 ${tender.view.minimalStep.amount}=  xpath=//td[contains(text(),'Розмір мінімального кроку')]/following-sibling::td/span[1]
 
@@ -61,11 +61,11 @@ ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][en
 
 
 ${locator.items.description}  /td[2]/div[1]
-${locator.items.deliveryAddress.countryName}  /td[2]/div[4]/span[2]
-${locator.items.deliveryAddress.postalCode}  /td[2]/div[4]/span[2]
-${locator.items.deliveryAddress.locality}  /td[2]/div[4]/span[2]
-${locator.items.deliveryAddress.streetAddress}  /td[2]/div[4]/span[2]
-${locator.items.deliveryAddress.region}  /td[2]/div[4]/span[2]
+${locator.items.deliveryAddress.countryName}  /descendant::span[contains(text(), "Місце поставки ")]
+${locator.items.deliveryAddress.postalCode}  /descendant::span[contains(text(), "Місце поставки ")]
+${locator.items.deliveryAddress.locality}  /descendant::span[contains(text(), "Місце поставки ")]
+${locator.items.deliveryAddress.streetAddress}  /descendant::span[contains(text(), "Місце поставки ")]
+${locator.items.deliveryAddress.region}  /descendant::span[contains(text(), "Місце поставки ")]
 ${locator.items.classification.scheme}  /td[2]/div[2]/span[1]
 ${locator.items.classification.id}  /td[2]/div[2]/span[2]
 ${locator.items.classification.description}  /td[2]/div[2]/span[3]
@@ -307,6 +307,21 @@ Get From Item
   [Arguments]  ${text_for_view}
   Reload Page
   Wait Until Page Contains  ${text_for_view}
+
+Отримати інформацію із документа
+  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
+  Wait Until Element Is Visible   xpath=//*[contains(text(),'${doc_id}')]
+  ${value}=   Get Text   xpath=//*[contains(text(),'${doc_id}')]
+  [Return]  ${value.split('/')[-1]}
+
+Отримати документ
+  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+  Пошук тендера у разі наявності змін   ${TENDER['LAST_MODIFICATION_DATE']}   ${username}   ${tender_uaid}
+  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
+  ${file_name}=   Get Text   xpath=//span[contains(text(),'${doc_id}')]
+  ${url}=   Get Element Attribute   xpath=//span[contains(text(),'${doc_id}')]/..@href
+  dzo_download_file   ${url}  ${file_name.split('/')[-1]}  ${OUTPUT_DIR}
+  [Return] ${file_name.split('/')[-1]}
 
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
