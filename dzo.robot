@@ -46,16 +46,26 @@ ${tender.view.enquiryPeriod.startDate}=  xpath=//span[contains(text(),"Проц�
 ${tender.view.enquiryPeriod.endDate}=  xpath=//td[contains(text(),"Завершення періоду уточнень")]/following-sibling::td[1]
 ${tender.view.tenderPeriod.startDate}=  xpath=//td[contains(text(),"Початок періоду прийому пропозицій")]/following-sibling::td[1]
 ${tender.view.tenderPeriod.endDate}=  xpath=//td[contains(text(),"Кінцевий строк подання тендерних пропозицій")]/following-sibling::td[1]
+${tender.view.status}=  xpath=(//div[@class="statusItem active"]/descendant::div[@class="statusName"])[last()]
+${tender.view.title}=  xpath=//h1[@class="t_title"]/span
+${tender.view.description}=  xpath=//h2[@class='tenderDescr']
+${tender.view.mainProcurementCategory}=  xpath=//td[text()="Вид предмету закупівлі"]/following-sibling::td[1]
+${tender.view.value.currency}=  xpath=//span[@class="price"]/span[@class="small"][2]/span[1]
+${tender.view.value.valueAddedTaxIncluded}=  xpath=//span[@class="taxIncluded"]/span
+${tender.view.tenderID}=  xpath=//span[@id="tender_id"]
+${tender.view.procuringEntity.name}=  xpath=//td[text()="Найменування організації"]/following-sibling::td/span
+${tender.view.minimalStep.amount}=  xpath=//td[contains(text(),'Розмір мінімального кроку')]/following-sibling::td/span[1]
+
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
 
 
 ${locator.items.description}  /td[2]/div[1]
-${locator.items.deliveryAddress.countryName}  /td[2]/div[3]/span[2]
-${locator.items.deliveryAddress.postalCode}  /td[2]/div[3]/span[2]
-${locator.items.deliveryAddress.locality}  /td[2]/div[3]/span[2]
-${locator.items.deliveryAddress.streetAddress}  /td[2]/div[3]/span[2]
-${locator.items.deliveryAddress.region}  /td[2]/div[3]/span[2]
+${locator.items.deliveryAddress.countryName}  /td[2]/div[4]/span[2]
+${locator.items.deliveryAddress.postalCode}  /td[2]/div[4]/span[2]
+${locator.items.deliveryAddress.locality}  /td[2]/div[4]/span[2]
+${locator.items.deliveryAddress.streetAddress}  /td[2]/div[4]/span[2]
+${locator.items.deliveryAddress.region}  /td[2]/div[4]/span[2]
 ${locator.items.classification.scheme}  /td[2]/div[2]/span[1]
 ${locator.items.classification.id}  /td[2]/div[2]/span[2]
 ${locator.items.classification.description}  /td[2]/div[2]/span[3]

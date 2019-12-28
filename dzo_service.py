@@ -17,7 +17,9 @@ DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'к
             u"Оголошення аукціону з продажу майна банків": u"dgfOtherAssets",
             u"Оголошення аукціону з продажу прав вимоги за кредитами банків": u"dgfFinancialAssets", u'вперше': 1,
             u'повторно (вдруге)': 2, u'повторно (втретє)': 3, u'повторно (вчетверте)': 4,
-            u'Попередню кваліфікацію скасовано': u'cancelled', u'Дискваліфіковано': u'unsuccessful'}
+            u'Попередню кваліфікацію скасовано': u'cancelled', u'Дискваліфіковано': u'unsuccessful',
+            u'Класифікація за ДК 021-2015 (CPV)': u'ДК021'}
+
 
 def subtract_from_time(date_time, subtr_min, subtr_sec):
     sub = datetime.strptime(date_time, "%d.%m.%Y %H:%M")
@@ -122,7 +124,7 @@ def adapt_items_data(field_name, value):
     elif field_name == 'deliveryAddress.region':
         value = value.split(',')[2].strip()
     elif field_name == 'quantity':
-        value = int(value)
+        value = float(value)
     elif field_name != 'deliveryAddress.region' and field_name != 'unit.name':
         value = convert_string_from_dict_dzo(value)
     return value
