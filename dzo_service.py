@@ -91,6 +91,10 @@ def convert_dzo_data(value, field_name):
     #     value_for_return = DZO_dict.get(value, value)
     else:
         value_for_return = {
+            u'ПЕРІОД УТОЧНЕНЬ': "active.enquiries",
+            u'ПЕРІОД ПОДАННЯ ПРОПОЗИЦІЙ': "active.tendering",
+            u'АУКЦІОН': "active.auction",
+            u'КВАЛІФІКАЦІЯ': "active.qualification",
             u'ЗАПЛАНОВАНИЙ': "scheduled",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",
