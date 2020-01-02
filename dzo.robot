@@ -136,6 +136,11 @@ Login
   Select From List By Value  name=data[budget][currency]  ${plan_data.data.budget.breakdown[0].value.currency}
   Wait And Click  xpath=//a[@data-class="ДК021"]
   Select CPV  ${plan_data.data.classification.id}
+  Click Element  xpath=//input[@name="procuringEntity[manual]"]/..
+  Clear Element Text  xpath=//input[@name="data[procuringEntity][name]"]
+  Input Text  xpath=//input[@name="data[procuringEntity][name]"]  ${plan_data.data.procuringEntity.name}
+  Clear Element Text  xpath=//input[@name="data[procuringEntity][identifier][id]"]
+  Input Text  xpath=//input[@name="data[procuringEntity][identifier][id]"]  ${plan_data.data.procuringEntity.identifier.id}
   Wait And Input Text  xpath=//input[@name="data[budget][description]"]  ${plan_data.data.budget.description}
 
   :FOR  ${index}  IN RANGE  ${items_length}
