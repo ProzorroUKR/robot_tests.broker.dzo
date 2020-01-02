@@ -87,8 +87,8 @@ def convert_dzo_data(value, field_name):
         value_for_return = float(value.replace("`", ""))
     elif "Date" in field_name:
         value_for_return = convert_time_to_tests_format(value)
-    elif "unit" in field_name:
-        value_for_return = DZO_dict.get(value, value)
+    # elif "unit" in field_name:
+    #     value_for_return = DZO_dict.get(value, value)
     else:
         value_for_return = {
             u'ЗАПЛАНОВАНИЙ': "scheduled",
