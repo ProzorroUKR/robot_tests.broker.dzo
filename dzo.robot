@@ -29,14 +29,14 @@ ${plan.view.classification.description}=  xpath=//td[text()="Класифіка�
 ${plan.view.classification.scheme}=  xpath=//td[text()="Класифікація за ДК 021-2015 (CPV)"]
 ${plan.view.classification.id}=  xpath=//td[text()="Класифікація за ДК 021-2015 (CPV)"]/following-sibling::td[1]/span[1]
 
-${tender.view.items.description}=  xpath=//h3[text()="Специфікація плану"]/../div/table/tbody/tr[1]/td[2]
-${tender.view.items.quantity}=  xpath=//h3[text()="Специфікація плану"]/../div/table/tbody/tr[3]/td[2]/span[1]
-${tender.view.items.deliveryDate.endDate}=  xpath=//h3[text()="Специфікація плану"]/../div/table/tbody/tr[4]/td[2]
-${tender.view.items.unit.code}=  xpath=//h3[text()="Специфікація плану"]/../div/table/tbody/tr[3]/td[2]/span[2]
-${tender.view.items.unit.name}=  xpath=//h3[text()="Специфікація плану"]/../div/table/tbody/tr[3]/td[2]/span[2]
-${tender.view.items.classification.description}=  xpath=//h3[text()="Специфікація плану"]/../div/table/tbody/tr[2]/td[2]/span[2]
-${tender.view.items.classification.scheme}=  xpath=//h3[text()="Специфікація плану"]/../div/table/tbody/tr[2]/td[1]
-${tender.view.items.classification.id}=  xpath=//h3[text()="Специфікація плану"]/../div/table/tbody/tr[2]/td[2]/span[1]
+${tender.view.items.description}=  xpath=//td[contains(text(),"Опис окремої частини")]/following-sibling::td[1]
+${tender.view.items.quantity}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[1]
+${tender.view.items.deliveryDate.endDate}=  xpath=//td[contains(text(),"Кінцевий строк поставки")]/following-sibling::td[1]
+${tender.view.items.unit.code}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[2]
+${tender.view.items.unit.name}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[2]
+${tender.view.items.classification.description}=  xpath=//td[contains(text(),"Класифікація за ДК 021")]/following-sibling::td[1]/span[2]
+${tender.view.items.classification.scheme}=  xpath=//td[contains(text(),"Класифікація за ДК 021")]
+${tender.view.items.classification.id}=  xpath=//td[contains(text(),"Класифікація за ДК 021")]/following-sibling::td[1]/span[1]
 
 ${tender.view.budget.amount}=  xpath=//td[text()="Очікувана вартість"]/following-sibling::td[1]/span
 ${plan.edit.budget.description}=  xpath=//input[@name="data[budget][description]"]
