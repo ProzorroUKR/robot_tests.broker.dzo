@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 import urllib
-
+from pytz import timezone
 from iso8601 import parse_date
 
 
@@ -29,6 +29,9 @@ def subtract_from_time(date_time, subtr_min, subtr_sec):
                            seconds=int(subtr_sec))).isoformat()
     return sub
 
+def convert_time_to_tests_format(date):
+    date = datetime.strptime(date, "%d.%m.%Y %H:%M")
+    return timezone('Europe/Kiev').localize(date).strftime('%Y-%m-%dT%H:%M:%S.%f%z')
 
 def convert_datetime_to_format(date, output_format):
     date_obj = parse_date(date)
@@ -82,6 +85,8 @@ def convert_date_to_slash_format(isodate):
 def convert_dzo_data(value, field_name):
     if "amount" in field_name or "duration.days" in field_name:
         value_for_return = float(value.replace("`", ""))
+    elif "Date" in field_name:
+        value_for_return = convert_time_to_tests_format(value)
     else:
         value_for_return = {
             u'ЗАПЛАНОВАНИЙ': "scheduled",
