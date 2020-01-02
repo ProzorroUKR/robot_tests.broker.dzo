@@ -39,7 +39,7 @@ def convert_datetime_to_format(date, output_format):
 def adapt_data_for_role(role_name, tender_data):
     if role_name == "tender_owner":
         tender_data['data']['procuringEntity']['name'] = u"ТОВ prozorroytenderowner"
-        tender_data['data']['procuringEntity']['identifier']['id'] = "00037256"
+        tender_data['data']['procuringEntity']['identifier']['id'] = "31212423"
         tender_data['data']['procuringEntity']['identifier']['legalName'] = u"ТОВ prozorroytenderowner"
         if "classification" in tender_data['data'] and tender_data['data']['classification']['id'] == "99999999-9":
             tender_data['data']['classification']['description'] = u"Не визначено"
