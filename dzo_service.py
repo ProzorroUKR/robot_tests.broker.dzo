@@ -31,7 +31,7 @@ def subtract_from_time(date_time, subtr_min, subtr_sec):
 
 def convert_time_to_tests_format(date):
     date = datetime.strptime(date, "%d.%m.%Y %H:%M")
-    return "{}{}".format(date.strftime('%Y-%m-%dT%H:%M:%S.%f'), "+02:00")
+    return "{}{}".format(date.strftime('%Y-%m-%dT%H:%M:%S'), "+02:00")
 
 def convert_datetime_to_format(date, output_format):
     date_obj = parse_date(date)
@@ -88,7 +88,7 @@ def convert_dzo_data(value, field_name):
     elif "Date" in field_name:
         value_for_return = convert_time_to_tests_format(value)
     elif "unit" in field_name:
-        value_for_return = convert_unit_id(value)
+        value_for_return = DZO_dict.get(value, value)
     else:
         value_for_return = {
             u'ЗАПЛАНОВАНИЙ': "scheduled",
