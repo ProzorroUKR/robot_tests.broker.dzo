@@ -71,11 +71,11 @@ ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][en
 
 
 ${locator.items.description}  /td[2]/div[1]
-${locator.items.deliveryAddress.countryName}  /descendant::span[contains(text(), "Місце поставки ")]
-${locator.items.deliveryAddress.postalCode}  /descendant::span[contains(text(), "Місце поставки ")]
-${locator.items.deliveryAddress.locality}  /descendant::span[contains(text(), "Місце поставки ")]
-${locator.items.deliveryAddress.streetAddress}  /descendant::span[contains(text(), "Місце поставки ")]
-${locator.items.deliveryAddress.region}  /descendant::span[contains(text(), "Місце поставки ")]
+${locator.items.deliveryAddress.countryName}  /descendant::span[contains(text(), "Місце поставки ")]/following-sibling::span
+${locator.items.deliveryAddress.postalCode}  /descendant::span[contains(text(), "Місце поставки ")]/following-sibling::span
+${locator.items.deliveryAddress.locality}  /descendant::span[contains(text(), "Місце поставки ")]/following-sibling::span
+${locator.items.deliveryAddress.streetAddress}  /descendant::span[contains(text(), "Місце поставки ")]/following-sibling::span
+${locator.items.deliveryAddress.region}  /descendant::span[contains(text(), "Місце поставки ")]/following-sibling::span
 ${locator.items.classification.scheme}  /td[2]/div[2]/span[1]
 ${locator.items.classification.id}  /td[2]/div[2]/span[2]
 ${locator.items.classification.description}  /td[2]/div[2]/span[3]
@@ -331,7 +331,6 @@ Get From Item
 
 Отримати документ
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-  Пошук тендера у разі наявності змін   ${TENDER['LAST_MODIFICATION_DATE']}   ${username}   ${tender_uaid}
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   ${file_name}=   Get Text   xpath=//span[contains(text(),'${doc_id}')]
   ${url}=   Get Element Attribute   xpath=//span[contains(text(),'${doc_id}')]/..@href
