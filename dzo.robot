@@ -337,6 +337,10 @@ Get From Item
   dzo_download_file   ${url}  ${file_name.split('/')[-1]}  ${OUTPUT_DIR}
   [Return] ${file_name.split('/')[-1]}
 
+#Отримати інформацію із лоту
+#  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
+
+
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
 ###############################################################################################################
@@ -356,10 +360,16 @@ Get From Item
   ${file_path}=  Get Variable Value  ${ARTIFACT_FILE}  artifact_plan.yaml
   ${artifact}=  load_data_from  ${file_path}
   ${plan_id}=  Set Variable  ${artifact.tender_uaid}
-  dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
+  ${is_lot}=  Set Variable If  "lots" in "${tender_data.data}"  ${True}  ${False}
 
+  dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
   Wait And Click  xpath=//a[contains(@href,"/tenders/new")]
-  Input Text  xpath=//input[@name="data[minimalStep][amount]"]  ${minimal_step_amount}
+
+  Run Keyword If  ${is_lot}  Wait And Select From List By Value  name="tender_type"  lots
+  ...  AND  Wait Element Animation  xpath=//a[@data-msg="jAlert OK"]
+  ...  AND  Підтвердити Дію
+  ...  ELSE  Input Text  xpath=//input[@name="data[minimalStep][amount]"]  ${minimal_step_amount}
+
   Select From List By Value  xpath=//select[@name="data[mainProcurementCategory]"]  ${tender_data.data.mainProcurementCategory}
   Input Text  xpath=//input[@name="data[title]"]  ${tender_data.data.title}
   Input Text  xpath=//input[@name="data[description]"]  ${tender_data.data.description}
@@ -502,7 +512,7 @@ Input Tender Period End Date
 ###############################################################################################################
 
 Подати цінову пропозицію
-  [Arguments]   ${username}  ${tender_uaid}  ${bid}
+  [Arguments]  ${username}  ${tender_uaid}  ${bid}  ${lots_ids}=${None}  ${features_ids}=${None}
   ${amount}=   add_second_sign_after_point   ${bid.data.value.amount}
 #  ${status}=   Get From Dictionary   ${bid['data']}   qualified
 #  ${qualified}=   Set Variable If   ${status}   ${EMPTY}   &bad=1
