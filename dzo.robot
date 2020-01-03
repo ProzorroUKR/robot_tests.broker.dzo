@@ -480,6 +480,15 @@ Input Tender Period End Date
 ##########################################    ЗАПИТАННЯ    ####################################################
 ###############################################################################################################
 
+Задати запитання на тендер
+  [Arguments]  ${username}  ${tender_uaid}  ${question}
+  Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(@href, 'questions')]
+#  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
+  Wait And Input Text  xpath=//form[@id="question_form"]/descendant::input[@name="title"]  ${question.data.title}
+  Wait And Input Text  xpath=//form[@id="question_form"]/descendant::textarea[@name="description"]  ${question.data.description}
+  Wait And Click  xpath=//button[contains(text(), 'Надіслати запитання')]
+  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+
 Відповісти на запитання
   [Arguments]  ${username}  ${tender_uaid}  ${answer_data}  ${question_id}
   Switch Browser  ${username}
