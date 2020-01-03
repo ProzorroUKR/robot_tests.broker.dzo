@@ -333,7 +333,7 @@ Get From Item
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   ${file_name}=   Get Text   xpath=//span[contains(text(),'${doc_id}')]
-  ${url}=   Get Element Attribute   xpath=//span[contains(text(),'${doc_id}')]/..@href
+  ${url}=   Get Element Attribute   xpath=//span[contains(text(),'${doc_id}')]/../preceding-sibling::a[contains(@class,"js-download-link")]@href
   dzo_download_file   ${url}  ${file_name.split('/')[-1]}  ${OUTPUT_DIR}
   [Return] ${file_name.split('/')[-1]}
 

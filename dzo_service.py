@@ -114,6 +114,7 @@ def convert_dzo_data(value, field_name):
             u'Код в ЄДРПОУ / ІПН': "UA-EDR",
             u'Класифікація за ДК 021-2015 (CPV)': u"ДК021",
             u'послуги': 'services',
+            u'товари': 'goods',
             u"(з ПДВ)": u"True",
             u"(без ПДВ)": u"False",
             u"з ПДВ": True,
