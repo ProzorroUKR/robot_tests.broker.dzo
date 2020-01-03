@@ -365,7 +365,7 @@ Get From Item
   ${file_path}=  Get Variable Value  ${ARTIFACT_FILE}  artifact_plan.yaml
   ${artifact}=  load_data_from  ${file_path}
   ${plan_id}=  Set Variable  ${artifact.tender_uaid}
-  ${is_lot}=  Set Variable If  "lots" in "${tender_data.data}"  ${True}  ${False}
+  ${is_lot}=  Set Variable If  ${tender_data.data.has_key('lots')}  ${True}  ${False}
 
   dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
   Wait And Click  xpath=//a[contains(@href,"/tenders/new")]
