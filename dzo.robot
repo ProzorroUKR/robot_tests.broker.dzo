@@ -88,6 +88,7 @@ ${locator.questions.description}  /following-sibling::div[@class="text"]
 ${locator.questions.date}  /preceding-sibling::div[@class="date"]
 ${locator.questions.answer}  /../following-sibling::div[@class="answer relative"]/div[@class="text"]
 
+${locator.ModalOK}=  xpath=//a[@data-msg="jAlert OK"]
 
 *** Keywords ***
 Підготувати клієнт для користувача
@@ -175,7 +176,7 @@ Login
   ...  Reload Page
   ...  AND  Element Should Be Visible  xpath=//a[@data-plan-action="scheduled"]
   Click Element  xpath=//a[@data-plan-action="scheduled"]
-  Wait And Click  xpath=//a[@data-msg="jAlert OK"]
+  Підтвердити дію
 
   [Return]  ${plan_uaid}
 
@@ -233,8 +234,7 @@ Select CPV
   Switch Browser  ${username}
   Wait And Click  xpath=//a[@class="button save"]
   Wait And Click  xpath=//input[contains(@value, "${item_id}")]/ancestor::div[contains(@class, "tenderItemElement")]/descendant::a[@class="deleteMultiItem"]
-  Wait And Click  xpath=//a[@data-msg="jAlert OK"]
-  Wait Until Element Is Not Visible  xpath=//div[@id="jAlertBack"]
+  Підтвердити дію
   Wait And Click  xpath=//button[@name="do"]
 
 Оновити сторінку з планом
@@ -487,6 +487,36 @@ Input Tender Period End Date
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(@href, 'questions')]
   Wait And Input Text  xpath=//div[contains(text(),'${question_id}')]/../following-sibling::div/descendant::textarea[@name="answer"]  ${answer_data.data.answer}
   Wait And Click  xpath=//button[contains(text(), 'Опублікувати відповідь')]
+
+###############################################################################################################
+#########################################    ПРОПОЗИЦІЇ    ####################################################
+###############################################################################################################
+
+Подати цінову пропозицію
+  [Arguments]   ${username}  ${tender_uaid}  ${bid}
+  ${amount}=   add_second_sign_after_point   ${bid.data.value.amount}
+#  ${status}=   Get From Dictionary   ${bid['data']}   qualified
+#  ${qualified}=   Set Variable If   ${status}   ${EMPTY}   &bad=1
+#  ${filePath}=   get_upload_file_path
+#  dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+#  ${bid_status}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//div[@class="priceFormated"]
+#  Run keyword if   ${bid_status}   Click Element  xpath=//a[contains(@class,'bidToEdit')]
+#  Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
+#  ${status_doc_upload}=   Run Keyword And Return Status   Element Should Not Be Visible   xpath=//select[@class="documents_url"]
+#  Run Keyword If   ${status_doc_upload}   Run Keywords
+#  ...   Run Keyword And Ignore Error   Click Element   xpath=//a[@class="uploadFile"]
+#  ...   AND   Choose File   xpath=/html/body/div[1]/form/input   ${filePath}
+#  ...   AND   Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
+#  ...   AND   Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
+#  Clear Element Text   name=data[value][amount]
+  Wait And Input Text  name=data[value][amount]   ${amount}
+  Wait And Click  name=do
+  Wait And Click  xpath=//a[./text()= 'Закрити']
+  Wait Element Animation  xpath=//a[./text()= 'Закрити']
+  Wait And Click  xpath=//button[@name="pay"]
+  Підтвердити дію
+  [Return]  ${bid}
+
 
 #####################################################################################
 
