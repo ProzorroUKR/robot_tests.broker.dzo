@@ -115,6 +115,7 @@ def convert_dzo_data(value, field_name):
             u'Класифікація за ДК 021-2015 (CPV)': u"ДК021",
             u'послуги': 'services',
             u'товари': 'goods',
+            u'роботи': 'works',
             u"(з ПДВ)": u"True",
             u"(без ПДВ)": u"False",
             u"з ПДВ": True,
