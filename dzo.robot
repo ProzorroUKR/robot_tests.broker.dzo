@@ -340,6 +340,11 @@ Get From Item
 #Отримати інформацію із лоту
 #  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
 
+Отримати інформацію із пропозиції
+  [Arguments]  ${username}  ${tender_uaid}  ${field}
+  ${bid_value}=  Get Text  xpath=//span[@class="bidAmountValue"]
+  ${bid_value}=  Convert To Number  ${bid_value.replace(' ', '')}
+  [Return]  ${bid_value}
 
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
