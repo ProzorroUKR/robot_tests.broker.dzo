@@ -267,6 +267,7 @@ Select CPV
 Отримати інформацію із тендера
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Switch Browser  ${username}
+  Reload Page
   ${text}=  Run Keyword If
   ...  "value.amount" in "${field_name}"  Get Amount
   ...  ELSE IF  "milestones" in "${field_name}"  Get From Milestone  ${field_name}
@@ -358,9 +359,6 @@ Get From Item
   ${valueAddedTaxIncluded}=  Set Variable If  ${tender_data.data.value.valueAddedTaxIncluded}  true  false
   ${enquiry_end_date}=  convert_datetime_to_format  ${tender_data.data.enquiryPeriod.endDate}  %d/%m/%Y %H:%M
   ${tender_end_date}=  convert_datetime_to_format  ${tender_data.data.tenderPeriod.endDate}  %d/%m/%Y %H:%M
-  ${milestones_length}=  Get Length  ${tender_data.data.milestones}
-  ${items}=  Get From Dictionary  ${tender_data.data}  items
-  ${items_length}=  Get Length  ${items}
   ${procurementMethodType}=  Set Variable If  ${tender_data.data.has_key("procurementMethodType")}  ${tender_data.data.procurementMethodType}  open_belowThreshold
   ${file_path}=  Get Variable Value  ${ARTIFACT_FILE}  artifact_plan.yaml
   ${artifact}=  load_data_from  ${file_path}
@@ -387,15 +385,8 @@ Get From Item
 #  Select CPV  ${tender_data.data.classification.id}
 #  Wait And Input Text  xpath=//input[@name="data[budget][description]"]  ${tender_data.data.budget.description}
 
-  Wait And Click  xpath=//section[contains(@id, "multiItems")]/a
-  :FOR  ${index}  IN RANGE  ${items_length}
-  \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
-  \  Add Tender Item  ${items[${index}]}  ${index}
-
-  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/a
-  :FOR  ${index}  IN RANGE  ${milestones_length}
-  \  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/descendant::a[@class="addMultiItem"]
-  \  Add Milestone  ${tender_data.data.milestones[${index}]}  ${index}
+  Run Keyword If  not ${is_lot}  Fill Form For Tender Without Lots  ${tender_data}
+  ...  ELSE  Fill Form Tender With Lots  ${tender_data}
 
   Input Date  data[enquiryPeriod][endDate]  ${enquiry_end_date.split(" ")[0]}
   Input Date  enquiryPeriod_time  ${enquiry_end_date.split(" ")[1]}
@@ -407,6 +398,48 @@ Get From Item
   Wait Until Page Contains Element  xpath=//span[@class="js-apiID"]
   ${tender_uaid}=  Get Text  xpath=//span[@class="js-apiID"]
   [Return]  ${tender_uaid}
+
+Fill Form For Tender Without Lots
+  [Arguments]  ${tender_data}
+  ${items}=  Get From Dictionary  ${tender_data.data}  items
+  ${items_length}=  Get Length  ${items}
+  ${milestones_length}=  Get Length  ${tender_data.data.milestones}
+  Wait And Click  xpath=//section[contains(@id, "multiItems")]/a
+  :FOR  ${index}  IN RANGE  ${items_length}
+  \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
+  \  Add Tender Item  ${items[${index}]}  ${index}
+
+  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/a
+  :FOR  ${index}  IN RANGE  ${milestones_length}
+  \  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/descendant::a[@class="addMultiItem"]
+  \  Add Milestone  ${tender_data.data.milestones[${index}]}  ${index}
+
+Fill Form Tender With Lots
+  [Arguments]  ${tender_data}
+  ${lots_length}=  Get Length  ${tender_data.data.lots}
+
+  Wait And Click  xpath=//section[contains(@id, "multiLots")]/a
+  :FOR  ${index}  IN RANGE  ${lots_length}
+  \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
+  \  Add Tender Lot  ${tender_data.data.lots[${index}]}  ${index}
+
+Add Tender Lot
+  [Arguments]  ${lot}  ${index}
+  ${amount}=  add_second_sign_after_point  ${lot.value.amount}
+  ${minimal_step_amount}=  add_second_sign_after_point  ${lot.minimalStep.amount}
+  ${items}=  Get From Dictionary  ${tender_data.data}  items
+  ${items_length}=  Get Length  ${items}
+  ${milestones_length}=  Get Length  ${tender_data.data.milestones}
+  Wait And Input Text  xpath=//input[@name="data[lots][${index}][title]"]  ${lot.title}
+  Wait And Input Text  xpath=//input[@name="data[lots][${index}][description]"]  ${lot.description}
+  Wait And Input Text  xpath=//input[@name="data[lots][${index}][value][amount]"]  ${amount}
+  Wait And Input Text  xpath=//input[@name="data[lots][${index}][minimalStep][amount]"]  ${minimal_step_amount}
+  Wait And Click  xpath=//section[contains(@id, "multiItems")]/a
+  :FOR  ${index}  IN RANGE  ${items_length}
+  \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
+  \  Continue For Loop If  ${lot.id} == ${items[${index}].relatedLot}
+  \  Add Tender Item  ${items[${index}]}  ${index}
+
 
 Add Tender Item
   [Arguments]  ${item}  ${index}
