@@ -336,7 +336,7 @@ Get From Item
   ${file_name}=   Get Text   xpath=//span[contains(text(),'${doc_id}')]
   ${url}=   Get Element Attribute   xpath=//span[contains(text(),'${doc_id}')]/../preceding-sibling::a[contains(@class,"js-download-link")]@href
   dzo_download_file   ${url}  ${file_name.split('/')[-1]}  ${OUTPUT_DIR}
-  [Return] ${file_name.split('/')[-1]}
+  [Return]  ${file_name.split('/')[-1]}
 
 #Отримати інформацію із лоту
 #  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
