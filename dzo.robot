@@ -567,7 +567,8 @@ Input Tender Period End Date
 #  ...   AND   Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
 #  Clear Element Text   name=data[value][amount]
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
-  Wait And Input Text  name=data[value][amount]   ${amount}
+  Scroll To Element  name=data[value][amount]
+  Input Text  name=data[value][amount]  ${amount}
   Wait And Click  name=do
   Wait And Click  xpath=//a[./text()= 'Закрити']
   Wait Element Animation  xpath=//a[./text()= 'Закрити']
