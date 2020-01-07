@@ -575,6 +575,15 @@ Input Tender Period End Date
   Підтвердити дію
   [Return]  ${bid}
 
+Завантажити документ в ставку
+  [Arguments]  ${username}  ${path}  ${tender_uaid}  ${doc_name}=documents  ${doc_type}=qualificationDocuments
+  Wait Until Page Contains  Ваша пропозиція  10
+  Wait And Click  xpath=//a[contains(@class,'bidToEdit')]
+  Choose File  xpath=/html/body/div[1]/form/input[2]  ${filePath}
+  ...  AND  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
+  ...  AND  Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@class="documents_url"]  ${doc_type}
+  Клікнути по елементу   name=do
+  Клікнути по елементу   xpath=//a[./text()= 'Закрити']
 
 #####################################################################################
 
