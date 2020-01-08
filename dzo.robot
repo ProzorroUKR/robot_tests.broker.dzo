@@ -368,7 +368,7 @@ Get From Item
   dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
   Wait And Click  xpath=//a[contains(@href,"/tenders/new")]
 
-  Run Keyword If  ${is_lot}  Select From List By Value  name="tender_type"  lots
+  Run Keyword If  ${is_lot}  Select From List By Value  name=tender_type  lots
   ...  AND  Wait Element Animation  xpath=//a[@data-msg="jAlert OK"]
   ...  AND  Підтвердити Дію
   ...  ELSE  Input Text  xpath=//input[@name="data[minimalStep][amount]"]  ${minimal_step_amount}
