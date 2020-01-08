@@ -69,6 +69,14 @@ ${tender.view.minimalStep.amount}=  xpath=//td[contains(text(),'Розмір м�
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
 
+${locator.lots.title}=  /descendant::span[@class="js-lot-title"]
+${locator.lots.description}=  /descendant::div[@class="lead"]
+${locator.lots.value.amount}=  /descendant::td[contains(text(),"очікувана вартість")]/following-sibling::td/span[1]
+${locator.lots.value.currency}=  /descendant::td[contains(text(),"очікувана вартість")]/following-sibling::td/span[2]
+${locator.lots.value.valueAddedTaxIncluded}=  /descendant::span[@class="taxIncluded"]
+${locator.lots.minimalStep.amount}=  /descendant::td[contains(text(),"Розмір мінімального кроку")]/following-sibling::td/span[1]
+${locator.lots.minimalStep.currency}=  /descendant::td[contains(text(),"Розмір мінімального кроку")]/following-sibling::td/span[2]
+${locator.lots.minimalStep.valueAddedTaxIncluded}=  /descendant::span[@class="taxIncluded"]
 
 ${locator.items.description}  /td[2]/div[1]
 ${locator.items.deliveryAddress.countryName}  /descendant::span[contains(text(), "Місце поставки ")]/following-sibling::span
@@ -301,6 +309,13 @@ Get From Item
   ${field_name}=  Remove String Using Regexp  ${field_name}  \\[(\\d+)\\]
   ${value}=  Get Text  ${tender.view.${field_name}}
   [Return]  ${value}
+
+Отримати інформацію із лоту
+  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
+  Switch Browser  ${username}
+  ${lot_value}=  Get Text  xpath=//*[contains(text(), '${lot_id}')]/ancestor::div[contains(@class,"tenderLotItemElement")]${locator.lots.${field_name}}
+#  ${lot_value}=  adapt_items_data  ${field_name}  ${lot_value}
+  [Return]  ${lot_value}
 
 Отримати інформацію із предмету
   [Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${field_name}
