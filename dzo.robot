@@ -368,7 +368,7 @@ Get From Item
   dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
   Wait And Click  xpath=//a[contains(@href,"/tenders/new")]
 
-  Run Keyword If  ${is_lot}  Wait And Select From List By Value  name="tender_type"  lots
+  Run Keyword If  ${is_lot}  Select From List By Value  name="tender_type"  lots
   ...  AND  Wait Element Animation  xpath=//a[@data-msg="jAlert OK"]
   ...  AND  Підтвердити Дію
   ...  ELSE  Input Text  xpath=//input[@name="data[minimalStep][amount]"]  ${minimal_step_amount}
@@ -421,13 +421,14 @@ Fill Form Tender With Lots
   Wait And Click  xpath=//section[contains(@id, "multiLots")]/a
   :FOR  ${index}  IN RANGE  ${lots_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
-  \  Add Tender Lot  ${tender_data.data.lots[${index}]}  ${index}
+  \  ${items}=  get_items_by_lot_id  ${tender_data}  ${tender_data.data.lots[${index}].id}
+  \  Add Tender Lot  ${tender_data.data.lots[${index}]}  ${index}  ${items}
 
 Add Tender Lot
-  [Arguments]  ${lot}  ${index}
+  [Arguments]  ${lot}  ${index}  ${items}
   ${amount}=  add_second_sign_after_point  ${lot.value.amount}
   ${minimal_step_amount}=  add_second_sign_after_point  ${lot.minimalStep.amount}
-  ${items}=  Get From Dictionary  ${tender_data.data}  items
+#  ${items}=  Get From Dictionary  ${tender_data.data}  items
   ${items_length}=  Get Length  ${items}
   ${milestones_length}=  Get Length  ${tender_data.data.milestones}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][title]"]  ${lot.title}
@@ -437,7 +438,6 @@ Add Tender Lot
   Wait And Click  xpath=//section[contains(@id, "multiItems")]/a
   :FOR  ${index}  IN RANGE  ${items_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
-  \  Continue For Loop If  ${lot.id} == ${items[${index}].relatedLot}
   \  Add Tender Item  ${items[${index}]}  ${index}
 
 
@@ -570,8 +570,8 @@ Input Tender Period End Date
   Scroll To Element  name=data[value][amount]
   Input Text  name=data[value][amount]  ${amount}
   Wait And Click  name=do
-  Wait Until Page Contains Element  xpath=//a[text()='ЗАКРИТИ']
-  Click Element  xpath=//a[text()='ЗАКРИТИ']
+#  Wait Until Page Contains Element  xpath=//a[text()='ЗАКРИТИ']
+  Wait Until Keyword Succeeds  10 x  1 s  Click Element  xpath=//a[text()='ЗАКРИТИ']
   Wait Element Animation  xpath=//a[text()='ЗАКРИТИ']
   Wait And Click  xpath=//button[@name="pay"]
   Підтвердити дію

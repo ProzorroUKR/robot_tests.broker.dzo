@@ -149,5 +149,11 @@ def adapt_items_data(field_name, value):
         value = convert_string_from_dict_dzo(value)
     return value
 
+
 def dzo_download_file(url, file_name, output_dir):
     urllib.urlretrieve(url, ('{}/{}'.format(output_dir, file_name)))
+
+
+def get_items_by_lot_id(tender_data, lot_id):
+    items = [item for item in tender_data['data']['items'] if item['relatedLot'] == lot_id]
+    return items
