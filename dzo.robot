@@ -575,9 +575,8 @@ Input Tender Period End Date
   Scroll To Element  name=data[value][amount]
   Input Text  name=data[value][amount]  ${amount}
   Wait And Click  name=do
-#  Wait Until Page Contains Element  xpath=//a[text()='ЗАКРИТИ']
-  Wait Until Keyword Succeeds  10 x  1 s  Click Element  xpath=//a[text()='ЗАКРИТИ']
-  Wait Element Animation  xpath=//a[text()='ЗАКРИТИ']
+  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+  Wait Element Animation  xpath=//a[@data-msg="jAlert Close"]
   Wait And Click  xpath=//button[@name="pay"]
   Підтвердити дію
   [Return]  ${bid}
@@ -589,8 +588,8 @@ Input Tender Period End Date
   Choose File  xpath=/html/body/div[1]/form/input[2]  ${filePath}
   ...  AND  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
   ...  AND  Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@class="documents_url"]  ${doc_type}
-  Клікнути по елементу   name=do
-  Клікнути по елементу   xpath=//a[./text()= 'Закрити']
+  Wait And Click   name=do
+  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
 
 #####################################################################################
 
