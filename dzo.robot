@@ -353,12 +353,11 @@ Get From Item
   dzo_download_file   ${url}  ${file_name.split('/')[-1]}  ${OUTPUT_DIR}
   [Return]  ${file_name.split('/')[-1]}
 
-#Отримати інформацію із лоту
-#  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
-
 Отримати інформацію із пропозиції
   [Arguments]  ${username}  ${tender_uaid}  ${field}
-  ${bid_value}=  Get Text  xpath=//span[@class="bidAmountValue"]
+  Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
+  ${bid_value}=  Get Text  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
   ${bid_value}=  Convert To Number  ${bid_value.replace(' ', '')}
   [Return]  ${bid_value}
 
@@ -599,7 +598,7 @@ Input Tender Period End Date
   [Arguments]  ${username}  ${path}  ${tender_uaid}  ${doc_name}=documents  ${doc_type}=qualificationDocuments
   Wait Until Page Contains  Ваша пропозиція  10
   Wait And Click  xpath=//a[contains(@class,'bidToEdit')]
-  Choose File  xpath=/html/body/div[1]/form/input[2]  ${filePath}
+  Choose File  xpath=/html/body/div[1]/form/input[2]  ${path}
   ...  AND  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
   ...  AND  Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@class="documents_url"]  ${doc_type}
   Wait And Click   name=do
