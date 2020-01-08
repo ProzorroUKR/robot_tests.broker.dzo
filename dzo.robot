@@ -368,7 +368,7 @@ Get From Item
   dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
   Wait And Click  xpath=//a[contains(@href,"/tenders/new")]
 
-  Run Keyword If  ${is_lot}  Select From List By Value  name=tender_type  lots
+  Run Keyword If  ${is_lot}  Run Keywords  Select From List By Value  name=tender_type  lots
   ...  AND  Wait Element Animation  xpath=//a[@data-msg="jAlert OK"]
   ...  AND  Підтвердити Дію
   ...  ELSE  Input Text  xpath=//input[@name="data[minimalStep][amount]"]  ${minimal_step_amount}
@@ -440,7 +440,7 @@ Add Tender Lot
   :FOR  ${index}  IN RANGE  ${items_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
   \  Add Tender Item  ${items[${index}]}  ${index}
-    Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/a
+  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/a
   :FOR  ${index}  IN RANGE  ${milestones_length}
   \  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/descendant::a[@class="addMultiItem"]
   \  Add Milestone  ${milestones[${index}]}  ${index}
