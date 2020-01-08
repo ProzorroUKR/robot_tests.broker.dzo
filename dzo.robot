@@ -421,16 +421,17 @@ Fill Form Tender With Lots
   Wait And Click  xpath=//section[contains(@id, "multiLots")]/a
   :FOR  ${index}  IN RANGE  ${lots_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
-  \  ${items}=  get_items_by_lot_id  ${tender_data}  ${tender_data.data.lots[${index}].id}
-  \  Add Tender Lot  ${tender_data.data.lots[${index}]}  ${index}  ${items}
+  \  Add Tender Lot  ${tender_data.data.lots[${index}]}  ${index}
 
 Add Tender Lot
-  [Arguments]  ${lot}  ${index}  ${items}
+  [Arguments]  ${lot}  ${index}
   ${amount}=  add_second_sign_after_point  ${lot.value.amount}
   ${minimal_step_amount}=  add_second_sign_after_point  ${lot.minimalStep.amount}
+  ${items}=  get_items_by_lot_id  ${tender_data}  ${tender_data.data.lots[${index}].id}
+  ${milestones}=  get_milestone_by_lot_id  ${tender_data}  ${tender_data.data.lots[${index}].id}
 #  ${items}=  Get From Dictionary  ${tender_data.data}  items
   ${items_length}=  Get Length  ${items}
-  ${milestones_length}=  Get Length  ${tender_data.data.milestones}
+  ${milestones_length}=  Get Length  ${milestones}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][title]"]  ${lot.title}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][description]"]  ${lot.description}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][value][amount]"]  ${amount}
@@ -439,6 +440,10 @@ Add Tender Lot
   :FOR  ${index}  IN RANGE  ${items_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
   \  Add Tender Item  ${items[${index}]}  ${index}
+    Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/a
+  :FOR  ${index}  IN RANGE  ${milestones_length}
+  \  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/descendant::a[@class="addMultiItem"]
+  \  Add Milestone  ${milestones[${index}]}  ${index}
 
 
 Add Tender Item

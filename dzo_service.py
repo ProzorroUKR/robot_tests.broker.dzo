@@ -157,3 +157,8 @@ def dzo_download_file(url, file_name, output_dir):
 def get_items_by_lot_id(tender_data, lot_id):
     items = [item for item in tender_data['data']['items'] if item['relatedLot'] == lot_id]
     return items
+
+
+def get_milestone_by_lot_id(tender_data, lot_id):
+    items = [item for item in tender_data['data']['milestones'] if item['relatedLot'] == lot_id]
+    return items
