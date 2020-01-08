@@ -575,7 +575,7 @@ Input Tender Period End Date
   Input Text  name=data[value][amount]  ${amount}
   Wait And Click  name=do
   Wait And Click  xpath=//a[@data-msg="jAlert Close"]
-  Wait Until Page Does Not Contain Element  xpath=//div[@id="jAlertBack"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
   Wait And Click  xpath=//button[@name="pay"]
   Підтвердити дію
   [Return]  ${bid}
