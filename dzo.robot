@@ -440,9 +440,8 @@ Add Tender Lot
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
   \  Add Tender Item  ${items[${index}]}  ${index}
   Wait And Click  xpath=(//section[contains(@class, "multiMilestones")]/a)[1]
-  Wait And Click  xpath=(//section[contains(@class, "multiMilestones")]/descendant::a[@class="addMultiItem"])[1]
   :FOR  ${index}  IN RANGE  ${milestones_length}
-  \  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/descendant::a[@class="addMultiItem"]
+  \  Wait And Click  xpath=(//section[contains(@class, "multiMilestones")]/descendant::a[@class="addMultiItem"])[1]
   \  Add Milestone  ${milestones[${index}]}  ${index}
 
 
