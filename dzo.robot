@@ -421,10 +421,10 @@ Fill Form Tender With Lots
   Wait And Click  xpath=//section[contains(@id, "multiLots")]/a
   :FOR  ${index}  IN RANGE  ${lots_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
-  \  Add Tender Lot  ${tender_data.data.lots[${index}]}  ${index}
+  \  Add Tender Lot  ${tender_data}  ${tender_data.data.lots[${index}]}  ${index}
 
 Add Tender Lot
-  [Arguments]  ${lot}  ${index}
+  [Arguments]  ${tender_data}  ${lot}  ${index}
   ${amount}=  add_second_sign_after_point  ${lot.value.amount}
   ${minimal_step_amount}=  add_second_sign_after_point  ${lot.minimalStep.amount}
   ${items}=  get_items_by_lot_id  ${tender_data}  ${tender_data.data.lots[${index}].id}
