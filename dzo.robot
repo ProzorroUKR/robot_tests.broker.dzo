@@ -570,8 +570,9 @@ Input Tender Period End Date
   Scroll To Element  name=data[value][amount]
   Input Text  name=data[value][amount]  ${amount}
   Wait And Click  name=do
-  Wait And Click  xpath=//a[./text()= 'Закрити']
-  Wait Element Animation  xpath=//a[./text()= 'Закрити']
+  Wait Until Page Contains Element  xpath=//a[text()='ЗАКРИТИ']
+  Click Element  xpath=//a[text()='ЗАКРИТИ']
+  Wait Element Animation  xpath=//a[text()='ЗАКРИТИ']
   Wait And Click  xpath=//button[@name="pay"]
   Підтвердити дію
   [Return]  ${bid}
