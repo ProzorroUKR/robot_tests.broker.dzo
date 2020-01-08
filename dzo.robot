@@ -436,11 +436,11 @@ Add Tender Lot
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][description]"]  ${lot.description}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][value][amount]"]  ${amount}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][minimalStep][amount]"]  ${minimal_step_amount}
-  Wait And Click  xpath=//section[contains(@id, "multiItems")]/a
   :FOR  ${index}  IN RANGE  ${items_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
   \  Add Tender Item  ${items[${index}]}  ${index}
-  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/a
+  Wait And Click  xpath=(//section[contains(@class, "multiMilestones")]/a)[1]
+  Wait And Click  xpath=(//section[contains(@class, "multiMilestones")]/descendant::a[@class="addMultiItem"])[1]
   :FOR  ${index}  IN RANGE  ${milestones_length}
   \  Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/descendant::a[@class="addMultiItem"]
   \  Add Milestone  ${milestones[${index}]}  ${index}
