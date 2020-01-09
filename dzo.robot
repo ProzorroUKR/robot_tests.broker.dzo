@@ -314,7 +314,7 @@ Get From Item
   [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
   Switch Browser  ${username}
   ${lot_value}=  Get Text  xpath=//*[contains(text(), '${lot_id}')]/ancestor::div[contains(@class,"tenderLotItemElement")]${locator.lots.${field_name}}
-#  ${lot_value}=  adapt_items_data  ${field_name}  ${lot_value}
+  ${lot_value}=  convert_dzo_data  ${lot_value}  ${field_name}
   [Return]  ${lot_value}
 
 Отримати інформацію із предмету
