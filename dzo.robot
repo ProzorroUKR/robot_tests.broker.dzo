@@ -158,7 +158,7 @@ Login
   Click Element  xpath=//input[@name="procuringEntity[manual]"]/..
   Clear Element Text  xpath=//input[@name="data[procuringEntity][name]"]
   Input Text  xpath=//input[@name="data[procuringEntity][name]"]  ${plan_data.data.procuringEntity.name}
-  Clear Element Text  xpath=//input[@name="data[procuringEntity][identifier][id]"]
+#  Clear Element Text  xpath=//input[@name="data[procuringEntity][identifier][id]"]
   Input Text  xpath=//input[@name="data[procuringEntity][identifier][id]"]  ${plan_data.data.procuringEntity.identifier.id}
   Wait And Input Text  xpath=//input[@name="data[budget][description]"]  ${plan_data.data.budget.description}
 
@@ -379,7 +379,7 @@ Get From Item
   [Arguments]  ${username}  ${tender_data}  ${plan_uaid}
   Switch Browser  ${username}
   ${valueAddedTaxIncluded}=  Set Variable If  ${tender_data.data.value.valueAddedTaxIncluded}  true  false
-  ${enquiry_end_date}=  convert_datetime_to_format  ${tender_data.data.enquiryPeriod.endDate}  %d/%m/%Y %H:%M
+  ${enquiry_end_date}=  Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  convert_datetime_to_format  ${tender_data.data.enquiryPeriod.endDate}  %d/%m/%Y %H:%M
   ${tender_end_date}=  convert_datetime_to_format  ${tender_data.data.tenderPeriod.endDate}  %d/%m/%Y %H:%M
   ${procurementMethodType}=  Set Variable If  ${tender_data.data.has_key("procurementMethodType")}  ${tender_data.data.procurementMethodType}  open_belowThreshold
   ${file_path}=  Get Variable Value  ${ARTIFACT_FILE}  artifact_plan.yaml
@@ -408,13 +408,17 @@ Get From Item
   Run Keyword If  not ${is_lot}  Fill Form For Tender Without Lots  ${tender_data}
   ...  ELSE  Fill Form Tender With Lots  ${tender_data}
 
-  Run Keyword If  ${tender_data.data.has_key('funders')}  Select From List By Label  name=funders[]  ${tender_data.data.funders[0].name}
+  Run Keyword If  ${tender_data.data.has_key('funders')}  Run Keywords
+  ...  Click Element  xpath=//input[@value="Визначте організацію-донора"]
+  ...  AND  Wait And Click  xpath=//li[text()="${tender_data.data.funders[0].name}"]
 
-  Input Date  data[enquiryPeriod][endDate]  ${enquiry_end_date.split(" ")[0]}
-  Input Date  enquiryPeriod_time  ${enquiry_end_date.split(" ")[1]}
+  Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  Run Keywords
+  ...  Input Date  data[enquiryPeriod][endDate]  ${enquiry_end_date.split(" ")[0]}
+  ...  AND  Input Date  enquiryPeriod_time  ${enquiry_end_date.split(" ")[1]}
   Input Date  data[tenderPeriod][endDate]  ${tender_end_date.split(" ")[0]}
   Input Date  tenderPeriod_time  ${tender_end_date.split(" ")[1]}
-  Click Element  xpath=//select[@name="tender_enquiry_timeout"]
+#  Click Element  xpath=//select[@name="tender_enquiry_timeout"]
+  Click Element  xpath=//*[contains(text(),"Надайте календарну")]
   Wait Until Element Is Not Visible  xpath=//div[@id="ui-datepicker-div"]
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Page Contains Element  xpath=//span[@class="js-apiID"]
@@ -482,7 +486,7 @@ Add Tender Item
   Click Element  xpath=//div[contains(@class, "tenderItemPositionElement")][@data-multiline="${index}"]/descendant::a[@data-class="ДК021"]
   Select CPV  ${item.classification.id}
   Run Keyword And Ignore Error  Run Keywords
-  ...  Wait Until Page Contains Element  xpath=//a[@data-msg="jAlert Close"]
+  ...  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//a[@data-msg="jAlert Close"]
   ...  AND  Click Element  xpath=//a[@data-msg="jAlert Close"]
   ...  AND  Wait Until Page Does Not Contain Element  xpath=//a[@data-msg="jAlert Close"]
   Input Date  data[items][${index}][deliveryDate][endDate]  ${delivery_end_date}
@@ -490,7 +494,8 @@ Add Tender Item
   Select From List By Label  xpath=//select[@name="data[items][${index}][region_id]"]  ${item.deliveryAddress.region}
   Input Text  xpath=//input[@name="data[items][${index}][deliveryAddress][locality]"]  ${item.deliveryAddress.locality}
   Input Text  xpath=//input[@name="data[items][${index}][deliveryAddress][streetAddress]"]  ${item.deliveryAddress.streetAddress}
-  Input Text  xpath=//input[@name="data[items][${index}][deliveryAddress][postalCode]"]  ${item.deliveryAddress.postalCode}
+  Execute Javascript  $('input[name="data[items][${index}][deliveryAddress][postalCode]"]').val('${item.deliveryAddress.postalCode}')
+#  Input Text  xpath=//input[@name="data[items][${index}][deliveryAddress][postalCode]"]  ${item.deliveryAddress.postalCode}
   Run Keyword And Ignore Error  Run Keywords
   ...  Click Element  xpath=//a[@data-msg="jAlert Close"]
   ...  AND  Wait Until Page Does Not Contain Element  xpath=//a[@data-msg="jAlert Close"]
