@@ -504,6 +504,13 @@ Add Milestone
   Click Element  xpath=(//button[text()="Пошук"])[1]
   Wait Until Keyword Succeeds  10 x  1 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]/a[contains(@href,"/tenders/")]  1
   Click Element  xpath=//a[contains(@class, "tenderLink")]
+  Run Keyword If  "${SUITE NAME.lower()}" == "qualification" and "${TEST NAME}" == "Можливість знайти закупівлю по ідентифікатору"
+  ...  Wait Until Keyword Succeeds  40 x  30 s  Status Should Be  ${username}  ${tender_uaid}  active.qualification
+
+Status Should Be
+  [Arguments]  ${status}
+  ${cur_status}=  Отримати інформацію із тендера  ${username}  ${tender_uaid}  status
+  Should Be Equal  ${status}  ${cur_status}
 
 Оновити сторінку з тендером
   [Arguments]  ${username}  ${tender_uaid}
