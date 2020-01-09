@@ -408,6 +408,8 @@ Get From Item
   Run Keyword If  not ${is_lot}  Fill Form For Tender Without Lots  ${tender_data}
   ...  ELSE  Fill Form Tender With Lots  ${tender_data}
 
+  Run Keyword If  ${tender_data.data.has_key('funders')}  Select From List By Label  name=funders[]  ${tender_data.data.funders[0].name}
+
   Input Date  data[enquiryPeriod][endDate]  ${enquiry_end_date.split(" ")[0]}
   Input Date  enquiryPeriod_time  ${enquiry_end_date.split(" ")[1]}
   Input Date  data[tenderPeriod][endDate]  ${tender_end_date.split(" ")[0]}
