@@ -65,6 +65,16 @@ ${tender.view.value.valueAddedTaxIncluded}=  xpath=//span[@class="taxIncluded"]/
 ${tender.view.tenderID}=  xpath=//span[@class="js-apiID"]
 ${tender.view.procuringEntity.name}=  xpath=//td[text()="Найменування організації"]/following-sibling::td/span
 ${tender.view.minimalStep.amount}=  xpath=//td[contains(text(),'Розмір мінімального кроку')]/following-sibling::td/span[1]
+${tender.view.funders[0].name}=  xpath=//div[@class="fundersItem"]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
+${tender.view.funders[0].address.countryName}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"Юридична адреса")]/following-sibling::td[1]
+${tender.view.funders[0].address.locality}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"Юридична адреса")]/following-sibling::td[1]
+${tender.view.funders[0].address.postalCode}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"Юридична адреса")]/following-sibling::td[1]
+${tender.view.funders[0].address.region}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"Юридична адреса")]/following-sibling::td[1]
+${tender.view.funders[0].address.streetAddress}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"Юридична адреса")]/following-sibling::td[1]
+${tender.view.funders[0].identifier.id}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"ЄДРПОУ")]/following-sibling::td[1]
+${tender.view.funders[0].identifier.legalName}=  xpath=//div[@class="fundersItem"]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
+${tender.view.funders[0].identifier.scheme}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"ЄДРПОУ")]/following-sibling::td[1]
+
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]

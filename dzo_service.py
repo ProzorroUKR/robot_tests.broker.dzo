@@ -87,6 +87,11 @@ def convert_dzo_data(value, field_name):
         value_for_return = float(value.replace("`", ""))
     elif "Date" in field_name:
         value_for_return = convert_time_to_tests_format(value)
+    elif "funders" in field_name:
+        value_for_return = adapt_items_data(field_name, value)
+        if "legalName" in field_name:
+            value_for_return = {"Глобальний фонд": "Глобальний Фонд для боротьби зі СНІДом, туберкульозом і малярією",
+                                "Світовий Банк": "Міжнародний банк реконструкції та розвитку (МБРР)"}.get(value, value)
     # elif "unit" in field_name:
     #     value_for_return = DZO_dict.get(value, value)
     else:
@@ -133,15 +138,15 @@ def get_street_from_tuple(string):
 
 
 def adapt_items_data(field_name, value):
-    if field_name == 'deliveryAddress.countryName':
+    if 'countryName' in field_name:
         value = value.split(',')[1].strip()
-    elif field_name == 'deliveryAddress.postalCode':
+    elif 'postalCode' in field_name:
         value = value.split(',')[0].strip()
-    elif field_name == 'deliveryAddress.locality':
+    elif 'locality' in field_name:
         value = value.split(',')[3].strip()
-    elif field_name == 'deliveryAddress.streetAddress':
+    elif 'streetAddress' in field_name:
         value = get_street_from_tuple(value.split(',')[4:])
-    elif field_name == 'deliveryAddress.region':
+    elif 'region' in field_name:
         value = value.split(',')[2].strip()
     elif field_name == 'quantity':
         value = float(value)
