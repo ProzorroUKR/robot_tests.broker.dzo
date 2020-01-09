@@ -116,8 +116,8 @@ def convert_dzo_data(value, field_name):
             u'послуги': 'services',
             u'товари': 'goods',
             u'роботи': 'works',
-            u"(з ПДВ)": u"True",
-            u"(без ПДВ)": u"False",
+            u"(з ПДВ)": True,
+            u"(без ПДВ)": False,
             u"з ПДВ": True,
             u"без ПДВ": False
     }.get(value, value)
