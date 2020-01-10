@@ -386,7 +386,6 @@ Get From Item
   ${artifact}=  load_data_from  ${file_path}
   ${plan_id}=  Set Variable  ${artifact.tender_uaid}
   ${is_lot}=  Set Variable If  ${tender_data.data.has_key('lots')}  ${True}  ${False}
-  ${feature_length}=  Run Keyword If  ${tender_data.data.has_key("features")}  Get Length  ${tender_data.data.features}
 
   dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
   Wait And Click  xpath=//a[contains(@href,"/tenders/new")]
@@ -412,11 +411,7 @@ Get From Item
   Run Keyword If  ${tender_data.data.has_key('funders')}
   ...  Execute Javascript  $('.js-choosenInit')[0].value = ${tender_data.data.funders[0].name.replace("Світовий Банк","0").replace("Глобальний фонд","1")}
 
-  Run Keyword If  ${tender_data.data.has_key("features")}  Run Keywords
-  ...  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[1]
-  ...  AND  :FOR  ${index}  IN RANGE  ${feature_length}
-            \  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/descendant::a[@class="addMultiItem"])[1]
-            \  Add Feature  ${tender_data.data.features[${index}]}  ${index}
+  Run Keyword If  ${tender_data.data.has_key("features")}  Add Features  ${tender_data}
 
   Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  Run Keywords
   ...  Input Date  data[enquiryPeriod][endDate]  ${enquiry_end_date.split(" ")[0]}
@@ -517,6 +512,24 @@ Add Milestone
   Input Text  xpath=//input[@name="data[milestones][${index}][percentage]"]  ${milestone.percentage}
   Input Text  xpath=//input[@name="data[milestones][${index}][duration][days]"]  ${milestone.duration.days}
   Select From List By Value  xpath=//select[@name="data[milestones][${index}][duration][type]"]  ${milestone.duration.type}
+
+Add Features
+  [Arguments]  ${tender_data}
+  ${feature_length}=  Get Length  ${tender_data.data.features}
+  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[1]
+  :FOR  ${index}  IN RANGE  ${feature_length}
+  \  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/descendant::a[@class="addMultiItem"])[1]
+  \  Add Feature  ${tender_data.data.features[${index}]}  ${index}
+
+Add Feature
+  [Arguments]  ${feature}  ${index}
+  ${enum_length}=  Get Length  ${feature.enum}
+  Input Text  xpath=//input[@name="data[features][${index}][title]"]  ${feature.title}
+  Input Text  xpath=//input[@name="data[features][${index}][description]"]  ${feature.description}
+  :FOR  ${enum_index}  IN  ${enum_length}
+  \  Run Keyword If  "${enum_index}" != 0  Click Element  xpath=//a[@class="addFeatureOptItem"]
+  \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title]"]  ${feature.enum[${enum_index}].title}
+  \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][value]"]  ${feature.enum[${enum_index}].value}
 
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
