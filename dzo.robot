@@ -610,7 +610,7 @@ Input Tender Period End Date
 #  ...   AND   Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
 #  Clear Element Text   name=data[value][amount]
   ${is_lot}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[contains(@name, "lotValues")]
-  ${locator_pref}=  Set Variable If  ${is_lot}  [lotValues][0]  ""
+  ${locator_pref}=  Set Variable If  ${is_lot}  [lotValues][0]  ${EMPTY}
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
   Scroll To Element  name=data${locator_pref}[value][amount]
   Input Text  name=data${locator_pref}[value][amount]  ${amount}
@@ -641,7 +641,7 @@ Input Tender Period End Date
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
   Wait And Click  xpath=//a[contains(@class, "bidToEdit")]
   ${is_lot}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[contains(@name, "lotValues")]
-  ${locator_pref}=  Set Variable If  ${is_lot}  [lotValues][0]  ""
+  ${locator_pref}=  Set Variable If  ${is_lot}  [lotValues][0]  ${EMPTY}
   Scroll To Element  name=data${locator_pref}[value][amount]
   Input Text  name=data${locator_pref}[value][amount]  ${amount}
   Wait And Click  name=do
