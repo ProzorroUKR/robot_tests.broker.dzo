@@ -567,6 +567,24 @@ Input Tender Period End Date
   # Сліп необхідний для корректної роботи з загруженим файлом користувачами Квінти, оскільки завантаження фалу у ЦБД може сягати 3-4 хвилин.
   Sleep  180
 
+Видалити донора
+  [Arguments]  ${username}  ${tender_uaid}  ${funders_index}
+  Switch Browser  ${username}
+  Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(text(), 'Процедура закупівлі')]
+  Wait And Click  xpath=//a[contains(@class, "save")]
+  Wait And Click  xpath=//a[@class="search-choice-close"]
+  Wait And Click  xpath=//button[@value="save"]
+
+Додати донора
+  [Arguments]  ${username}  ${tender_uaid}  ${funders_data}
+  Switch Browser  ${username}
+  Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(text(), 'Процедура закупівлі')]
+  Wait And Click  xpath=//a[contains(@class, "save")]
+  Wait And Click  xpath=//input[@value="Визначте організацію-донора"]
+  Wait Until Element Is Visible  xpath=//li[text()="${funders_data.funders[0].name}"]
+  Wait Until Keyword Succeeds  5 x  1 s  CLick Element  xpath=//li[text()="${funders_data.funders[0].name}"]
+  Wait And Click  xpath=//button[@value="save"]
+
 ###############################################################################################################
 ##########################################    ЗАПИТАННЯ    ####################################################
 ###############################################################################################################

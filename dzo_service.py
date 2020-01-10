@@ -87,6 +87,10 @@ def convert_dzo_data(value, field_name):
         value_for_return = float(value.replace("`", ""))
     elif "Date" in field_name:
         value_for_return = convert_time_to_tests_format(value)
+    elif field_name == "funders[0].identifier.id":
+        value_for_return = value.split(":")[1]
+    elif field_name == "funders[0].identifier.scheme":
+        value_for_return = value.split(":")[0]
     elif "funders" in field_name:
         value_for_return = adapt_items_data(field_name, value)
         if "legalName" in field_name:
