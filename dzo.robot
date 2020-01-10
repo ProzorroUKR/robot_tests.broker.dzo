@@ -386,6 +386,7 @@ Get From Item
   ${artifact}=  load_data_from  ${file_path}
   ${plan_id}=  Set Variable  ${artifact.tender_uaid}
   ${is_lot}=  Set Variable If  ${tender_data.data.has_key('lots')}  ${True}  ${False}
+  ${feature_length}=  Run Keyword If  ${tender_data.data.has_key("features")}  Get Length  ${tender_data.data.features}
 
   dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
   Wait And Click  xpath=//a[contains(@href,"/tenders/new")]
@@ -408,10 +409,14 @@ Get From Item
   Run Keyword If  not ${is_lot}  Fill Form For Tender Without Lots  ${tender_data}
   ...  ELSE  Fill Form Tender With Lots  ${tender_data}
 
-  Run Keyword If  ${tender_data.data.has_key('funders')}  Run Keywords
-  ...  Wait And Click  xpath=//input[@value="Визначте організацію-донора"]
-  ...  AND  Wait Until Element Is Visible  xpath=//li[text()="${tender_data.data.funders[0].name}"]
-  ...  AND  Wait Until Keyword Succeeds  5 x  1 s  CLick Element  xpath=//li[text()="${tender_data.data.funders[0].name}"]
+  Run Keyword If  ${tender_data.data.has_key('funders')}
+  ...  Execute Javascript  $('.js-choosenInit')[0].value = ${tender_data.data.funders[0].name.replace("Світовий Банк","0").replace("Глобальний фонд","1")}
+
+  Run Keyword If  ${tender_data.data.has_key("features")}  Run Keywords
+  ...  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[1]
+  ...  AND  :FOR  ${index}  IN RANGE  ${feature_length}
+            \  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/descendant::a[@class="addMultiItem"])[1]
+            \  Add Feature  ${tender_data.data.features[${index}]}  ${index}
 
   Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  Run Keywords
   ...  Input Date  data[enquiryPeriod][endDate]  ${enquiry_end_date.split(" ")[0]}
