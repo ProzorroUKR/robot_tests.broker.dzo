@@ -386,11 +386,14 @@ Get From Item
   ${artifact}=  load_data_from  ${file_path}
   ${plan_id}=  Set Variable  ${artifact.tender_uaid}
   ${is_lot}=  Set Variable If  ${tender_data.data.has_key('lots')}  ${True}  ${False}
+  ${tender_type}=  Set Variable If  ${is_lot}  lots
+  ...  ${tender_data.data.has_key("features")}  features_lots
 
   dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
   Wait And Click  xpath=//a[contains(@href,"/tenders/new")]
 
-  Run Keyword If  ${is_lot}  Run Keywords  Select From List By Value  name=tender_type  lots
+
+  Run Keyword If  ${is_lot}  Run Keywords  Select From List By Value  name=tender_type  ${tender_type}
   ...  AND  Wait Element Animation  xpath=//a[@data-msg="jAlert OK"]
   ...  AND  Підтвердити Дію
 
