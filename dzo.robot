@@ -637,13 +637,19 @@ Input Tender Period End Date
 
 Змінити цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
+  ${amount}=  add_second_sign_after_point  ${fieldvalue}
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
   Wait And Click  xpath=//a[contains(@class, "bidToEdit")]
   ${is_lot}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[contains(@name, "lotValues")]
   ${locator_pref}=  Set Variable If  ${is_lot}  [lotValues][0]  ""
   Scroll To Element  name=data${locator_pref}[value][amount]
   Input Text  name=data${locator_pref}[value][amount]  ${amount}
-  Wait And Click   name=do
+  Wait And Click  name=do
+  Wait Until Element Is Visible  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
+  Input Text  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
+  Click Element  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+
 
 #####################################################################################
 
