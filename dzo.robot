@@ -609,9 +609,15 @@ Input Tender Period End Date
 #  ...   AND   Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
 #  ...   AND   Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
 #  Clear Element Text   name=data[value][amount]
+  ${is_lot}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[contains(@name, "lotValues")]
+  ${locator_pref}=  Set Variable If  ${is_lot}  [lotValues][0]  ""
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
-  Scroll To Element  name=data[value][amount]
-  Input Text  name=data[value][amount]  ${amount}
+  Scroll To Element  name=data${locator_pref}[value][amount]
+  Input Text  name=data${locator_pref}[value][amount]  ${amount}
+  ${is_self_qualified}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfQualified]"]/..
+  Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfQualified]"]/..
+  ${is_self_eligible}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfEligible]"]/..
+  Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfEligible]"]/..
   Wait And Click  name=do
   Wait And Click  xpath=//a[@data-msg="jAlert Close"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
@@ -628,6 +634,16 @@ Input Tender Period End Date
   ...  AND  Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@class="documents_url"]  ${doc_type}
   Wait And Click   name=do
   Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+
+Змінити цінову пропозицію
+  [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
+  Wait And Click  xpath=//a[text()="Процедура закупівлі"]
+  Wait And Click  xpath=//a[contains(@class, "bidToEdit")]
+  ${is_lot}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[contains(@name, "lotValues")]
+  ${locator_pref}=  Set Variable If  ${is_lot}  [lotValues][0]  ""
+  Scroll To Element  name=data${locator_pref}[value][amount]
+  Input Text  name=data${locator_pref}[value][amount]  ${amount}
+  Wait And Click   name=do
 
 #####################################################################################
 
