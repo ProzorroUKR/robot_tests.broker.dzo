@@ -411,7 +411,7 @@ Get From Item
   Run Keyword If  ${tender_data.data.has_key('funders')}  Run Keywords
   ...  Wait And Click  xpath=//input[@value="Визначте організацію-донора"]
   ...  AND  Wait Until Element Is Visible  xpath=//li[text()="${tender_data.data.funders[0].name}"]
-  ...  AND  CLick Element  xpath=//li[text()="${tender_data.data.funders[0].name}"]
+  ...  AND  Wait Until Keyword Succeeds  5 x  1 s  CLick Element  xpath=//li[text()="${tender_data.data.funders[0].name}"]
 
   Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  Run Keywords
   ...  Input Date  data[enquiryPeriod][endDate]  ${enquiry_end_date.split(" ")[0]}
