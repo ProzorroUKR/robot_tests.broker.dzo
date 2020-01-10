@@ -409,8 +409,9 @@ Get From Item
   ...  ELSE  Fill Form Tender With Lots  ${tender_data}
 
   Run Keyword If  ${tender_data.data.has_key('funders')}  Run Keywords
-  ...  Click Element  xpath=//input[@value="Визначте організацію-донора"]
-  ...  AND  Wait And Click  xpath=//li[text()="${tender_data.data.funders[0].name}"]
+  ...  Wait And Click  xpath=//input[@value="Визначте організацію-донора"]
+  ...  AND  Wait Until Element Is Visible  xpath=//li[text()="${tender_data.data.funders[0].name}"]
+  ...  AND  CLick Element  xpath=//li[text()="${tender_data.data.funders[0].name}"]
 
   Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  Run Keywords
   ...  Input Date  data[enquiryPeriod][endDate]  ${enquiry_end_date.split(" ")[0]}
