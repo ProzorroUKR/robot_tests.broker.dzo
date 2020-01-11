@@ -697,7 +697,7 @@ Input Tender Period End Date
 
 Підтвердити дію
   Wait And Click  ${locator.ModalOK}
-  Wait Until Element Is Not Visible  id=jAlertBack
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Not Be Visible  id=jAlertBack
 
 Ввести текст
   [Arguments]  ${locator}  ${text}
