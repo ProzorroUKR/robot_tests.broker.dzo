@@ -412,7 +412,7 @@ Get From Item
   ...  ELSE  Fill Form Tender With Lots  ${tender_data}
 
   Run Keyword If  ${tender_data.data.has_key('funders')}
-  ...  Execute Javascript  $('.js-choosenInit')[0].value = ${tender_data.data.funders[0].name.replace("Світовий Банк","0").replace("Глобальний фонд","1")}
+  ...  Execute Javascript  $('.js-choosenInit')[0].value = ${tender_data.data.funders[0].name.replace(u"Світовий Банк","0").replace(u"Глобальний фонд","1")}
 
   Run Keyword If  ${tender_data.data.has_key("features")}  Add Features  ${tender_data}
 
