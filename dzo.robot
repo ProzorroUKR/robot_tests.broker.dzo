@@ -369,6 +369,7 @@ Get From Item
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
   ${bid_value}=  Get Text  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
   ${bid_value}=  Convert To Number  ${bid_value.replace('`', '')}
+  Click Element  xpath=//a[@onclick="modalClose();"]
   [Return]  ${bid_value}
 
 ###############################################################################################################
