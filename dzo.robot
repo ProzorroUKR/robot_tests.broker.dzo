@@ -387,8 +387,8 @@ Get From Item
   ${artifact}=  load_data_from  ${file_path}
   ${plan_id}=  Set Variable  ${artifact.tender_uaid}
   ${is_lot}=  Set Variable If  ${tender_data.data.has_key('lots')}  ${True}  ${False}
-  ${tender_type}=  Set Variable If  ${is_lot}  lots
-  ...  ${tender_data.data.has_key("features")}  features_lots
+  ${tender_type}=  Set Variable If  ${tender_data.data.has_key("features")}  features_lots
+  ...  ${is_lot}  lots
 
   dzo.Пошук плану по ідентифікатору  ${username}  ${plan_id}
   Wait And Click  xpath=//a[contains(@href,"/tenders/new")]
@@ -520,9 +520,9 @@ Add Milestone
 Add Features
   [Arguments]  ${tender_data}
   ${feature_length}=  Get Length  ${tender_data.data.features}
-  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[1]
+  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[last()]
   :FOR  ${index}  IN RANGE  ${feature_length}
-  \  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/descendant::a[@class="addMultiItem"])[1]
+  \  Run Keyword If  "${index}" != "0"  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/descendant::a[@class="addMultiItem"])[last()]
   \  Add Feature  ${tender_data.data.features[${index}]}  ${index}
 
 Add Feature
@@ -530,10 +530,11 @@ Add Feature
   ${enum_length}=  Get Length  ${feature.enum}
   Input Text  xpath=//input[@name="data[features][${index}][title]"]  ${feature.title}
   Input Text  xpath=//input[@name="data[features][${index}][description]"]  ${feature.description}
-  :FOR  ${enum_index}  IN  ${enum_length}
-  \  Run Keyword If  "${enum_index}" != 0  Click Element  xpath=//a[@class="addFeatureOptItem"]
+  :FOR  ${enum_index}  IN RANGE  ${enum_length}
+  \  ${enum_value}=  Convert To String  ${feature.enum[${enum_index}].value * 100}
+  \  Run Keyword If  "${enum_index}" != "0"  Click Element  xpath=//a[@class="addFeatureOptItem"]
   \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title]"]  ${feature.enum[${enum_index}].title}
-  \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][value]"]  ${feature.enum[${enum_index}].value}
+  \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][value]"]  ${enum_value.split(".")[0]}
 
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
@@ -685,6 +686,7 @@ Input Tender Period End Date
   Scroll To Element  name=data${locator_pref}[value][amount]
   Input Text  name=data${locator_pref}[value][amount]  ${amount}
   Wait And Click  name=do
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
   Wait Until Element Is Visible  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
   Input Text  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
   Click Element  xpath=//button[@class="bidAction"]
