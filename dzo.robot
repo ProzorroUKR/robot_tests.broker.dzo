@@ -106,6 +106,10 @@ ${locator.questions.description}  /following-sibling::div[@class="text"]
 ${locator.questions.date}  /preceding-sibling::div[@class="date"]
 ${locator.questions.answer}  /../following-sibling::div[@class="answer relative"]/div[@class="text"]
 
+${locator.feature.title}  /td[1]
+${locator.feature.description}  /descendant::div[@class="featureDescr"]
+${locator.feature.featureOf}  /descendant::div[@class="featureDescr"]
+
 ${locator.ModalOK}=  xpath=//a[@data-msg="jAlert OK"]
 
 *** Keywords ***
@@ -371,6 +375,11 @@ Get From Item
   ${bid_value}=  Convert To Number  ${bid_value.replace('`', '')}
   Click Element  xpath=//a[@onclick="modalClose();"]
   [Return]  ${bid_value}
+
+Отримати інформацію із нецінового показника
+  [Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
+  ${value}=  Get Text  xpath=//div[contains(text(),"${feature_id}")]/..${locator.feature.${field_name}}
+  [Return]  ${value}
 
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
