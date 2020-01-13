@@ -571,14 +571,14 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
   Switch Browser  ${username}
-  Run Keyword If  ${dzo_internal_id} == ${None}  Sleep  360
+  Run Keyword If  "${dzo_internal_id}" == "${None}"  Sleep  360
   Go To  http://www.dzo.byustudio.in.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
   Click Element  xpath=(//button[text()="Пошук"])[1]
   Wait Until Keyword Succeeds  10 x  1 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]/a[contains(@href,"/tenders/")]  1
   Click Element  xpath=//a[contains(@class, "tenderLink")]
-  ${internal_id}=  Run Keyword If  ${dzo_internal_id} == ${None}  Get Text  id=tender_id
+  ${internal_id}=  Run Keyword If  "${dzo_internal_id}" == "${None}"  Get Text  id=tender_id
   Set Global Variable  ${dzo_internal_id}  ${internal_id}
   Run Keyword If  "${SUITE NAME.lower()}" == "qualification" and "${TEST NAME}" == "Можливість знайти закупівлю по ідентифікатору"
   ...  Wait Until Keyword Succeeds  40 x  30 s  Status Should Be  ${username}  ${tender_uaid}  active.qualification
@@ -680,7 +680,8 @@ Input Tender Period End Date
 
 Подати цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${bid}  ${lots_ids}=${None}  ${features_ids}=${None}
-  ${amount}=   add_second_sign_after_point   ${bid.data.value.amount}
+  ${amount}=  Set Variable If  ${is_lot} ${bid.data.lotValues[0].value.amount}   ${bid.data.value.amount}
+  ${amount}=  add_second_sign_after_point   ${amount}
 #  ${status}=   Get From Dictionary   ${bid['data']}   qualified
 #  ${qualified}=   Set Variable If   ${status}   ${EMPTY}   &bad=1
 #  ${filePath}=   get_upload_file_path
