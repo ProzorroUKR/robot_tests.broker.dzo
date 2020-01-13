@@ -17,7 +17,6 @@ ${locator.tenderPeriod.endDate}      xpath=//td[./text()='Завершення �
 
 
 ##################
-${dzo_internal_id}=  ${None}
 
 ${plan.view.status}=  xpath=//div[@class="statusName"]
 ${plan.view.tender.procurementMethodType}=  xpath=//td[text()="Тип процедури"]/following-sibling::td[1]
@@ -49,6 +48,7 @@ ${plan.edit.budget.period}=  data[tender][tenderPeriod][startDate]
 
 ${tender.edit.lot.value.amount}  xpath=//input[@name="data[lots][0][value][amount]"]
 ${tender.edit.lot.description}  xpath=//input[@name="data[lots][0][description]"]
+${tender.edit.lot.minimalStep.amount}  xpath=//input[@name="data[lots][0][minimalStep][amount]"]
 
 ${milestone_index}
 ${tender.view.milestones.code}=  xpath=//h3[contains(text(),"Умови оплати")]/../descendant::div[${milestone_index}]/descendant::td[text()="Тип оплати"]/following-sibling::td
@@ -122,6 +122,7 @@ ${locator.ModalOK}=  xpath=//a[@data-msg="jAlert OK"]
   [Arguments]  ${username}
   ${chrome_options}=  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys
   Set Global Variable  ${DZO_MODIFICATION_DATE}  ${EMPTY}
+  Set Global Variable  ${dzo_internal_id}  ${None}
   Call Method  ${chrome_options}  add_argument  --headless
   Create Webdriver  Chrome  alias=${username}  chrome_options=${chrome_options}
   Go To  ${USERS.users['${username}'].homepage}
@@ -288,7 +289,7 @@ Select CPV
   ${status}=   Run Keyword And Return Status   Should Not Be Equal   ${DZO_MODIFICATION_DATE}   ${last_mod_date}
   refresh_tender   ${dzo_internal_id}
   Run Keyword If   ${status}   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
-  Set Global Variable ${DZO_MODIFICATION_DATE} ${last_mod_date}
+  Set Global Variable  ${DZO_MODIFICATION_DATE}  ${last_mod_date}
 
 Отримати інформацію із плану
   [Arguments]  ${username}  ${plan_uaid}  ${field_name}
@@ -457,7 +458,8 @@ Get From Item
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Page Contains Element  xpath=//span[@class="js-apiID"]
   ${tender_uaid}=  Get Text  xpath=//span[@class="js-apiID"]
-  ${dzo_internal_id}=  Get Text  id=tender_id
+  ${internal_id}=  Get Text  id=tender_id
+  Set Global Variable  ${dzo_internal_id}  ${internal_id}
   [Return]  ${tender_uaid}
 
 Fill Form For Tender Without Lots
@@ -576,7 +578,8 @@ Add Feature
   Click Element  xpath=(//button[text()="Пошук"])[1]
   Wait Until Keyword Succeeds  10 x  1 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]/a[contains(@href,"/tenders/")]  1
   Click Element  xpath=//a[contains(@class, "tenderLink")]
-  ${dzo_internal_id}=  Run Keyword If  ${dzo_internal_id} == ${None}  Get Text  id=tender_id
+  ${internal_id}=  Run Keyword If  ${dzo_internal_id} == ${None}  Get Text  id=tender_id
+  Set Global Variable  ${dzo_internal_id}  ${internal_id}
   Run Keyword If  "${SUITE NAME.lower()}" == "qualification" and "${TEST NAME}" == "Можливість знайти закупівлю по ідентифікатору"
   ...  Wait Until Keyword Succeeds  40 x  30 s  Status Should Be  ${username}  ${tender_uaid}  active.qualification
 

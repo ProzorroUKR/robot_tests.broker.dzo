@@ -104,6 +104,7 @@ def convert_dzo_data(value, field_name):
             u'ПЕРІОД ПОДАННЯ ПРОПОЗИЦІЙ': "active.tendering",
             u'АУКЦІОН': "active.auction",
             u'КВАЛІФІКАЦІЯ': "active.qualification",
+            u'ПРЕКВАЛІФІКАЦІЯ': "active.pre-qualification",
             u'ЗАПЛАНОВАНИЙ': "scheduled",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",
