@@ -701,6 +701,26 @@ Input Tender Period End Date
   Click Element  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
+###############################################################################################################
+#########################################    КВАЛІФІКАЦІЯ    ##################################################
+###############################################################################################################
+
+Завантажити документ рішення кваліфікаційної комісії
+  [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
+  Wait And Click  xpath=//a[@data-bid-action="aply"]
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@placeholder="Вкажіть назву докумету"]
+  Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${document.split("/")[-1]}
+  Choose File  xpath=//input[@type="file"]  ${document}
+  Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
+  Select From List By Value  name=documentType  notice
+  Click Element  xpath=//a[@onclick="modalClose();"]
+
+Підтвердити постачальника
+  [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+  Wait And Click  xpath=//a[@data-bid-action="aply"]
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@placeholder="Вкажіть назву докумету"]
+  Click Element  xpath=//button[@class="bidAction"]
+  Click Element  xpath=//a[@onclick="modalClose();"]
 
 #####################################################################################
 
