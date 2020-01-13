@@ -109,7 +109,7 @@ ${locator.questions.description}  /following-sibling::div[@class="text"]
 ${locator.questions.date}  /preceding-sibling::div[@class="date"]
 ${locator.questions.answer}  /../following-sibling::div[@class="answer relative"]/div[@class="text"]
 
-${locator.feature.title}  /td[1]
+${locator.feature.title}  /div[1]
 ${locator.feature.description}  /descendant::div[@class="featureDescr"]
 ${locator.feature.featureOf}  /descendant::div[@class="featureDescr"]
 
@@ -622,7 +622,7 @@ Input Tender Period End Date
 
 Змінити лот
   [Arguments]  ${username}  ${tender_uaid}  ${lot_id}   ${fieldname}  ${fieldvalue}
-  ${fieldvalue}=  Run Keyword If  "amount" in ${fieldname}  add_second_sign_after_point  ${fieldvalue}
+  ${fieldvalue}=  Run Keyword If  "amount" in "${fieldname}"  add_second_sign_after_point  ${fieldvalue}
   Switch Browser  ${username}
   Wait And Click  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=//section[contains(@id, "multiLots")]/a
@@ -710,7 +710,7 @@ Input Tender Period End Date
   Wait And Click  xpath=//div[contains(@class,"hide_onBided")]/descendant::button[@value="save"]
 #  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
-  Input Text  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
+  Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
   Click Element  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
