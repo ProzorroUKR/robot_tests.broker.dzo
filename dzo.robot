@@ -680,8 +680,6 @@ Input Tender Period End Date
 
 Подати цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${bid}  ${lots_ids}=${None}  ${features_ids}=${None}
-  ${amount}=  Set Variable If  ${is_lot} ${bid.data.lotValues[0].value.amount}   ${bid.data.value.amount}
-  ${amount}=  add_second_sign_after_point   ${amount}
 #  ${status}=   Get From Dictionary   ${bid['data']}   qualified
 #  ${qualified}=   Set Variable If   ${status}   ${EMPTY}   &bad=1
 #  ${filePath}=   get_upload_file_path
@@ -697,6 +695,8 @@ Input Tender Period End Date
 #  ...   AND   Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
 #  Clear Element Text   name=data[value][amount]
   ${is_lot}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[contains(@name, "lotValues")]
+  ${amount}=  Set Variable If  ${is_lot}  ${bid.data.lotValues[0].value.amount}  ${bid.data.value.amount}
+  ${amount}=  add_second_sign_after_point   ${amount}
   ${locator_pref}=  Set Variable If  ${is_lot}  [lotValues][0]  ${EMPTY}
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
   Scroll To Element  name=data${locator_pref}[value][amount]
