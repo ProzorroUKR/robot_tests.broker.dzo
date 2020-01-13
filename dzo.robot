@@ -45,6 +45,9 @@ ${plan.edit.items[0].deliveryDate.endDate}=  data[items][0][deliveryDate][endDat
 ${plan.edit.items[0].quantity}=  xpath=//input[@name="data[items][0][quantity]"]
 ${plan.edit.budget.period}=  data[tender][tenderPeriod][startDate]
 
+${tender.edit.lot.value.amount}  xpath=//input[@name="data[lots][0][value][amount]"]
+${tender.edit.lot.description}  xpath=//input[@name="data[lots][0][description]"]
+
 ${milestone_index}
 ${tender.view.milestones.code}=  xpath=//h3[contains(text(),"Умови оплати")]/../descendant::div[${milestone_index}]/descendant::td[text()="Тип оплати"]/following-sibling::td
 ${tender.view.milestones.title}=  xpath=//h3[contains(text(),"Умови оплати")]/../descendant::div[${milestone_index}]/descendant::td[text()="Подія"]/following-sibling::td
@@ -616,6 +619,16 @@ Input Tender Period End Date
   Wait Until Element Is Visible  xpath=//li[text()="${funders_data.funders[0].name}"]
   Wait Until Keyword Succeeds  5 x  1 s  CLick Element  xpath=//li[text()="${funders_data.funders[0].name}"]
   Wait And Click  xpath=//button[@value="save"]
+
+Змінити лот
+  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}   ${fieldname}  ${fieldvalue}
+  ${fieldvalue}=  Run Keyword If  "amount" in ${fieldvalue}  add_second_sign_after_point  ${fieldvalue}
+  Switch Browser  ${username}
+  Wait And Click  xpath=//a[contains(@class, "save")]
+  Wait And Click  xpath=//section[contains(@id, "multiLots")]/a
+  Wait And Input Text  ${tender.edit.lot.${fieldname}}  ${fieldvalue}
+  Wait And Click  xpath=//button[@value="save"]
+
 
 ###############################################################################################################
 ##########################################    ЗАПИТАННЯ    ####################################################
