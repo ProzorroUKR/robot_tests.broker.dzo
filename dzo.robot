@@ -647,6 +647,7 @@ Input Tender Period End Date
 Змінити лот
   [Arguments]  ${username}  ${tender_uaid}  ${lot_id}   ${fieldname}  ${fieldvalue}
   ${fieldvalue}=  Run Keyword If  "amount" in "${fieldname}"  add_second_sign_after_point  ${fieldvalue}
+  ...  ELSE  Set Variable  ${fieldvalue}
   Switch Browser  ${username}
   Wait And Click  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=//section[contains(@id, "multiLots")]/a
