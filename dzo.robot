@@ -272,6 +272,7 @@ Select CPV
 Пошук плану по ідентифікатору
   [Arguments]  ${username}  ${plan_uaid}
   Switch Browser  ${username}
+  Sleep  360
 #  ${url}=  Set Variable If  'Viewer' in '${username}'  http://www.dzo.byustudio.in.ua/tenders/plans?test_mode=0  http://www.dzo.byustudio.in.ua/tenders/plans
   Go To  http://www.dzo.byustudio.in.ua/tenders/plans
   Select From List By Value  xpath=//select[@name="filter[object]"]  planID
