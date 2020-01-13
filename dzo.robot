@@ -696,7 +696,7 @@ Input Tender Period End Date
   Input Text  name=data${locator_pref}[value][amount]  ${amount}
   Wait And Click  name=do
 #  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
-  Wait Until Element Is Visible  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  10
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
   Input Text  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
   Click Element  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
