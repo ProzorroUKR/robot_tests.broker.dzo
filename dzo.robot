@@ -710,7 +710,7 @@ Input Tender Period End Date
   Wait And Click  xpath=//div[contains(@class,"hide_onBided")]/descendant::button[@value="save"]
 #  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
-  Input Text  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
+  Input Text  xpath=////div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
   Click Element  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
@@ -720,6 +720,7 @@ Input Tender Period End Date
 
 Завантажити документ рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
+  Wait Until Keyword Succeeds  30 x  10 s  Element Should Be Visible  xpath=//a[@data-bid-action="aply"]
   Wait And Click  xpath=//a[@data-bid-action="aply"]
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@placeholder="Вкажіть назву докумету"]
   Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${document.split("/")[-1]}
