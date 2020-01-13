@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import urllib
 from pytz import timezone
 from iso8601 import parse_date
-
+import requests
 
 DZO_dict = {u'килограммы': u'кг', u'кілограм': u'кг', u'кілограми': u'кг', u'метри': u'м', u'пара': u'пар',
             u'літр': u'л', u'набір': u'наб', u'пачок': u'пач', u'послуга': u'послуги', u'метри кубічні': u'м.куб',
@@ -171,3 +171,8 @@ def get_items_by_lot_id(tender_data, lot_id):
 def get_milestone_by_lot_id(tender_data, lot_id):
     items = [item for item in tender_data['data']['milestones'] if item['relatedLot'] == lot_id]
     return items
+
+
+def refresh_tender(tender_id):
+    resp = requests.get("http://www.dzo.byustudio.in.ua/cron/J7hdfks7_jlsdfn.php?tender_id={}&CDB_Number=0&run=KUgfjduk*tgkBkusdh&type=tenders".format(tender_id))
+    return resp.content

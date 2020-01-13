@@ -17,6 +17,8 @@ ${locator.tenderPeriod.endDate}      xpath=//td[./text()='Завершення �
 
 
 ##################
+${dzo_internal_id}=  ${None}
+
 ${plan.view.status}=  xpath=//div[@class="statusName"]
 ${plan.view.tender.procurementMethodType}=  xpath=//td[text()="Тип процедури"]/following-sibling::td[1]
 ${plan.view.budget.description}=  xpath=//div[@class="topInfo"]/h1
@@ -281,6 +283,13 @@ Select CPV
 #########################################    ВІДОБРАЖЕННЯ    ##################################################
 ###############################################################################################################
 
+Пошук тендера у разі наявності змін
+  [Arguments]  ${last_mod_date}  ${username}  ${tender_uaid}
+  ${status}=   Run Keyword And Return Status   Should Not Be Equal   ${DZO_MODIFICATION_DATE}   ${last_mod_date}
+  refresh_tender   ${dzo_internal_id}
+  Run Keyword If   ${status}   dzo.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Set Global Variable ${DZO_MODIFICATION_DATE} ${last_mod_date}
+
 Отримати інформацію із плану
   [Arguments]  ${username}  ${plan_uaid}  ${field_name}
   Switch Browser  ${username}
@@ -292,6 +301,7 @@ Select CPV
 Отримати інформацію із тендера
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Switch Browser  ${username}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Reload Page
   ${text}=  Run Keyword If
   ...  "value.amount" in "${field_name}"  Get Amount
@@ -330,6 +340,7 @@ Get From Item
 Отримати інформацію із лоту
   [Arguments]  ${username}  ${tender_uaid}  ${lot_id}  ${field_name}
   Switch Browser  ${username}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   ${lot_value}=  Get Text  xpath=//*[contains(text(), '${lot_id}')]/ancestor::div[contains(@class,"tenderLotItemElement")]${locator.lots.${field_name}}
   ${lot_value}=  convert_dzo_data  ${lot_value}  ${field_name}
   [Return]  ${lot_value}
@@ -337,6 +348,7 @@ Get From Item
 Отримати інформацію із предмету
   [Arguments]  ${username}  ${tender_uaid}  ${item_id}  ${field_name}
   Switch Browser  ${username}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   ${item_value}=  Get Text  xpath=//div[contains(text(), '${item_id}')]/ancestor::tr[contains(@class,"tenderFullListElement")]${locator.items.${field_name}}
   ${item_value}=  adapt_items_data  ${field_name}  ${item_value}
   [Return]  ${item_value}
@@ -344,6 +356,7 @@ Get From Item
 Отримати інформацію із запитання
   [Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
   Switch Browser  ${username}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Reload Page
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(@href, 'questions')]
   Wait Until Element Is Visible  xpath=//div[@id='questions']
@@ -358,12 +371,14 @@ Get From Item
 
 Отримати інформацію із документа
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait Until Element Is Visible   xpath=//*[contains(text(),'${doc_id}')]
   ${value}=   Get Text   xpath=//*[contains(text(),'${doc_id}')]
   [Return]  ${value.split('/')[-1]}
 
 Отримати документ
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Execute Javascript   $(".topFixed").remove(); $(".bottomFixed").remove();
   ${file_name}=   Get Text   xpath=//span[contains(text(),'${doc_id}')]
   ${url}=   Get Element Attribute   xpath=//span[contains(text(),'${doc_id}')]/../preceding-sibling::a[contains(@class,"js-download-link")]@href
@@ -372,6 +387,7 @@ Get From Item
 
 Отримати інформацію із пропозиції
   [Arguments]  ${username}  ${tender_uaid}  ${field}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
   ${bid_value}=  Get Text  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
@@ -381,6 +397,7 @@ Get From Item
 
 Отримати інформацію із нецінового показника
   [Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   ${value}=  Get Text  xpath=//div[contains(text(),"${feature_id}")]/..${locator.feature.${field_name}}
   [Return]  ${value}
 
@@ -440,6 +457,7 @@ Get From Item
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Page Contains Element  xpath=//span[@class="js-apiID"]
   ${tender_uaid}=  Get Text  xpath=//span[@class="js-apiID"]
+  ${dzo_internal_id}=  Get Text  id=tender_id
   [Return]  ${tender_uaid}
 
 Fill Form For Tender Without Lots
@@ -551,12 +569,14 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
   Switch Browser  ${username}
+  Run Keyword If  ${dzo_internal_id} == ${None}  Sleep  360
   Go To  http://www.dzo.byustudio.in.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
   Click Element  xpath=(//button[text()="Пошук"])[1]
   Wait Until Keyword Succeeds  10 x  1 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]/a[contains(@href,"/tenders/")]  1
   Click Element  xpath=//a[contains(@class, "tenderLink")]
+  ${dzo_internal_id}=  Run Keyword If  ${dzo_internal_id} == ${None}  Get Text  id=tender_id
   Run Keyword If  "${SUITE NAME.lower()}" == "qualification" and "${TEST NAME}" == "Можливість знайти закупівлю по ідентифікатору"
   ...  Wait Until Keyword Succeeds  40 x  30 s  Status Should Be  ${username}  ${tender_uaid}  active.qualification
 
