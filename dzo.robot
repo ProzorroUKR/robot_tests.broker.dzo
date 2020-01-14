@@ -115,6 +115,9 @@ ${locator.feature.title}  /div[1]
 ${locator.feature.description}  /descendant::div[@class="featureDescr"]
 ${locator.feature.featureOf}  /descendant::div[@class="featureDescr"]
 
+${contract.value.amountNet}  xpath=//input[@name="data[value][amountNet]"]
+${contract.value.amount}  xpath=//input[@name="data[value][amount]"]
+
 ${locator.ModalOK}=  xpath=//a[@data-msg="jAlert OK"]
 
 *** Keywords ***
@@ -764,6 +767,31 @@ Input Tender Period End Date
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@placeholder="Вкажіть назву докумету"]
   Click Element  xpath=//button[@class="bidAction"]
   Click Element  xpath=//a[@onclick="modalClose();"]
+
+###############################################################################################################
+##########################################    КОНТРАКТІНГ    ##################################################
+###############################################################################################################
+
+Редагувати угоду
+  [Arguments]  ${username}  ${tender_uaid}  ${contract_index}  ${fieldname}  ${fieldvalue}
+  ${amount}=  add_second_sign_after_point  ${fieldvalue}
+  Wait And Click  xpath=//a[@data-bid-action="contract"]
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@name="data[value][amount]"]
+  Input Text  ${contract.${fieldname}}  ${amount}
+
+Підтвердити підписання контракту
+  [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
+  ${document}=  get_upload_file_path
+  Choose File  xpath=//input[@type="file"]  ${document}
+  Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
+  Wait And Input Text  xpath=//input[@name="data[contractNumber]"]  123456
+  ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
+  Input Date  data[dateSigned]  ${date}
+  Input Date  data[period][startDate]  ${date}
+  Input Date  data[period][endDate]  ${date}
+  Click Element  xpath=//button[@class="bidAction"]
+  Підтвердити дію
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
 
 #####################################################################################
 

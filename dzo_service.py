@@ -2,6 +2,8 @@
 
 from datetime import datetime, timedelta
 import urllib
+
+import os
 from pytz import timezone
 from iso8601 import parse_date
 import requests
@@ -162,6 +164,10 @@ def adapt_items_data(field_name, value):
 
 def dzo_download_file(url, file_name, output_dir):
     urllib.urlretrieve(url, ('{}/{}'.format(output_dir, file_name)))
+
+
+def get_upload_file_path():
+    return os.path.join(os.getcwd(), 'src/robot_tests.broker.tendersallbiz/testFileForUpload.txt')
 
 
 def get_items_by_lot_id(tender_data, lot_id):
