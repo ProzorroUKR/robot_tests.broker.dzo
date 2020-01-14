@@ -660,6 +660,25 @@ Input Tender Period End Date
   Wait And Input Text  ${tender.edit.lot.${fieldname}}  ${fieldvalue}
   Wait And Click  xpath=//button[@value="save"]
 
+Додати неціновий показник на тендер
+  [Arguments]  ${username}  ${tender_uaid}  ${feature}
+  Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(text(), 'Процедура закупівлі')]
+  Wait And Click  xpath=//a[contains(@class, "save")]
+  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[last()]
+  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/descendant::a[@class="addMultiItem"])[last()]
+  ${index}=  Get Matching Xpath Count  xpath=//a[@class="deleteFeatureItem"]
+  ${index}=  Convert To Number  ${index}
+  Add Feature  ${feature}  ${index}
+  Wait And Click  xpath=//button[@value="save"]
+
+Видалити неціновий показник
+  [Arguments]  ${username}  ${tender_uaid}  ${feature_id}
+  Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(text(), 'Процедура закупівлі')]
+  Wait And Click  xpath=//a[contains(@class, "save")]
+  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[last()]
+  Wait And Click  xpath=//input[@value="${feature_id}"]/ancestor::div[contains(@class,"tenderFeatureItemElement")]/descendant::a[@class="deleteFeatureItem"]
+  Підтвердити Дію
+  Wait And Click  xpath=//button[@value="save"]
 
 ###############################################################################################################
 ##########################################    ЗАПИТАННЯ    ####################################################
