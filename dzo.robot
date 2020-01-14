@@ -719,10 +719,13 @@ Input Tender Period End Date
   Wait Until Page Contains  Ваша пропозиція  10
   Wait And Click  xpath=//a[contains(@class,'bidToEdit')]
   Choose File  xpath=/html/body/div[1]/form/input[2]  ${path}
-  ...  AND  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
-  ...  AND  Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@class="documents_url"]  ${doc_type}
-  Wait And Click   name=do
-  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
+  Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@class="documents_url"]  ${doc_type}
+  Wait And Click  xpath=//div[contains(@class,"hide_onBided")]/descendant::button[@value="save"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
+  Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
+  Click Element  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
 Змінити цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
