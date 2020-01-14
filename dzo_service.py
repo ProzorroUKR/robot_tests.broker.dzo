@@ -108,6 +108,7 @@ def convert_dzo_data(value, field_name):
             u'КВАЛІФІКАЦІЯ': "active.qualification",
             u'ПРЕКВАЛІФІКАЦІЯ': "active.pre-qualification",
             u'ЗАПЛАНОВАНИЙ': "scheduled",
+            u'ЗАВЕРШЕНА': "active",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",
             u'виконання робіт': "executionOfWorks",

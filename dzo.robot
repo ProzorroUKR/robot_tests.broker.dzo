@@ -79,7 +79,8 @@ ${tender.view.funders[0].address.streetAddress}=  xpath=//div[@class="fundersIte
 ${tender.view.funders[0].identifier.id}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"ЄДРПОУ")]/following-sibling::td[1]
 ${tender.view.funders[0].identifier.legalName}=  xpath=//div[@class="fundersItem"]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
 ${tender.view.funders[0].identifier.scheme}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"ЄДРПОУ")]/following-sibling::td[1]
-
+${tender.view.awards[0].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
+${tender.view.contracts[0].status}=  xpath=(//div[@class="statusItem active"]/descendant::div[@class="statusName"])[last()]
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
@@ -406,6 +407,8 @@ Get From Item
   ${value}=  Get Text  xpath=//div[contains(text(),"${feature_id}")]/..${locator.feature.${field_name}}
   [Return]  ${value}
 
+
+
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
 ###############################################################################################################
@@ -722,7 +725,7 @@ Input Tender Period End Date
   Wait Until Page Contains  Ваша пропозиція  10
   Wait And Click  xpath=//a[contains(@class,'bidToEdit')]
   Choose File  xpath=/html/body/div[1]/form/input[2]  ${path}
-  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
+  Run Keyword And Ignore Error  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
   Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@class="documents_url"]  ${doc_type}
   Wait And Click  xpath=//div[contains(@class,"hide_onBided")]/descendant::button[@value="save"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
