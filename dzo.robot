@@ -277,8 +277,8 @@ Select CPV
   [Arguments]  ${username}  ${plan_uaid}
   Switch Browser  ${username}
   Sleep  360
-#  ${url}=  Set Variable If  'Viewer' in '${username}'  http://www.dzo.byustudio.in.ua/tenders/plans?test_mode=0  http://www.dzo.byustudio.in.ua/tenders/plans
-  Go To  http://www.dzo.byustudio.in.ua/tenders/plans
+#  ${url}=  Set Variable If  'Viewer' in '${username}'  https://www.sandbox.dzo.com.ua/tenders/plans?test_mode=0  https://www.sandbox.dzo.com.ua/tenders/plans
+  Go To  https://www.sandbox.dzo.com.ua/tenders/plans
   Select From List By Value  xpath=//select[@name="filter[object]"]  planID
   Input Text  xpath=//input[@name="filter[search]"]  ${plan_uaid}
   Click Element  xpath=//button[contains(@class,"not_toExtend")]
@@ -579,7 +579,7 @@ Add Feature
   [Arguments]  ${username}  ${tender_uaid}
   Switch Browser  ${username}
   Run Keyword If  "${dzo_internal_id}" == "${None}"  Sleep  360
-  Go To  http://www.dzo.byustudio.in.ua/tenders/public
+  Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
   Click Element  xpath=(//button[text()="Пошук"])[1]
