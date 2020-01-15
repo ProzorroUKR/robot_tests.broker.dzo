@@ -598,7 +598,7 @@ Status Should Be
 Оновити сторінку з тендером
   [Arguments]  ${username}  ${tender_uaid}
   Switch Browser  ${username}
-  Reload Page
+  Run Keyword If  "${TEST NAME}" != "Можливість укласти угоду для закупівлі"  Reload Page
 
 
 ###############################################################################################################
@@ -793,7 +793,7 @@ Input Tender Period End Date
   Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${document.split("/")[-1]}
   Choose File  xpath=//input[@type="file"]  ${document}
   Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
-  Select From List By Value  name=documentType  notice
+  Wait Until Keyword Succeeds  5 x  1 s  Select From List By Value  name=documentType  notice
   Click Element  xpath=//a[@onclick="modalClose();"]
 
 Підтвердити постачальника
