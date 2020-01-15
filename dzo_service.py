@@ -182,5 +182,5 @@ def get_milestone_by_lot_id(tender_data, lot_id):
 
 
 def refresh_tender(tender_id):
-    resp = requests.get("http://www.dzo.byustudio.in.ua/cron/J7hdfks7_jlsdfn.php?tender_id={}&CDB_Number=0&run=KUgfjduk*tgkBkusdh&type=tenders".format(tender_id))
+    resp = requests.get("https://www.sandbox.dzo.com.ua/cron/J7hdfks7_jlsdfn.php?tender_id={}&CDB_Number=0&run=KUgfjduk*tgkBkusdh&type=tenders".format(tender_id))
     return resp.content

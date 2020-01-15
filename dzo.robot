@@ -788,6 +788,7 @@ Input Tender Period End Date
 
 Завантажити документ рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait Until Keyword Succeeds  30 x  10 s  Element Should Be Visible  xpath=//a[@data-bid-action="aply"]
   Wait And Click  xpath=//a[@data-bid-action="aply"]
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@placeholder="Вкажіть назву докумету"]
