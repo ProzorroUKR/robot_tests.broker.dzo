@@ -796,6 +796,11 @@ Input Tender Period End Date
   Wait And Click  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  xpath=//a[@onclick="modalClose();"]
 
+Затвердити остаточне рішення кваліфікації
+  [Arguments]  ${username}  ${tender_uaid}
+  Wait Until Keyword Succeeds  10 x  5 s  Element Should Be Visible  xpath=//a[@data-bid-action="done"]
+  Підтвердити Дію
+
 Завантажити документ рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
