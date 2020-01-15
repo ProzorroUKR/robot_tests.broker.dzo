@@ -822,7 +822,7 @@ Input Tender Period End Date
 Редагувати угоду
   [Arguments]  ${username}  ${tender_uaid}  ${contract_index}  ${fieldname}  ${fieldvalue}
   ${amount}=  add_second_sign_after_point  ${fieldvalue}
-  Wait And Click  xpath=//a[@data-bid-action="contract"]
+  Wait And Click  xpath=//a[@data-bid-action="contract"]/..
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@name="data[value][amount]"]
   Input Text  ${contract.${fieldname}}  ${amount}
 
