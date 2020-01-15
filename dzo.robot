@@ -62,6 +62,7 @@ ${tender.view.enquiryPeriod.endDate}=  xpath=//td[contains(text(),"Заверш�
 ${tender.view.tenderPeriod.startDate}=  xpath=//td[contains(text(),"Початок періоду прийому пропозицій")]/following-sibling::td[1]
 ${tender.view.tenderPeriod.endDate}=  xpath=//td[contains(text(),"Кінцевий строк подання тендерних пропозицій")]/following-sibling::td[1]
 ${tender.view.status}=  xpath=(//div[@class="statusItem active"]/descendant::div[@class="statusName"])[last()]
+${tender.view.procurementMethodType}=  xpath=//td[contains(text(),"Процедура закупівлі")]/following-sibling::td[1]
 ${tender.view.title}=  xpath=//h1[@class="t_title"]/span
 ${tender.view.description}=  xpath=//h2[@class='tenderDescr']
 ${tender.view.mainProcurementCategory}=  xpath=//td[text()="Вид предмету закупівлі"]/following-sibling::td[1]
@@ -578,7 +579,7 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
   Switch Browser  ${username}
-  Run Keyword If  "${dzo_internal_id}" == "${None}" and "${SUITE NAME}" == "openProcedure"  Sleep  360
+  Run Keyword If  "${dzo_internal_id}" == "${None}" and "openProcedure" in "${SUITE NAME}"  Sleep  360
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
@@ -667,7 +668,7 @@ Input Tender Period End Date
   Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[last()]
   Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/descendant::a[@class="addMultiItem"])[last()]
   ${index}=  Get Matching Xpath Count  xpath=//a[@class="deleteFeatureItem"]
-  ${index}=  Convert To Number  ${index}
+  ${index}=  Convert To Integer  ${index}
   Add Feature  ${feature}  ${index}
   Wait And Click  xpath=//button[@value="save"]
 
