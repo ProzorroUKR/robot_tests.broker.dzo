@@ -786,6 +786,16 @@ Input Tender Period End Date
 #########################################    КВАЛІФІКАЦІЯ    ##################################################
 ###############################################################################################################
 
+Підтвердити кваліфікацію
+  [Arguments]  ${username}  ${tender_uaid}  ${qualification_num}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
+  Wait And Click  xpath=(//a[@data-bid-action="aply"])[${qualification_num * -1 + 1}]
+  Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
+  Wait And Click  xpath=//input[@name="data[qualified]"]/..
+  Wait And Click  xpath=//input[@name="data[eligible]"]/..
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  xpath=//a[@onclick="modalClose();"]
+
 Завантажити документ рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
