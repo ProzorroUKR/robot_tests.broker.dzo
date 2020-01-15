@@ -578,7 +578,7 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
   Switch Browser  ${username}
-  Run Keyword If  "${dzo_internal_id}" == "${None}"  Sleep  360
+  Run Keyword If  "${dzo_internal_id}" == "${None}" and "${SUITE NAME}" == "openProcedure"  Sleep  360
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
