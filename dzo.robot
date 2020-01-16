@@ -384,7 +384,7 @@ Get From Item
 Отримати інформацію із документа
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
-  Run Keyword If  "contract signing" in ${SUITE NAME.lower()}  Wait And Click  xpath=//div[@class="btn docs"]/a
+  Run Keyword If  "contract signing" in "${SUITE NAME.lower()}"  Wait And Click  xpath=//div[@class="btn docs"]/a
   Wait Until Element Is Visible   xpath=//*[contains(text(),'${doc_id}')]
   ${value}=   Get Text   xpath=//*[contains(text(),'${doc_id}')]
   [Return]  ${value.split('/')[-1]}
@@ -600,7 +600,7 @@ Add Feature
   Input Text  xpath=//input[@name="data[features][${index}][description]"]  ${feature.description}
   :FOR  ${enum_index}  IN RANGE  ${enum_length}
   \  ${enum_value}=  Convert To String  ${feature.enum[${enum_index}].value * 100}
-  \  Run Keyword If  "${enum_index}" != "0"  Click Element  xpath=//a[@class="addFeatureOptItem"]
+  \  Run Keyword If  "${enum_index}" != "0"  Wait And Click  xpath=//a[@class="addFeatureOptItem"]
   \  Wait And Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title]"]  ${feature.enum[${enum_index}].title}
   \  Input Text En  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title_en]"]  test
   \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][value]"]  ${enum_value.split(".")[0]}
