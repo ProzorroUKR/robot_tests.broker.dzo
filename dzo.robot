@@ -423,7 +423,8 @@ Get From Item
 Створити тендер
   [Arguments]  ${username}  ${tender_data}  ${plan_uaid}
   Switch Browser  ${username}
-  ${valueAddedTaxIncluded}=  Set Variable If  ${tender_data.data.value.valueAddedTaxIncluded}  true  false
+  ${rate}=  Run Keyword If  ${tender_data.data.has_key("NBUdiscountRate")}  Convert To String  ${tender_data.data.NBUdiscountRate * 100}
+  ${valueAddedTaxIncluded}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Set Variable If  ${tender_data.data.value.valueAddedTaxIncluded}  true  false
   ${enquiry_end_date}=  Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  convert_datetime_to_format  ${tender_data.data.enquiryPeriod.endDate}  %d/%m/%Y %H:%M
   ${tender_end_date}=  convert_datetime_to_format  ${tender_data.data.tenderPeriod.endDate}  %d/%m/%Y %H:%M
   ${procurementMethodType}=  Set Variable If  ${tender_data.data.has_key("procurementMethodType")}  ${tender_data.data.procurementMethodType}  open_belowThreshold
@@ -442,10 +443,12 @@ Get From Item
   ...  AND  Wait Element Animation  xpath=//a[@data-msg="jAlert OK"]
   ...  AND  Підтвердити Дію
 
+  Run Keyword If  "${tender_data.data.procurementMethodType}" == "esco"  Input Text  xpath=//input[@name="data[NBUdiscountRate]"]  ${rate}
+
   Select From List By Value  xpath=//select[@name="data[mainProcurementCategory]"]  ${tender_data.data.mainProcurementCategory}
   Input Text  xpath=//input[@name="data[title]"]  ${tender_data.data.title}
   Input Text  xpath=//input[@name="data[description]"]  ${tender_data.data.description}
-  Select From List By Value  xpath=//select[@name="data[value][valueAddedTaxIncluded]"]  ${valueAddedTaxIncluded}
+  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Select From List By Value  xpath=//select[@name="data[value][valueAddedTaxIncluded]"]  ${valueAddedTaxIncluded}
 
 #  Input Text  name=data[budget][amount]  ${amount}
 #  Select From List By Value  name=data[budget][currency]  ${tender_data.data.budget.breakdown[0].value.currency}
@@ -506,41 +509,50 @@ Fill Form Tender With Lots
 
 Add Tender Lot
   [Arguments]  ${tender_data}  ${lot}  ${index}
-  ${amount}=  add_second_sign_after_point  ${lot.value.amount}
-  ${minimal_step_amount}=  add_second_sign_after_point  ${lot.minimalStep.amount}
+  ${amount}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  add_second_sign_after_point  ${lot.value.amount}
+  ${minimal_step_amount}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  add_second_sign_after_point  ${lot.minimalStep.amount}
+  ${minimalStepPercentage}=  Run Keyword If  "${tender_data.data.procurementMethodType}" == "esco"  Convert To String  ${lot.minimalStepPercentage * 100}
+  ${yearlyPaymentsPercentageRange}=  Run Keyword If  "${tender_data.data.procurementMethodType}" == "esco"  Convert To String  ${lot.yearlyPaymentsPercentageRange * 100}
   ${items}=  get_items_by_lot_id  ${tender_data}  ${tender_data.data.lots[${index}].id}
-  ${milestones}=  get_milestone_by_lot_id  ${tender_data}  ${tender_data.data.lots[${index}].id}
+#  ${milestones}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  get_milestone_by_lot_id  ${tender_data}  ${tender_data.data.lots[${index}].id}
 #  ${items}=  Get From Dictionary  ${tender_data.data}  items
   ${items_length}=  Get Length  ${items}
-  ${milestones_length}=  Get Length  ${milestones}
+#  ${milestones_length}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Get Length  ${milestones}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][title]"]  ${lot.title}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][description]"]  ${lot.description}
-  Wait And Input Text  xpath=//input[@name="data[lots][${index}][value][amount]"]  ${amount}
-  Wait And Input Text  xpath=//input[@name="data[lots][${index}][minimalStep][amount]"]  ${minimal_step_amount}
+  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Wait And Input Text  xpath=//input[@name="data[lots][${index}][value][amount]"]  ${amount}
+  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Wait And Input Text  xpath=//input[@name="data[lots][${index}][minimalStep][amount]"]  ${minimal_step_amount}
+  Run Keyword If  "${tender_data.data.procurementMethodType}" == "esco"  Wait And Input Text  xpath=//input[@name="data[lots][${index}][minimalStepPercentage]"]  ${minimalStepPercentage}
+  Run Keyword If  "${tender_data.data.procurementMethodType}" == "esco"  Wait And Input Text  xpath=//input[@name="data[lots][${index}][yearlyPaymentsPercentageRange]"]  ${yearlyPaymentsPercentageRange}
   :FOR  ${index}  IN RANGE  ${items_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
-  \  Add Tender Item  ${items[${index}]}  ${index}
+  \  Add Tender Item  ${tender_data}  ${items[${index}]}  ${index}
+  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Add Milestones  ${tender_data}  ${index}
+
+Add Milestones
+  [Arguments]  ${tender_data}  ${index}
+  ${milestones}=  get_milestone_by_lot_id  ${tender_data}  ${tender_data.data.lots[${index}].id}
+  ${milestones_length}=  Get Length  ${milestones}
   Wait And Click  xpath=(//section[contains(@class, "multiMilestones")]/a)[1]
   :FOR  ${index}  IN RANGE  ${milestones_length}
   \  Wait And Click  xpath=(//section[contains(@class, "multiMilestones")]/descendant::a[@class="addMultiItem"])[1]
   \  Add Milestone  ${milestones[${index}]}  ${index}
 
-
 Add Tender Item
-  [Arguments]  ${item}  ${index}
+  [Arguments]  ${tender_data}  ${item}  ${index}
   ${quantity}=  add_second_sign_after_point  ${item.quantity}
-  ${unit_id}=  convert_unit_id  ${item.unit.code}
-  ${delivery_end_date}=  convert_datetime_to_format  ${item.deliveryDate.endDate}  %d/%m/%Y
+  ${unit_id}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  convert_unit_id  ${item.unit.code}
+  ${delivery_end_date}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  convert_datetime_to_format  ${item.deliveryDate.endDate}  %d/%m/%Y
   Wait And Input Text  xpath=//input[@name="data[items][${index}][description]"]  ${item.description}
-  Input Text  xpath=//input[@name="data[items][${index}][quantity]"]  ${quantity}
-  Select From List By Value  xpath=//select[@name="data[items][${index}][unit_id]"]  ${unit_id}
+  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Input Text  xpath=//input[@name="data[items][${index}][quantity]"]  ${quantity}
+  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Select From List By Value  xpath=//select[@name="data[items][${index}][unit_id]"]  ${unit_id}
   Click Element  xpath=//div[contains(@class, "tenderItemPositionElement")][@data-multiline="${index}"]/descendant::a[@data-class="ДК021"]
   Select CPV  ${item.classification.id}
   Run Keyword And Ignore Error  Run Keywords
   ...  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//a[@data-msg="jAlert Close"]
   ...  AND  Click Element  xpath=//a[@data-msg="jAlert Close"]
   ...  AND  Wait Until Page Does Not Contain Element  xpath=//a[@data-msg="jAlert Close"]
-  Input Date  data[items][${index}][deliveryDate][endDate]  ${delivery_end_date}
+  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Input Date  data[items][${index}][deliveryDate][endDate]  ${delivery_end_date}
   Select From List By Value  xpath=//select[@name="data[items][${index}][country_id]"]  461
   Select From List By Label  xpath=//select[@name="data[items][${index}][region_id]"]  ${item.deliveryAddress.region}
   Input Text  xpath=//input[@name="data[items][${index}][deliveryAddress][locality]"]  ${item.deliveryAddress.locality}
