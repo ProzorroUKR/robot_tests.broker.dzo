@@ -125,6 +125,7 @@ def convert_dzo_data(value, field_name):
             u'робочі дні': "working",
             u'банківські дні': "banking",
             u'Допорогові закупівлі': "belowThreshold",
+            u'Конкурентний діалог 1-ий етап': "competitiveDialogueUA",
             u'грн': "UAH",
             u'Код в ЄДРПОУ / ІПН': "UA-EDR",
             u'Класифікація за ДК 021-2015 (CPV)': u"ДК021",

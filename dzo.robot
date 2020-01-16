@@ -491,7 +491,7 @@ Fill Form For Tender Without Lots
   Wait And Click  xpath=//section[contains(@id, "multiItems")]/a
   :FOR  ${index}  IN RANGE  ${items_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
-  \  Add Tender Item  ${items[${index}]}  ${index}
+  \  Add Tender Item  ${tender_data}  ${items[${index}]}  ${index}
 
   Wait And Click  xpath=//section[contains(@id, "multiMilestones")]/a
   :FOR  ${index}  IN RANGE  ${milestones_length}
@@ -591,7 +591,7 @@ Add Feature
   :FOR  ${enum_index}  IN RANGE  ${enum_length}
   \  ${enum_value}=  Convert To String  ${feature.enum[${enum_index}].value * 100}
   \  Run Keyword If  "${enum_index}" != "0"  Click Element  xpath=//a[@class="addFeatureOptItem"]
-  \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title]"]  ${feature.enum[${enum_index}].title}
+  \  Wait And Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title]"]  ${feature.enum[${enum_index}].title}
   \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][value]"]  ${enum_value.split(".")[0]}
 
 Пошук тендера по ідентифікатору
@@ -741,12 +741,15 @@ Input Tender Period End Date
 #  ...   AND   Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
 #  Clear Element Text   name=data[value][amount]
   ${is_lot}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[contains(@name, "lotValues")]
+  ${is_self_declaration}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data_competitive[lotValues][0][value][amount]"]/..
   ${amount}=  Set Variable If  ${is_lot}  ${bid.data.lotValues[0].value.amount}  ${bid.data.value.amount}
   ${amount}=  add_second_sign_after_point   ${amount}
   ${locator_pref}=  Set Variable If  ${is_lot}  [lotValues][0]  ${EMPTY}
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
-  Scroll To Element  name=data${locator_pref}[value][amount]
-  Input Text  name=data${locator_pref}[value][amount]  ${amount}
+  Run Keyword If  ${is_self_declaration}  Wait And Click  xpath=//input[@name="data_competitive[lotValues][0][value][amount]"]/..
+  ...  ELSE  Run Keywords
+  ...  Scroll To Element  name=data${locator_pref}[value][amount]
+  ...  AND  Input Text  name=data${locator_pref}[value][amount]  ${amount}
   Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${bid.data.parameters[0].value}
   ${is_self_qualified}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfQualified]"]/..
   Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfQualified]"]/..
@@ -807,6 +810,7 @@ Input Tender Period End Date
 
 Підтвердити кваліфікацію
   [Arguments]  ${username}  ${tender_uaid}  ${qualification_num}
+  ${qualification_num}=  Convert To Integer  ${qualification_num}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait And Click  xpath=(//a[@data-bid-action="aply"])[${qualification_num * -1 + 1}]
   Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
