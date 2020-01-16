@@ -81,6 +81,7 @@ ${tender.view.funders[0].identifier.id}=  xpath=//div[@class="fundersItem"]/desc
 ${tender.view.funders[0].identifier.legalName}=  xpath=//div[@class="fundersItem"]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
 ${tender.view.funders[0].identifier.scheme}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"ЄДРПОУ")]/following-sibling::td[1]
 ${tender.view.awards[0].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
+${tender.view.awards[1].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
 ${tender.view.contracts[0].status}=  xpath=(//div[@class="statusItem active"]/descendant::div[@class="statusName"])[last()]
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
@@ -667,9 +668,9 @@ Input Tender Period End Date
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(text(), 'Процедура закупівлі')]
   Wait And Click  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[last()]
-  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/descendant::a[@class="addMultiItem"])[last()]
   ${index}=  Get Matching Xpath Count  xpath=//a[@class="deleteFeatureItem"]
   ${index}=  Convert To Integer  ${index}
+  Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/descendant::a[@class="addMultiItem"])[last()]
   Add Feature  ${feature}  ${index}
   Wait And Click  xpath=//button[@value="save"]
 
@@ -730,6 +731,7 @@ Input Tender Period End Date
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
   Scroll To Element  name=data${locator_pref}[value][amount]
   Input Text  name=data${locator_pref}[value][amount]  ${amount}
+  Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${bid.data.parameters.value}
   ${is_self_qualified}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfQualified]"]/..
   Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfQualified]"]/..
   ${is_self_eligible}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfEligible]"]/..
@@ -800,6 +802,13 @@ Input Tender Period End Date
 Затвердити остаточне рішення кваліфікації
   [Arguments]  ${username}  ${tender_uaid}
   Wait Until Keyword Succeeds  10 x  5 s  Element Should Be Visible  xpath=//a[@data-bid-action="done"]
+  Wait And Click  xpath=//a[@data-bid-action="done"]
+  Підтвердити Дію
+
+Перевести тендер на статус очікування обробки мостом
+  [Arguments]  ${username}  ${tender_uaid}
+  Wait Until Keyword Succeeds  10 x  5 s  Element Should Be Visible  xpath=//a[@data-bid-action="done"]
+  Wait And Click  xpath=//a[@data-stage="/stage2"]
   Підтвердити Дію
 
 Завантажити документ рішення кваліфікаційної комісії
