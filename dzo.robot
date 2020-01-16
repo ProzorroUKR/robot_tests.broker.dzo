@@ -819,6 +819,9 @@ Input Tender Period End Date
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@placeholder="Вкажіть назву докумету"]
   Click Element  xpath=//button[@class="bidAction"]
   Click Element  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  20 x  5 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//a[@data-bid-question="sure_award_cancel"]
 
 ###############################################################################################################
 ##########################################    КОНТРАКТІНГ    ##################################################
