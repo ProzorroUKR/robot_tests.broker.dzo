@@ -141,7 +141,7 @@ ${locator.ModalOK}=  xpath=//a[@data-msg="jAlert OK"]
 Login
   [Arguments]  ${username}
   Wait And Click  xpath=//div[@class="authBtn"]/a
-  Ввести текст  name=email  ${USERS.users['${username}'].login}
+  Wait And Input Text  name=email  ${USERS.users['${username}'].login}
   Execute Javascript  $('input[name="email"]').attr('rel','CHANGE');
   Ввести текст  name=psw  ${USERS.users['${username}'].password}
   Wait And Click  xpath=//button[contains(@class, 'btn')][./text()='Вхід']
@@ -279,7 +279,7 @@ Select CPV
 Пошук плану по ідентифікатору
   [Arguments]  ${username}  ${plan_uaid}
   Switch Browser  ${username}
-  Sleep  360
+  Run Keyword If  "planning" in "${SUITE NAME.lower()}"  Sleep  360
 #  ${url}=  Set Variable If  'Viewer' in '${username}'  https://www.sandbox.dzo.com.ua/tenders/plans?test_mode=0  https://www.sandbox.dzo.com.ua/tenders/plans
   Go To  https://www.sandbox.dzo.com.ua/tenders/plans
   Select From List By Value  xpath=//select[@name="filter[object]"]  planID
@@ -447,6 +447,7 @@ Get From Item
 
   Select From List By Value  xpath=//select[@name="data[mainProcurementCategory]"]  ${tender_data.data.mainProcurementCategory}
   Input Text  xpath=//input[@name="data[title]"]  ${tender_data.data.title}
+  Input Text En  xpath=//input[@name="data[title_en]"]  ${tender_data.data.title_en}
   Input Text  xpath=//input[@name="data[description]"]  ${tender_data.data.description}
   Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Select From List By Value  xpath=//select[@name="data[value][valueAddedTaxIncluded]"]  ${valueAddedTaxIncluded}
 
@@ -478,6 +479,12 @@ Get From Item
   ${internal_id}=  Get Text  id=tender_id
   Set Global Variable  ${dzo_internal_id}  ${internal_id}
   [Return]  ${tender_uaid}
+
+Input Text En
+  [Arguments]  ${locator}  ${value}
+  Wait And Click  xpath=//span[text()="In English"]/../..
+  Wait And Input Text  ${locator}  ${value}
+  Wait And Click  xpath=//span[text()="Українська"]/../..
 
 Fill Form For Tender Without Lots
   [Arguments]  ${tender_data}
@@ -519,6 +526,7 @@ Add Tender Lot
   ${items_length}=  Get Length  ${items}
 #  ${milestones_length}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Get Length  ${milestones}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][title]"]  ${lot.title}
+  Input Text En  xpath=//input[@name="data[lots][${index}][title_en]"]  ${lot.title_en}
   Wait And Input Text  xpath=//input[@name="data[lots][${index}][description]"]  ${lot.description}
   Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Wait And Input Text  xpath=//input[@name="data[lots][${index}][value][amount]"]  ${amount}
   Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Wait And Input Text  xpath=//input[@name="data[lots][${index}][minimalStep][amount]"]  ${minimal_step_amount}
@@ -544,9 +552,10 @@ Add Tender Item
   ${unit_id}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  convert_unit_id  ${item.unit.code}
   ${delivery_end_date}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  convert_datetime_to_format  ${item.deliveryDate.endDate}  %d/%m/%Y
   Wait And Input Text  xpath=//input[@name="data[items][${index}][description]"]  ${item.description}
+  Input Text En  xpath=//input[@name="data[items][${index}][description_en]"]  ${item.description_en}
   Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Input Text  xpath=//input[@name="data[items][${index}][quantity]"]  ${quantity}
   Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Select From List By Value  xpath=//select[@name="data[items][${index}][unit_id]"]  ${unit_id}
-  Click Element  xpath=//div[contains(@class, "tenderItemPositionElement")][@data-multiline="${index}"]/descendant::a[@data-class="ДК021"]
+  Wait And Click  xpath=//div[contains(@class, "tenderItemPositionElement")][@data-multiline="${index}"]/descendant::a[@data-class="ДК021"]
   Select CPV  ${item.classification.id}
   Run Keyword And Ignore Error  Run Keywords
   ...  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//a[@data-msg="jAlert Close"]
@@ -587,11 +596,13 @@ Add Feature
   [Arguments]  ${feature}  ${index}
   ${enum_length}=  Get Length  ${feature.enum}
   Input Text  xpath=//input[@name="data[features][${index}][title]"]  ${feature.title}
+  Input Text En  xpath=//input[@name="data[features][${index}][title_en]"]  ${feature.title_en}
   Input Text  xpath=//input[@name="data[features][${index}][description]"]  ${feature.description}
   :FOR  ${enum_index}  IN RANGE  ${enum_length}
   \  ${enum_value}=  Convert To String  ${feature.enum[${enum_index}].value * 100}
   \  Run Keyword If  "${enum_index}" != "0"  Click Element  xpath=//a[@class="addFeatureOptItem"]
   \  Wait And Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title]"]  ${feature.enum[${enum_index}].title}
+  \  Input Text En  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title_en]"]  test
   \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][value]"]  ${enum_value.split(".")[0]}
 
 Пошук тендера по ідентифікатору
@@ -750,7 +761,7 @@ Input Tender Period End Date
   ...  ELSE  Run Keywords
   ...  Scroll To Element  name=data${locator_pref}[value][amount]
   ...  AND  Input Text  name=data${locator_pref}[value][amount]  ${amount}
-  Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${bid.data.parameters[0].value}
+  Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${bid.data.parameters[0]['value']}
   ${is_self_qualified}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfQualified]"]/..
   Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfQualified]"]/..
   ${is_self_eligible}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfEligible]"]/..
