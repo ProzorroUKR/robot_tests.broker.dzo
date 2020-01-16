@@ -747,7 +747,7 @@ Input Tender Period End Date
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
   Scroll To Element  name=data${locator_pref}[value][amount]
   Input Text  name=data${locator_pref}[value][amount]  ${amount}
-  Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${bid.data.parameters.value}
+  Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${bid.data.parameters[0].value}
   ${is_self_qualified}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfQualified]"]/..
   Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfQualified]"]/..
   ${is_self_eligible}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfEligible]"]/..
