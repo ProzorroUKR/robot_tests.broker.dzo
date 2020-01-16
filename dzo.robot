@@ -83,6 +83,7 @@ ${tender.view.funders[0].identifier.scheme}=  xpath=//div[@class="fundersItem"]/
 ${tender.view.awards[0].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
 ${tender.view.awards[1].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
 ${tender.view.contracts[0].status}=  xpath=(//div[@class="statusItem active"]/descendant::div[@class="statusName"])[last()]
+${tender.view.contracts[1].dateSigned}=  xpath=//div[text()="Дата підписання"]/following-sibling::div
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
@@ -313,7 +314,9 @@ Select CPV
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Reload Page
   ${text}=  Run Keyword If
-  ...  "value.amount" in "${field_name}"  Get Amount
+  ...  "value.amount" in "${field_name}" and "contracts" in "${field_name}"  Get Text  xpath=//div[text()="Ціна договору"]/following-sibling::div
+  ...  ELSE IF  "value.amountNet" in "${field_name}" and "contracts" in "${field_name}"  Get Text  xpath=//div[text()="Ціна договору без ПДВ"]/following-sibling::div
+  ...  ELSE IF  "value.amount" in "${field_name}"  Get Amount
   ...  ELSE IF  "milestones" in "${field_name}"  Get From Milestone  ${field_name}
   ...  ELSE IF  "item" in "${field_name}"  Get From Item  ${field_name}
   ...  ELSE  Get Text  ${tender.view.${field_name}}
@@ -381,6 +384,7 @@ Get From Item
 Отримати інформацію із документа
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
+  Run Keyword If  "contract signing" in ${SUITE NAME.lower()}  Wait And Click  xpath=//div[@class="btn docs"]/a
   Wait Until Element Is Visible   xpath=//*[contains(text(),'${doc_id}')]
   ${value}=   Get Text   xpath=//*[contains(text(),'${doc_id}')]
   [Return]  ${value.split('/')[-1]}

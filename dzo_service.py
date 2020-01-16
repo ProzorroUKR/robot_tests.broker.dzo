@@ -85,6 +85,8 @@ def convert_date_to_slash_format(isodate):
 
 
 def convert_dzo_data(value, field_name):
+    if "contracts" in field_name and "amount" in field_name:
+        value = value.split(" ")[0]
     if "amount" in field_name or "quantity" in field_name or "duration.days" in field_name:
         value_for_return = float(value.replace("`", ""))
     elif "Date" in field_name:
