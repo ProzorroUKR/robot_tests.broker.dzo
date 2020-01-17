@@ -17,6 +17,7 @@ ${locator.tenderPeriod.endDate}      xpath=//td[./text()='Завершення �
 
 
 ##################
+${internal_id}
 
 ${plan.view.status}=  xpath=//div[@class="statusName"]
 ${plan.view.tender.procurementMethodType}=  xpath=//td[text()="Тип процедури"]/following-sibling::td[1]
@@ -600,7 +601,7 @@ Add Feature
   Input Text  xpath=//input[@name="data[features][${index}][description]"]  ${feature.description}
   :FOR  ${enum_index}  IN RANGE  ${enum_length}
   \  ${enum_value}=  Convert To String  ${feature.enum[${enum_index}].value * 100}
-  \  Run Keyword If  "${enum_index}" != "0"  Wait And Click  xpath=//a[@class="addFeatureOptItem"]
+  \  Run Keyword If  "${enum_index}" != "0"  Wait And Click  xpath=(//a[@class="addFeatureOptItem"])[last()]
   \  Wait And Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title]"]  ${feature.enum[${enum_index}].title}
   \  Input Text En  xpath=//input[@name="data[features][${index}][enum][${enum_index}][title_en]"]  test
   \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][value]"]  ${enum_value.split(".")[0]}
@@ -616,6 +617,7 @@ Add Feature
   Wait Until Keyword Succeeds  10 x  1 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]/a[contains(@href,"/tenders/")]  1
   Click Element  xpath=//a[contains(@class, "tenderLink")]
   ${internal_id}=  Run Keyword If  "${dzo_internal_id}" == "${None}"  Get Text  id=tender_id
+  ...  ELSE  Set Variable  ${internal_id}
   Set Global Variable  ${dzo_internal_id}  ${internal_id}
   Run Keyword If  "${SUITE NAME.lower()}" == "qualification" and "${TEST NAME}" == "Можливість знайти закупівлю по ідентифікатору"
   ...  Wait Until Keyword Succeeds  40 x  30 s  Status Should Be  ${username}  ${tender_uaid}  active.qualification
@@ -761,7 +763,8 @@ Input Tender Period End Date
   ...  ELSE  Run Keywords
   ...  Scroll To Element  name=data${locator_pref}[value][amount]
   ...  AND  Input Text  name=data${locator_pref}[value][amount]  ${amount}
-  Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${bid.data.parameters[0]['value']}
+  ${parameter_value}=  Run Keyword If  ${bid.data.has_key("parameters")}  Convert To String  ${bid.data.parameters[0]['value']}
+  Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${parameter_value}
   ${is_self_qualified}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfQualified]"]/..
   Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfQualified]"]/..
   ${is_self_eligible}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfEligible]"]/..
