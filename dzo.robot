@@ -708,7 +708,7 @@ Input Tender Period End Date
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(text(), 'Процедура закупівлі')]
   Wait And Click  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=(//section[contains(@class, "multiFeatures")]/a)[last()]
-  Wait And Click  xpath=//input[@value="${feature_id}"]/ancestor::div[contains(@class,"tenderFeatureItemElement")]/descendant::a[@class="deleteFeatureItem"]
+  Wait And Click  xpath=(//input[contains(@value,"${feature_id}")]/ancestor::div[contains(@class,"tenderFeatureItemElement")])[1]/descendant::a[@class="deleteFeatureItem"]
   Підтвердити Дію
   Wait And Click  xpath=//button[@value="save"]
 
@@ -764,7 +764,7 @@ Input Tender Period End Date
   ...  Scroll To Element  name=data${locator_pref}[value][amount]
   ...  AND  Input Text  name=data${locator_pref}[value][amount]  ${amount}
   ${parameter_value}=  Run Keyword If  ${bid.data.has_key("parameters")}  Convert To String  ${bid.data.parameters[0]['value']}
-  ${parameter_value}=  Set Variable If  ${parameter_value} == "0"  0.0  ${parameter_value}
+  ${parameter_value}=  Set Variable If  "${parameter_value}" == "0"  0.0  ${parameter_value}
   Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${parameter_value}
   ${is_self_qualified}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfQualified]"]/..
   Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfQualified]"]/..
