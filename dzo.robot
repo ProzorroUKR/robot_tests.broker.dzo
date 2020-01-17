@@ -764,6 +764,7 @@ Input Tender Period End Date
   ...  Scroll To Element  name=data${locator_pref}[value][amount]
   ...  AND  Input Text  name=data${locator_pref}[value][amount]  ${amount}
   ${parameter_value}=  Run Keyword If  ${bid.data.has_key("parameters")}  Convert To String  ${bid.data.parameters[0]['value']}
+  ${parameter_value}=  Set Variable If  ${parameter_value} == "0"  0.0  ${parameter_value}
   Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${parameter_value}
   ${is_self_qualified}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfQualified]"]/..
   Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfQualified]"]/..
@@ -826,12 +827,16 @@ Input Tender Period End Date
   [Arguments]  ${username}  ${tender_uaid}  ${qualification_num}
   ${qualification_num}=  Convert To Integer  ${qualification_num}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
-  Wait And Click  xpath=(//a[@data-bid-action="aply"])[${qualification_num * -1 + 1}]
+  Wait And Click  xpath=(//div[contains(@class," award ")])[${qualification_num * -1 + 1}]/descendant::a[@data-bid-action="aply"]
   Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
   Wait And Click  xpath=//input[@name="data[qualified]"]/..
   Wait And Click  xpath=//input[@name="data[eligible]"]/..
   Wait And Click  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  xpath=//a[@onclick="modalClose();"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  20 x  5 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Page Should Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num * -1 + 1}]/descendant::a[@data-bid-action="award cancel"]
 
 Затвердити остаточне рішення кваліфікації
   [Arguments]  ${username}  ${tender_uaid}
