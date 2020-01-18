@@ -407,9 +407,8 @@ Get From Item
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
-  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
+  Wait Until Keyword Succeeds  20 x  1 s  Page Should Contain Element  xpath=//*[contains(text(),"Інформація про пропозицію учасника")]
   ${bid_value}=  Get Text  ${locator.bids.${field_name}}
-  ${locator.bids.lotValues[0].value.amount}  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
   ${bid_value}=  Convert To Number  ${bid_value.replace('`', '')}
   Click Element  xpath=//a[@onclick="modalClose();"]
   [Return]  ${bid_value}
@@ -880,11 +879,33 @@ Confirm Invalid Bid
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
   Wait And Click  xpath=//a[@data-bid-action="aply"]
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@placeholder="Вкажіть назву докумету"]
+  Run Keyword And Ignore Error  Click Element  xpath=//input[@name="data[qualified]"]/..
+  Run Keyword And Ignore Error  Click Element  xpath=//input[@name="data[eligible]"]/..
   Click Element  xpath=//button[@class="bidAction"]
+
+  Run Keyword And Ignore Error  Накласти ЕЦП
+
   Click Element  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  5 s  Run Keywords
   ...  Reload Page
   ...  AND  Page Should Contain Element  xpath=//a[@data-bid-question="sure_award_cancel"]
+
+Накласти ЕЦП
+  Wait Until Element Is Visible  xpath=//a[contains(@class, "tenderSignCommand")]
+  Click Element  xpath=//a[contains(@class, "tenderSignCommand")]
+  Select Window  NEW
+  Wait And Click  xpath=//a[@class="js-oldPageLink"]
+  ${status}=  Run Keyword And Return Status  Wait Until Keyword Succeeds  30 x  1 s  Page Should Contain  Оберіть файл з особистим ключем (зазвичай з ім'ям Key-6.dat) та вкажіть пароль захисту
+  Run Keyword If  ${status}  Wait Until Keyword Succeeds  30 x  20 s  Run Keywords
+  ...  Wait And Select From List By Label  id=CAsServersSelect  Тестовий ЦСК АТ "ІІТ"
+  ...  AND  Execute Javascript  var element = document.getElementById('PKeyFileInput'); element.style.visibility="visible";
+  ...  AND  Choose File  id=PKeyFileInput  ${CURDIR}/Key-6.dat
+  ...  AND  Input text  id=PKeyPassword  12345677
+  ...  AND  Wait And Click  id=PKeyReadButton
+  ...  AND  Wait Until Page Contains  Ключ успішно завантажено  10
+  Wait And Click  id=SignDataButton
+  Wait Until Keyword Succeeds  60 x  1 s  Page Should Contain  Підпис успішно накладено та передано у ЦБД
+  Select Window  MAIN
 
 ###############################################################################################################
 ##########################################    КОНТРАКТІНГ    ##################################################
