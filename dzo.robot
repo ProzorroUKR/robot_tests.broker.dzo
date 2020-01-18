@@ -409,8 +409,10 @@ Get From Item
   Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
   Wait Until Keyword Succeeds  20 x  1 s  Page Should Contain Element  xpath=//*[contains(text(),"Інформація про пропозицію учасника")]
   ${bid_value}=  Get Text  ${locator.bids.${field_name}}
-  ${bid_value}=  Convert To Number  ${bid_value.replace('`', '')}
+  ${bid_value}=  Run Keyword If  "amount" in "${field_name}"  Convert To Number  ${bid_value.replace('`', '')}
+  ...  ELSE  Set Variable  ${bid_value}
   Click Element  xpath=//a[@onclick="modalClose();"]
+  ${bid_value}=  convert_dzo_data  ${bid_value}  ${field_name}
   [Return]  ${bid_value}
 
 Отримати інформацію із нецінового показника
@@ -882,17 +884,29 @@ Confirm Invalid Bid
   Run Keyword And Ignore Error  Click Element  xpath=//input[@name="data[qualified]"]/..
   Run Keyword And Ignore Error  Click Element  xpath=//input[@name="data[eligible]"]/..
   Click Element  xpath=//button[@class="bidAction"]
-
-  Run Keyword And Ignore Error  Накласти ЕЦП
-
+  Wait Until Page Contains  Рішення по кваліфікації даного учасника прийнято та знаходиться в обробці
+  ${is_eds_needed}=  Run Keyword And Return Status  Page Should Contain  Цей документ треба підтвердити ЕЦП.
+  Run Keyword If  ${is_eds_needed}  Run Keywords
+  ...  Wait Until Keyword Succeeds  10 x  20 s  Дочекатися Кнопки Для Підпису
+  ...  AND  Click Element  xpath=(//a[@data-bid-action="aply"])[1]
+  ...  AND  Накласти ЕЦП
   Click Element  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  5 s  Run Keywords
   ...  Reload Page
   ...  AND  Page Should Contain Element  xpath=//a[@data-bid-question="sure_award_cancel"]
 
+Дочекатися Кнопки Для Підпису
+  Reload Page
+  Page Should Contain Element  xpath=//div[contains(@class, "awardActionSign")]
+
+Скасування рішення кваліфікаційної комісії
+  [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+  Wait And Click  xpath=//a[@data-bid-action="award cancel"]
+  Підтвердити Дію
+
 Накласти ЕЦП
-  Wait Until Element Is Visible  xpath=//a[contains(@class, "tenderSignCommand")]
-  Click Element  xpath=//a[contains(@class, "tenderSignCommand")]
+#  Wait Until Element Is Visible  xpath=//a[contains(@class, "tenderSignCommand")]
+  Wait And Click  xpath=//a[contains(@class, "tenderSignCommand")]
   Select Window  NEW
   Wait And Click  xpath=//a[@class="js-oldPageLink"]
   ${status}=  Run Keyword And Return Status  Wait Until Keyword Succeeds  30 x  1 s  Page Should Contain  Оберіть файл з особистим ключем (зазвичай з ім'ям Key-6.dat) та вкажіть пароль захисту
