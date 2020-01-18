@@ -111,6 +111,8 @@ def convert_dzo_data(value, field_name):
             u'ПРЕКВАЛІФІКАЦІЯ': "active.pre-qualification",
             u'ЗАПЛАНОВАНИЙ': "scheduled",
             u'ЗАВЕРШЕНА': "active",
+            u'ОСКАРЖЕННЯ ПРЕКВАЛІФІКАЦІЇ': "active.pre-qualification.stand-still",
+            u'ВАШУ ПРОПОЗИЦІЮ ЗАБЛОКОВАНО ЧЕРЕЗ ЗМІНИ, ВНЕСЕНІ ЗАМОВНИКОМ В УМОВИ ОГОЛОШЕННЯ. ДЛЯ ПОВТОРНОЇ АКТИВАЦІЇ ПРОПОЗИЦІЇ, ЇЇ НЕОБХІДНО ПІДТВЕРДИТИ, ПОВТОРНО ЗБЕРІГШИ ЇЇ СКЛАД': "invalid",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",
             u'виконання робіт': "executionOfWorks",

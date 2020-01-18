@@ -120,6 +120,10 @@ ${locator.feature.title}  /div[1]
 ${locator.feature.description}  /descendant::div[@class="featureDescr"]
 ${locator.feature.featureOf}  /descendant::div[@class="featureDescr"]
 
+${locator.bids.lotValues[0].value.amount}  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
+${locator.bids.value.amount}  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
+${locator.bids.status}  xpath=//td[text()="Статус пропозиції"]/following-sibling::td[2]
+
 ${contract.value.amountNet}  xpath=//input[@name="data[value][amountNet]"]
 ${contract.value.amount}  xpath=//input[@name="data[value][amount]"]
 
@@ -400,11 +404,12 @@ Get From Item
   [Return]  ${file_name.split('/')[-1]}
 
 Отримати інформацію із пропозиції
-  [Arguments]  ${username}  ${tender_uaid}  ${field}
+  [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
-  ${bid_value}=  Get Text  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
+  ${bid_value}=  Get Text  ${locator.bids.${field_name}}
+  ${locator.bids.lotValues[0].value.amount}  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
   ${bid_value}=  Convert To Number  ${bid_value.replace('`', '')}
   Click Element  xpath=//a[@onclick="modalClose();"]
   [Return]  ${bid_value}
@@ -805,6 +810,7 @@ Input Tender Period End Date
 
 Змінити цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
+  Run Keyword And Return If  "${TEST NAME}" == "Можливість підтвердити цінову пропозицію після зміни умов тендера першим учасником"  Confirm Invalid Bid
   ${amount}=  add_second_sign_after_point  ${fieldvalue}
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
   Wait And Click  xpath=//a[contains(@class, "bidToEdit")]
@@ -818,6 +824,14 @@ Input Tender Period End Date
   Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
   Click Element  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+
+Confirm Invalid Bid
+  Wait And Click  xpath=//button[contains(@class, "invalidSave")]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
+  Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
+  Click Element  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+
 
 ###############################################################################################################
 #########################################    КВАЛІФІКАЦІЯ    ##################################################
