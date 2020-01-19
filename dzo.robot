@@ -409,8 +409,8 @@ Get From Item
   Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
   Wait Until Keyword Succeeds  20 x  1 s  Page Should Contain Element  xpath=//*[contains(text(),"Інформація про пропозицію учасника")]
   ${bid_value}=  Get Text  ${locator.bids.${field_name}}
-  ${bid_value}=  Run Keyword If  "amount" in "${field_name}"  Convert To Number  ${bid_value.replace('`', '')}
-  ...  ELSE  Set Variable  ${bid_value}
+#  ${bid_value}=  Run Keyword If  "amount" in "${field_name}"  Convert To Number  ${bid_value.replace('`', '')}
+#  ...  ELSE  Set Variable  ${bid_value}
   Click Element  xpath=//a[@onclick="modalClose();"]
   ${bid_value}=  convert_dzo_data  ${bid_value}  ${field_name}
   [Return]  ${bid_value}
