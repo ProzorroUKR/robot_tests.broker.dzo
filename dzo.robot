@@ -430,7 +430,7 @@ Get From Item
 Створити тендер
   [Arguments]  ${username}  ${tender_data}  ${plan_uaid}
   Switch Browser  ${username}
-  ${dzo_accelerator}=  Set Variable If  "esco" in "${tender_data.data.procurementMethodType}" or "competitive" in ${tender_data.data.procurementMethodType}  2880  1440
+  ${dzo_accelerator}=  Set Variable If  "esco" in "${tender_data.data.procurementMethodType}" or "competitive" in "${tender_data.data.procurementMethodType}"  2880  1440
   ${rate}=  Run Keyword If  ${tender_data.data.has_key("NBUdiscountRate")}  Convert To String  ${tender_data.data.NBUdiscountRate * 100}
   ${valueAddedTaxIncluded}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Set Variable If  ${tender_data.data.value.valueAddedTaxIncluded}  true  false
   ${enquiry_end_date}=  Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  convert_datetime_to_format  ${tender_data.data.enquiryPeriod.endDate}  %d/%m/%Y %H:%M
@@ -942,6 +942,7 @@ Confirm Invalid Bid
   [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
   ${document}=  get_upload_file_path
   Choose File  xpath=//input[@type="file"]  ${document}
+  Input Text  xpath=//input[@name="title"]  test
   Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
   Wait And Input Text  xpath=//input[@name="data[contractNumber]"]  123456
   ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
