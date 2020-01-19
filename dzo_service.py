@@ -129,6 +129,7 @@ def convert_dzo_data(value, field_name):
             u'Допорогові закупівлі': "belowThreshold",
             u'Конкурентний діалог 1-ий етап': "competitiveDialogueUA",
             u'Відкриті торги для закупівлі енергосервісу': "esco",
+            u'Переговорна процедура для потреб оборони': "aboveThresholdUA.defense",
             u'грн': "UAH",
             u'Код в ЄДРПОУ / ІПН': "UA-EDR",
             u'Класифікація за ДК 021-2015 (CPV)': u"ДК021",

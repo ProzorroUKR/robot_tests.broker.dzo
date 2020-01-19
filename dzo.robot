@@ -430,7 +430,7 @@ Get From Item
 Створити тендер
   [Arguments]  ${username}  ${tender_data}  ${plan_uaid}
   Switch Browser  ${username}
-  ${dzo_accelerator}=  Get Variable Value  ${dzo_accelerator}  1440
+  ${dzo_accelerator}=  Set Variable If  "esco" in "${tender_data.data.procurementMethodType}" or "competitive" in ${tender_data.data.procurementMethodType}  2880  1440
   ${rate}=  Run Keyword If  ${tender_data.data.has_key("NBUdiscountRate")}  Convert To String  ${tender_data.data.NBUdiscountRate * 100}
   ${valueAddedTaxIncluded}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Set Variable If  ${tender_data.data.value.valueAddedTaxIncluded}  true  false
   ${enquiry_end_date}=  Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  convert_datetime_to_format  ${tender_data.data.enquiryPeriod.endDate}  %d/%m/%Y %H:%M
@@ -934,7 +934,7 @@ Confirm Invalid Bid
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
   ...  AND  Page Should Contain Element  xpath=//a[@data-bid-action="contract"]/..
-  Click Element  xpath=//a[@data-bid-action="contract"]/..
+  Wait And Click  xpath=//a[@data-bid-action="contract"]/..
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@name="data[value][amount]"]
   Input Text  ${contract.${fieldname}}  ${amount}
 
