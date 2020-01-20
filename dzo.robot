@@ -778,6 +778,7 @@ Input Tender Period End Date
 #  ...   AND   Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
 #  ...   AND   Run Keyword And Ignore Error   Select From List By Value   xpath=//select[@class="documents_url"]   financialLicense
 #  Clear Element Text   name=data[value][amount]
+  Run Keyword And Return If  "${MODE}" == "open_esco"  Send Bid Esco  ${bid}
   ${is_lot}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[contains(@name, "lotValues")]
   ${is_self_declaration}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data_competitive[lotValues][0][value][amount]"]/..
   ${amount}=  Set Variable If  ${is_lot}  ${bid.data.lotValues[0].value.amount}  ${bid.data.value.amount}
@@ -802,6 +803,29 @@ Input Tender Period End Date
   Підтвердити дію
   [Return]  ${bid}
 
+Send Bid Esco
+  [Arguments]  ${bid}
+  ${years}=  Convert To String  ${bid.data.lotValues[0].value.contractDuration.years}
+  ${days}=  Convert To String  ${bid.data.lotValues[0].value.contractDuration.days}
+  ${yearlyPaymentsPercentage}=  Convert To String  ${bid.data.lotValues[0].value.yearlyPaymentsPercentage * 100}
+  Wait And Select From List By Value  name=data[lotValues][0][value][contractDuration][years]  ${years}
+  Input Text  xpath=//input[@name="data[lotValues][0][value][contractDuration][days]"]  ${days}
+  Input Text  xpath=//input[@name="data[lotValues][0][value][yearlyPaymentsPercentage]"]  ${yearlyPaymentsPercentage}
+  ${inputs_counter}=  Get Matching Xpath Count  xpath=//tr[@style="display: table-row;"]/descendant::input[contains(@name, "annualCostsReduction")]
+  ${inputs_counter}=  Convert To Integer  ${inputs_counter}
+  :FOR  ${index}  IN RANGE  ${inputs_counter}
+  \  ${annualCostsReduction}=  Convert To String  ${bid.data.lotValues[0].value.annualCostsReduction[${index}]}
+  \  Input Text  xpath=//input[@name="data[lotValues][0][value][annualCostsReduction][${index}]"]  ${annualCostsReduction}
+  ${parameter_value}=  Run Keyword If  ${bid.data.has_key("parameters")}  Convert To String  ${bid.data.parameters[0]['value']}
+  ${parameter_value}=  Set Variable If  "${parameter_value}" == "0"  0.0  ${parameter_value}
+  Run Keyword If  ${bid.data.has_key("parameters")}  Wait And Select From List By Value  name=data[parameters][0][value]  ${parameter_value}
+  Wait And Click  xpath=//button[@value="save"]
+  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Wait And Click  xpath=//button[@name="pay"]
+  Підтвердити дію
+  [Return]  ${bid}
+
 Завантажити документ в ставку
   [Arguments]  ${username}  ${path}  ${tender_uaid}  ${doc_name}=documents  ${doc_type}=qualificationDocuments
   Wait Until Page Contains  Ваша пропозиція  10
@@ -816,12 +840,12 @@ Input Tender Period End Date
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
 Змінити документ в ставці
-  [Arguments]  ${username}  ${tender_uaid}  ${path}  ${doc_id}  ${doc_type}=documents
+  [Arguments]  ${username}  ${tender_uaid}  ${path}  ${doc_id}  ${doc_type}=technicalSpecifications
   Wait Until Page Contains  Ваша пропозиція  10
   Wait And Click  xpath=//a[contains(@class,'bidToEdit')]
   Choose File  xpath=/html/body/div[1]/form/input[2]  ${path}
   Run Keyword And Ignore Error  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
-  Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@class="documents_url"]  ${doc_type}
+  Run Keyword And Ignore Error  Select From List By Value  xpath=(//select[@class="documents_url"])[last()]  ${doc_type}
   Wait And Click  xpath=//div[contains(@class,"hide_onBided")]/descendant::button[@value="save"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
   Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
