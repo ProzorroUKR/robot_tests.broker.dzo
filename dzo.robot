@@ -378,6 +378,10 @@ Get From Item
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(@href, 'questions')]
   Wait Until Element Is Visible  xpath=//div[@id='questions']
   Wait Until Keyword Succeeds  15 x  20 s  Дочекатися відображення запитання на сторінці  ${question_id}
+  Run Keyword If  "${field_name}" == "answer"  Wait Until Keyword Succeeds  15 x  20 s  Run Keywords
+  ...  refresh_tender  ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//div[contains(text(),'${question_id}')]/../following-sibling::div[@class="answer relative"]/div[@class="text"]
   ${question_value}=  Get Text  xpath=//div[contains(text(),'${question_id}')]${locator.questions.${field_name}}
   [Return]  ${question_value}
 
@@ -389,6 +393,10 @@ Get From Item
 Отримати інформацію із документа
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
+  Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
+  ...  refresh_tender  ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain  ${doc_id}
   Run Keyword If  "contract signing" in "${SUITE NAME.lower()}"  Wait And Click  xpath=//div[@class="btn docs"]/a
   Wait Until Element Is Visible   xpath=//*[contains(text(),'${doc_id}')]
   ${value}=   Get Text   xpath=//*[contains(text(),'${doc_id}')]
@@ -418,6 +426,10 @@ Get From Item
 Отримати інформацію із нецінового показника
   [Arguments]  ${username}  ${tender_uaid}  ${feature_id}  ${field_name}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
+  Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
+  ...  refresh_tender  ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain  ${feature_id}
   ${value}=  Get Text  xpath=//div[contains(text(),"${feature_id}")]/..${locator.feature.${field_name}}
   [Return]  ${value}
 
