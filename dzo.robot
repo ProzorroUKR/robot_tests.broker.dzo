@@ -324,6 +324,7 @@ Select CPV
   ...  ELSE IF  "value.amount" in "${field_name}"  Get Amount
   ...  ELSE IF  "milestones" in "${field_name}"  Get From Milestone  ${field_name}
   ...  ELSE IF  "item" in "${field_name}"  Get From Item  ${field_name}
+  ...  ELSE IF  "qualificationPeriod.endDate" in "${field_name}"  Run Keyword And Return  Get Element Attribute  xpath=//div[contains(@class, "prequalificationDoneDate")]/span[2]@data-qualificationperiod-enddate
   ...  ELSE  Get Text  ${tender.view.${field_name}}
   ${value}=  convert_dzo_data  ${text}  ${field_name}
 #  ${value}=  Set Variable If  "amount" in "${field_name}"  ${value.replace("`", "")}  ${value}
