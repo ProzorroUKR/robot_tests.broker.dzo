@@ -50,9 +50,10 @@ def adapt_data_for_role(role_name, tender_data):
             tender_data['data']['classification']['description'] = u"Не визначено"
         for item in tender_data['data']['items']:
             # item['unit']['name'] = DZO_dict.get(item['unit']['name'], item['unit']['name'])
-            date = parse_date(item['deliveryDate']['endDate'])
-            date = date.replace(hour=16, minute=0, second=0)
-            item['deliveryDate']['endDate'] = "{}{}".format(date.strftime("%Y-%m-%dT%H:%M:%S"), "+02:00")
+            if 'deliveryDate' in item:
+                date = parse_date(item['deliveryDate']['endDate'])
+                date = date.replace(hour=16, minute=0, second=0)
+                item['deliveryDate']['endDate'] = "{}{}".format(date.strftime("%Y-%m-%dT%H:%M:%S"), "+02:00")
             if "deliveryAddress" in item:
                 item['deliveryAddress']['region'] = item['deliveryAddress']['region'].replace(u"місто Київ", u"м. Київ")
             if item['classification']['id'] == "99999999-9":
@@ -126,6 +127,7 @@ def convert_dzo_data(value, field_name):
             u'календарні дні': "calendar",
             u'робочі дні': "working",
             u'банківські дні': "banking",
+            u'Співфінансування з бюджетних коштів': "budget",
             u'Допорогові закупівлі': "belowThreshold",
             u'Конкурентний діалог 1-ий етап': "competitiveDialogueUA",
             u'Відкриті торги для закупівлі енергосервісу': "esco",

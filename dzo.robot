@@ -85,6 +85,9 @@ ${tender.view.awards[0].complaintPeriod.endDate}=  xpath=//span[@class="complain
 ${tender.view.awards[1].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
 ${tender.view.contracts[0].status}=  xpath=(//div[@class="statusItem active"]/descendant::div[@class="statusName"])[last()]
 ${tender.view.contracts[1].dateSigned}=  xpath=//div[text()="Дата підписання"]/following-sibling::div
+${tender.view.minimalStepPercentage}=  xpath=//td[contains(text(), "Мінімальний крок підвищення показника ефективності")]/following-sibling::td/span[1]
+${tender.view.yearlyPaymentsPercentageRange}=  xpath=//td[contains(text(), "Фіксований відсоток суми скорочення")]/following-sibling::td/span[1]
+${tender.view.fundingKind}=  xpath=//td[contains(text(), "Джерело фінансування закупівлі")]/following-sibling::td/span[1]
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
@@ -325,6 +328,7 @@ Select CPV
   ...  ELSE IF  "milestones" in "${field_name}"  Get From Milestone  ${field_name}
   ...  ELSE IF  "item" in "${field_name}"  Get From Item  ${field_name}
   ...  ELSE IF  "qualificationPeriod.endDate" in "${field_name}"  Run Keyword And Return  Get Element Attribute  xpath=//div[contains(@class, "prequalificationDoneDate")]/span[2]@data-qualificationperiod-enddate
+  ...  ELSE IF  "complaintPeriod.endDate" in "${field_name}"  Run Keyword And Return  Get Element Attribute  xpath=//div[@data-status="1.1"]@data-dateorig
   ...  ELSE  Get Text  ${tender.view.${field_name}}
   ${value}=  convert_dzo_data  ${text}  ${field_name}
 #  ${value}=  Set Variable If  "amount" in "${field_name}"  ${value.replace("`", "")}  ${value}
