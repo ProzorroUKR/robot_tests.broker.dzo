@@ -874,6 +874,9 @@ Confirm Invalid Bid
   Wait Until Keyword Succeeds  10 x  5 s  Element Should Be Visible  xpath=//a[@data-bid-action="done"]
   Wait And Click  xpath=//a[@data-bid-action="done"]
   Підтвердити Дію
+  Wait Until Keyword Succeeds  20 x  10 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//span[@data-qualificationperiod-enddate]
 
 Перевести тендер на статус очікування обробки мостом
   [Arguments]  ${username}  ${tender_uaid}
