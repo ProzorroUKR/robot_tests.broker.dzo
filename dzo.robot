@@ -325,7 +325,7 @@ Select CPV
 Отримати інформацію із тендера
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Switch Browser  ${username}
-  Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі"  Sleep  360
+  Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі" or "${TEST NAME}" == "Можливість дочекатися початку періоду очікування"  Sleep  360
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Reload Page
   ${text}=  Run Keyword If
