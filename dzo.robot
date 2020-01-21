@@ -952,6 +952,7 @@ Confirm Invalid Bid
 Дискваліфікувати постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
   ${document}=  get_upload_file_path
+  Wait Until Keyword Succeeds  10 x  2 s  Element Should Be Visisble  xpath=//a[@data-bid-action="cancel"]
   Wait And Click  xpath=//a[@data-bid-action="cancel"]
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
