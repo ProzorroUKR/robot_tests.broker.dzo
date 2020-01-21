@@ -1061,7 +1061,7 @@ Confirm Invalid Bid
   ...  AND  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
   ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
   ${amount_net}=  Get Element Attribute  xpath=//input[@name="data[value][amountNet]"]@value
-  ${amount_net}=  Convert To Integer  ${amount_net}
+  ${amount_net}=  Convert To Number  ${amount_net}
   ${amount_net}=  Convert To String  ${amount_net - 10}
   Clear Element Text  xpath=//input[@name="data[value][amountNet]"]
   Input Text  xpath=//input[@name="data[value][amountNet]"]  ${amount_net}
