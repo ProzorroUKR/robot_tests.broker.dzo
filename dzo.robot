@@ -1009,7 +1009,7 @@ Confirm Invalid Bid
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
   Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
-  Wait And Input Text  xpath=//input[@name="data[contractNumber]"]  123456
+  Wait Until Keyword Succeeds  5 x  1 s  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
   ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
   Input Date  data[dateSigned]  ${date}
   Input Date  data[period][startDate]  ${date}
