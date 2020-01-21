@@ -419,6 +419,10 @@ Get From Item
 Отримати інформацію із пропозиції
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
+  Run Keyword If  "status" in "${field_name}" and "після редагування" in "${TEST_NAME}"  Run Keywords
+  ...  Sleep  120
+  ...  AND  refresh_tender
+  ...  AND  Reload Page
   Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
   Wait Until Keyword Succeeds  20 x  1 s  Page Should Contain Element  xpath=//*[contains(text(),"Інформація про пропозицію учасника")]
   ${bid_value}=  Get Text  ${locator.bids.${field_name}}
