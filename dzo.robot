@@ -325,7 +325,7 @@ Select CPV
 Отримати інформацію із тендера
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Switch Browser  ${username}
-  Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі"  Sleep  120
+  Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі"  Sleep  360
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Reload Page
   ${text}=  Run Keyword If
@@ -1029,6 +1029,10 @@ Confirm Invalid Bid
   Click Element  xpath=//button[@class="bidAction"]
   Підтвердити дію
   Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
+  ...  refresh_tender
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain  ЗАВЕРШЕНА
 
 #####################################################################################
 
