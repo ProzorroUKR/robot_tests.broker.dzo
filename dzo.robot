@@ -912,7 +912,7 @@ Confirm Invalid Bid
 
 Перевести тендер на статус очікування обробки мостом
   [Arguments]  ${username}  ${tender_uaid}
-  Wait Until Keyword Succeeds  10 x  5 s  Element Should Be Visible  xpath=//a[@data-bid-action="done"]
+  Wait Until Keyword Succeeds  10 x  5 s  Element Should Be Visible  xpath=//a[@data-stage="/stage2"]
   Wait And Click  xpath=//a[@data-stage="/stage2"]
   Підтвердити Дію
 
