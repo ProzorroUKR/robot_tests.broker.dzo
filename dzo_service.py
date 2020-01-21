@@ -92,6 +92,8 @@ def convert_dzo_data(value, field_name):
         value_for_return = float(value.replace("`", ""))
     elif "Date" in field_name:
         value_for_return = convert_time_to_tests_format(value)
+        if field_name == "awards[0].complaintPeriod.endDate":
+            value_for_return = value_for_return.replace(":00+", ":59+")
     elif field_name == "funders[0].identifier.id":
         value_for_return = value.split(":")[1]
     elif field_name == "funders[0].identifier.scheme":
@@ -133,12 +135,14 @@ def convert_dzo_data(value, field_name):
             u'Конкурентний діалог 1-ий етап': "competitiveDialogueUA",
             u'Відкриті торги для закупівлі енергосервісу': "esco",
             u'Переговорна процедура для потреб оборони': "aboveThresholdUA.defense",
+            u'Укладання рамкової угоди': "closeFrameworkAgreementUA",
             u'грн': "UAH",
             u'Код в ЄДРПОУ / ІПН': "UA-EDR",
             u'Класифікація за ДК 021-2015 (CPV)': u"ДК021",
             u'послуги': 'services',
             u'товари': 'goods',
             u'роботи': 'works',
+            u'НА РОЗГЛЯДІ': 'pending',
             u"(з ПДВ)": True,
             u"(без ПДВ)": False,
             u"з ПДВ": True,

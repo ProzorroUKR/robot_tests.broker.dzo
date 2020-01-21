@@ -50,6 +50,7 @@ ${plan.edit.budget.period}=  data[tender][tenderPeriod][startDate]
 ${tender.edit.lot.value.amount}  xpath=//input[@name="data[lots][0][value][amount]"]
 ${tender.edit.lot.description}  xpath=//input[@name="data[lots][0][description]"]
 ${tender.edit.lot.minimalStep.amount}  xpath=//input[@name="data[lots][0][minimalStep][amount]"]
+${tender.edit.maxAwardsCount}  xpath=//input[@name="data[maxAwardsCount]"]
 
 ${milestone_index}
 ${tender.view.milestones.code}=  xpath=//h3[contains(text(),"Умови оплати")]/../descendant::div[${milestone_index}]/descendant::td[text()="Тип оплати"]/following-sibling::td
@@ -92,6 +93,8 @@ ${tender.view.qualifications[0].status}=  xpath=(//div[contains(@class,"qualific
 ${tender.view.qualifications[1].status}=  xpath=(//div[contains(@class,"qualificationDocsExist")])[2]/div/a/span
 ${tender.view.qualifications[2].status}=  xpath=(//div[contains(@class,"qualificationDocsExist")])[3]/div/a/span
 ${tender.view.NBUdiscountRate}=  xpath=//td[text()="Облікова ставка НБУ"]/following-sibling::td/span[1]
+${tender.view.maxAwardsCount}=  xpath=//td[contains(text(), "Кіл-ть учасників")]/following-sibling::td[1]
+${tender.view.agreementDuration}=  xpath=//td[contains(text(), "Строк, на який укладається рамкова угода")]/following-sibling::td[1]
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
@@ -685,6 +688,8 @@ Status Should Be
 
 Внести зміни в тендер
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
+  ${fieldvalue}=  Run Keyword If  "${fieldname}" == "maxAwardsCount"  Convert To String  ${fieldvalue}
+  ...  ELSE  Set Variable  ${fieldvalue}
   Switch Browser  ${username}
   Reload Page
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(text(), 'Процедура закупівлі')]
