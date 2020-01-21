@@ -430,7 +430,7 @@ Get From Item
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Run Keyword If  "status" in "${field_name}" and "після редагування" in "${TEST_NAME}"  Run Keywords
-  ...  Sleep  120
+  ...  Sleep  300
   ...  AND  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
   Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
@@ -988,6 +988,26 @@ Confirm Invalid Bid
   Wait Until Keyword Succeeds  20 x  5 s  Run Keywords
   ...  Reload Page
   ...  AND  Page Should Contain  Дискваліфіковано
+
+Відхилити кваліфікацію
+  [Arguments]  ${username}  ${tender_uaid}  ${qualification_num}
+  ${qualification_num}=  Convert To Integer  ${qualification_num}
+  Wait And Click  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="cancel"]
+  Wait And Click  xpath=//input[contains(@data-description,"Учасник не відповідає кваліфікаційним")]/..
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  10 x  5 s  Run Keywords
+  ...  Reload Page
+  ...  Page Should Not Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="cancel"]
+
+Скасувати кваліфікацію
+  [Arguments]  ${username}  ${tender_uaid}  ${qualification_num}
+  ${qualification_num}=  Convert To Integer  ${qualification_num}
+  Wait And Click  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="award cancel"]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  10 x  5 s  Run Keywords
+  ...  Reload Page
+  ...  Page Should Not Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="award cancel"]
 
 Дочекатися Кнопки Для Підпису
   Reload Page

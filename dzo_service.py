@@ -88,7 +88,7 @@ def convert_date_to_slash_format(isodate):
 def convert_dzo_data(value, field_name):
     if "contracts" in field_name and "amount" in field_name:
         value = value.split(" ")[0]
-    if "amount" in field_name or "quantity" in field_name or "duration.days" in field_name:
+    if "amount" in field_name or "quantity" in field_name or "duration.days" in field_name or "maxAwardsCount" in field_name:
         value_for_return = float(value.replace("`", ""))
     elif "Date" in field_name:
         value_for_return = convert_time_to_tests_format(value)
@@ -98,6 +98,9 @@ def convert_dzo_data(value, field_name):
         value_for_return = value.split(":")[1]
     elif field_name == "funders[0].identifier.scheme":
         value_for_return = value.split(":")[0]
+    elif field_name == "agreementDuration":
+        l = value.split(" ")
+        value_for_return = "P{}Y{}M{}D".format(l[0], l[2], l[4])
     elif "funders" in field_name:
         value_for_return = adapt_items_data(field_name, value)
         if "legalName" in field_name:
