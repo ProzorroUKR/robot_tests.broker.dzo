@@ -91,6 +91,7 @@ ${tender.view.fundingKind}=  xpath=//td[contains(text(), "Джерело фін�
 ${tender.view.qualifications[0].status}=  xpath=(//div[contains(@class,"qualificationDocsExist")])[1]/div/a/span
 ${tender.view.qualifications[1].status}=  xpath=(//div[contains(@class,"qualificationDocsExist")])[2]/div/a/span
 ${tender.view.qualifications[2].status}=  xpath=(//div[contains(@class,"qualificationDocsExist")])[3]/div/a/span
+${tender.view.NBUdiscountRate}=  xpath=//td[text()="Облікова ставка НБУ"]/following-sibling::td/span[1]
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
@@ -103,6 +104,9 @@ ${locator.lots.value.valueAddedTaxIncluded}=  /descendant::span[@class="taxInclu
 ${locator.lots.minimalStep.amount}=  /descendant::td[contains(text(),"Розмір мінімального кроку")]/following-sibling::td/span[1]
 ${locator.lots.minimalStep.currency}=  /descendant::td[contains(text(),"Розмір мінімального кроку")]/following-sibling::td/span[2]
 ${locator.lots.minimalStep.valueAddedTaxIncluded}=  /descendant::span[@class="taxIncluded"]
+${locator.lots.minimalStepPercentage}=  /descendant::td[contains(text(),"Мінімальний крок підвищення показника")]/following-sibling::td/span[1]
+${locator.lots.yearlyPaymentsPercentageRange}=  /descendant::td[contains(text(), "Фіксований відсоток суми скорочення")]/following-sibling::td/span[1]
+${locator.lots.fundingKind}=  /descendant::td[contains(text(), "Джерело фінансування закупівлі")]/following-sibling::td/span[1]
 
 ${locator.items.description}  /td[2]/div[1]
 ${locator.items.deliveryAddress.countryName}  /descendant::span[contains(text(), "Місце поставки ")]/following-sibling::span
