@@ -458,7 +458,7 @@ Get From Item
 Створити тендер
   [Arguments]  ${username}  ${tender_data}  ${plan_uaid}
   Switch Browser  ${username}
-  ${dzo_accelerator}=  Set Variable If  "esco" in "${tender_data.data.procurementMethodType}" or "competitive" in "${tender_data.data.procurementMethodType}"  2880  1440
+  ${dzo_accelerator}=  Set Variable If  "esco" in "${tender_data.data.procurementMethodType}" or "competitive" in "${tender_data.data.procurementMethodType}" or "FrameworkAgreement" in "${tender_data.data.procurementMethodType}"  2880  1440
   ${rate}=  Run Keyword If  ${tender_data.data.has_key("NBUdiscountRate")}  Convert To String  ${tender_data.data.NBUdiscountRate * 100}
   ${valueAddedTaxIncluded}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Set Variable If  ${tender_data.data.value.valueAddedTaxIncluded}  true  false
   ${enquiry_end_date}=  Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  convert_datetime_to_format  ${tender_data.data.enquiryPeriod.endDate}  %d/%m/%Y %H:%M
@@ -480,6 +480,16 @@ Get From Item
   ...  AND  Підтвердити Дію
 
   Run Keyword If  "${tender_data.data.procurementMethodType}" == "esco"  Input Text  xpath=//input[@name="data[NBUdiscountRate]"]  ${rate}
+
+  ${maxAwardsCount}=  Run Keyword If  ${tender_data.data.has_key("maxAwardsCount")}  Convert To String  ${tender_data.data.maxAwardsCount}
+  Run Keyword If  ${tender_data.data.has_key("maxAwardsCount")}  Input Text  xpath=//input[@name="data[maxAwardsCount]"]  ${maxAwardsCount}
+
+  Run Keyword If  ${tender_data.data.has_key("agreementDuration")}  Run Keywords
+  ...  Mouse Over  xpath=//div[@class="durationPicker-ui"]
+  ...  AND  Wait Until Keyword Succeeds  5 x  0.5 s  Element Should Be Visible  xpath=//div[contains(@class,"durationPicker-select-field-0-Y")]/div/input
+  ...  AND  Input Text  xpath=//div[contains(@class,"durationPicker-select-field-0-Y")]/div/input  ${tender_data.data.agreementDuration[1]}
+  ...  AND  Input Text  xpath=//div[contains(@class,"durationPicker-select-field-0-M")]/div/input  ${tender_data.data.agreementDuration[3]}
+  ...  AND  Input Text  xpath=//div[contains(@class,"durationPicker-select-field-0-D")]/div/input  ${tender_data.data.agreementDuration[5]}
 
   Select From List By Value  xpath=//select[@name="data[mainProcurementCategory]"]  ${tender_data.data.mainProcurementCategory}
   Input Text  xpath=//input[@name="data[title]"]  ${tender_data.data.title}
@@ -1021,7 +1031,9 @@ Confirm Invalid Bid
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
   Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
-  Wait Until Keyword Succeeds  5 x  1 s  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
+  Wait Until Keyword Succeeds  5 x  1 s  Run Keywords
+  ...  Element Should Be Visible  xpath=//input[@name="data[contractNumber]"]
+  ...  AND  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
   ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
   Input Date  data[dateSigned]  ${date}
   Input Date  data[period][startDate]  ${date}
