@@ -428,7 +428,7 @@ Get From Item
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Run Keyword If  "status" in "${field_name}" and "після редагування" in "${TEST_NAME}"  Run Keywords
   ...  Sleep  120
-  ...  AND  refresh_tender
+  ...  AND  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
   Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
   Wait Until Keyword Succeeds  20 x  1 s  Page Should Contain Element  xpath=//*[contains(text(),"Інформація про пропозицію учасника")]
@@ -1030,7 +1030,7 @@ Confirm Invalid Bid
   Підтвердити дію
   Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
-  ...  refresh_tender
+  ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
   ...  AND  Page Should Contain  ЗАВЕРШЕНА
 
