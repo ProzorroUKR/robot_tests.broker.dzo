@@ -881,7 +881,7 @@ Send Bid Esco
 Змінити цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
-  Run Keyword And Return If  "${TEST NAME}" == "Можливість підтвердити цінову пропозицію після зміни умов тендера першим учасником"  Confirm Invalid Bid
+  Run Keyword And Return If  "Можливість підтвердити цінову пропозицію після зміни умов тендера" in "${TEST NAME}"  Confirm Invalid Bid
   ${amount}=  add_second_sign_after_point  ${fieldvalue}
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
   Wait And Click  xpath=//a[contains(@class, "bidToEdit")]
