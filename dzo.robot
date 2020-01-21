@@ -88,6 +88,9 @@ ${tender.view.contracts[1].dateSigned}=  xpath=//div[text()="Дата підпи
 ${tender.view.minimalStepPercentage}=  xpath=//td[contains(text(), "Мінімальний крок підвищення показника ефективності")]/following-sibling::td/span[1]
 ${tender.view.yearlyPaymentsPercentageRange}=  xpath=//td[contains(text(), "Фіксований відсоток суми скорочення")]/following-sibling::td/span[1]
 ${tender.view.fundingKind}=  xpath=//td[contains(text(), "Джерело фінансування закупівлі")]/following-sibling::td/span[1]
+${tender.view.qualifications[0].status}=  xpath=(//div[contains(@class,"qualificationDocsExist")])[1]/div/a/span
+${tender.view.qualifications[1].status}=  xpath=(//div[contains(@class,"qualificationDocsExist")])[2]/div/a/span
+${tender.view.qualifications[2].status}=  xpath=(//div[contains(@class,"qualificationDocsExist")])[3]/div/a/span
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
