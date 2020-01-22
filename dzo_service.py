@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timedelta
+import time
 import urllib
 
 import os
@@ -31,14 +32,21 @@ def subtract_from_time(date_time, subtr_min, subtr_sec):
                            seconds=int(subtr_sec))).isoformat()
     return sub
 
+
 def convert_time_to_tests_format(date):
     date = datetime.strptime(date, "%d.%m.%Y %H:%M")
     return "{}{}".format(date.strftime('%Y-%m-%dT%H:%M:%S'), "+02:00")
+
 
 def convert_datetime_to_format(date, output_format):
     date_obj = parse_date(date)
     day_string = date_obj.strftime(output_format)
     return day_string
+
+
+def retrieve_date_for_second_stage():
+    now = datetime.now()
+    return (now + timedelta(minutes=10)).strftime("%d/%m/%Y %H:%M")
 
 
 def adapt_data_for_role(role_name, tender_data):

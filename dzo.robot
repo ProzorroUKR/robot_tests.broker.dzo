@@ -454,7 +454,7 @@ Get From Item
 
 Отримати тендер другого етапу та зберегти його
   [Arguments]  ${username}  ${tender_uaid}
-  Log  Отримати тендер другого етапу
+  Wait And Click  xpath=//span[text()="Перебіг другого етапу процедури"]/..
 
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
@@ -765,6 +765,17 @@ Input Tender Period End Date
   Підтвердити Дію
   Wait And Click  xpath=//button[@value="save"]
 
+Активувати другий етап
+  [Arguments]  ${username}  ${tender_uaid}
+  ${tender_end_date}=  retrieve_date_for_second_stage
+  Wait And Click  xpath=//a[contains(@class, "save")]
+  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Input Date  data[tenderPeriod][endDate]  ${tender_end_date.split(" ")[0]}
+  Input Date  tenderPeriod_time  ${tender_end_date.split(" ")[1]}
+  Wait And Click  xpath=//button[@value="save"]
+
+
 ###############################################################################################################
 ##########################################    ЗАПИТАННЯ    ####################################################
 ###############################################################################################################
@@ -1059,7 +1070,7 @@ Confirm Invalid Bid
   Input Text  xpath=//input[@name="title"]  test
   Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
   Wait Until Element Is Not Visible  xpath=//*[@id="jAlertBack"]
-#  Sleep  5
+  Sleep  5
 #  Wait Until Keyword Succeeds  5 x  1 s  Run Keywords
 #  ...  Element Should Be Visible  xpath=//input[@name="data[contractNumber]"]
 #  ...  AND  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
