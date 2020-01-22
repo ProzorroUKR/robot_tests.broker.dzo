@@ -884,6 +884,7 @@ Send Bid Esco
   Wait Until Page Contains  Ваша пропозиція  10
   Wait And Click  xpath=//a[contains(@class,'bidToEdit')]
   Choose File  xpath=/html/body/div[1]/form/input[2]  ${path}
+  Sleep  5
   Run Keyword And Ignore Error  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
   Run Keyword And Ignore Error  Select From List By Value  xpath=(//select[@class="documents_url"])[last()]  ${doc_type}
   Wait And Click  xpath=//div[contains(@class,"hide_onBided")]/descendant::button[@value="save"]
@@ -1101,7 +1102,7 @@ Confirm Invalid Bid
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
-  ...  AND  Page Should Contain  ЗАВЕРШЕНА
+  ...  AND  Page Should Contain  Завершена
 
 Встановити дату підписання угоди
   [Arguments]  ${username}  ${tender_uaid}  ${contract_index}  ${fieldvalue}
