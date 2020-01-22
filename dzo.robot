@@ -1082,20 +1082,19 @@ Confirm Invalid Bid
 Встановити дату підписання угоди
   [Arguments]  ${username}  ${tender_uaid}  ${contract_index}  ${fieldvalue}
   ${date}=  convert_datetime_to_format  ${fieldvalue}  %d/%m/%Y
-  Input Date  data[dateSigned]  ${date}
+  Log  ${date}
 
 Вказати період дії угоди
   [Arguments]  ${username}  ${tender_uaid}  ${contract_index}  ${startDate}  ${endDate}
   ${startDate}=  convert_datetime_to_format  ${startDate}  %d/%m/%Y
   ${endDate}=  convert_datetime_to_format  ${endDate}  %d/%m/%Y
-  Input Date  data[period][startDate]  ${startDate}
-  Input Date  data[period][endDate]  ${endDate}
+  Log  ${startDate}
+  Log  ${endDate}
 
 Завантажити документ в угоду
   [Arguments]  ${username}  ${path}  ${tender_uaid}  ${contract_index}  ${doc_type}=documents
-  Choose File  xpath=//input[@type="file"]  ${path}
-  Input Text  xpath=//input[@name="title"]  test
-  Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
+  Log  ${path}
+
 
 #####################################################################################
 
