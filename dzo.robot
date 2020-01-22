@@ -921,8 +921,9 @@ Confirm Invalid Bid
 
 Змінити документацію в ставці
   [Arguments]  ${username}  ${tender_uaid}  ${doc_data}  ${doc_id}
-  Wait And Click  xpath=//input[@value="${doc_id}"]/ancestor::tr[contains(@class,"docItem")]/descendant::input[@class="confidentialityRationale"]/..
-  Wait And Input Text  xpath=//input[@value="${doc_id}"]/ancestor::tr[contains(@class,"docItem")]/descendant::input[contains(@name,"confidentialityRationale")]  ${doc_data.data.confidentialityRationale}
+  Wait And Click  xpath=//a[contains(@class, "bidToEdit")]
+  Wait And Click  xpath=//input[contains(@value,"${doc_id}")]/ancestor::tr[contains(@class,"docItem")]/descendant::input[@class="confidentialityRationale"]/..
+  Wait And Input Text  xpath=//input[contains(@value,"${doc_id}")]/ancestor::tr[contains(@class,"docItem")]/descendant::input[contains(@name,"confidentialityRationale")]  ${doc_data.data.confidentialityRationale}
   Wait And Click  xpath=//button[text()="Зберегти"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
   Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
