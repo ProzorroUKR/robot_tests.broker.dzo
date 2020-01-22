@@ -998,7 +998,7 @@ Confirm Invalid Bid
   Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  10 x  5 s  Run Keywords
   ...  Reload Page
-  ...  Page Should Not Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="cancel"]
+  ...  AND  Page Should Not Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="cancel"]
 
 Скасувати кваліфікацію
   [Arguments]  ${username}  ${tender_uaid}  ${qualification_num}
@@ -1007,7 +1007,7 @@ Confirm Invalid Bid
   Підтвердити Дію
   Wait Until Keyword Succeeds  10 x  5 s  Run Keywords
   ...  Reload Page
-  ...  Page Should Not Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="award cancel"]
+  ...  AND  Page Should Not Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="award cancel"]
 
 Дочекатися Кнопки Для Підпису
   Reload Page
