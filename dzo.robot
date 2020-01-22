@@ -452,7 +452,9 @@ Get From Item
   ${value}=  Get Text  xpath=//div[contains(text(),"${feature_id}")]/..${locator.feature.${field_name}}
   [Return]  ${value}
 
-
+Отримати тендер другого етапу та зберегти його
+  [Arguments]  ${username}  ${tender_uaid}
+  Log  Отримати тендер другого етапу
 
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
@@ -656,7 +658,7 @@ Add Feature
   \  Input Text  xpath=//input[@name="data[features][${index}][enum][${enum_index}][value]"]  ${enum_value.split(".")[0]}
 
 Пошук тендера по ідентифікатору
-  [Arguments]  ${username}  ${tender_uaid}
+  [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
   Run Keyword If  "${dzo_internal_id}" == "${None}" and "openProcedure" in "${SUITE NAME}"  Sleep  360
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
