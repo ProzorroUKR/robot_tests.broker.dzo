@@ -867,6 +867,7 @@ Send Bid Esco
 
 Завантажити документ в ставку
   [Arguments]  ${username}  ${path}  ${tender_uaid}  ${doc_name}=documents  ${doc_type}=qualificationDocuments
+  ${doc_type}=  Set Variable If  "${doc_type}" == "${None}"  qualificationDocuments  ${doc_type}
   Wait Until Page Contains  Ваша пропозиція  10
   Wait And Click  xpath=//a[contains(@class,'bidToEdit')]
   Choose File  xpath=/html/body/div[1]/form/input[2]  ${path}
@@ -916,6 +917,15 @@ Confirm Invalid Bid
   Click Element  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
+Змінити документацію в ставці
+  [Arguments]  ${username}  ${tender_uaid}  ${doc_data}  ${doc_id}
+  Wait And Click  xpath=//input[@value="${doc_id}"]/ancestor::tr[contains(@class,"docItem")]/descendant::input[@class="confidentialityRationale"]/..
+  Wait And Input Text  xpath=//input[@value="${doc_id}"]/ancestor::tr[contains(@class,"docItem")]/descendant::input[contains(@name,"confidentialityRationale")]  ${doc_data.data.confidentialityRationale}
+  Wait And Click  xpath=//button[text()="Зберегти"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
+  Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
+  Click Element  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
 ###############################################################################################################
 #########################################    КВАЛІФІКАЦІЯ    ##################################################
