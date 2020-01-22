@@ -102,7 +102,7 @@ def convert_dzo_data(value, field_name):
         l = value.split(" ")
         value_for_return = "P{}Y{}M{}D".format(l[0], l[2], l[4])
     elif field_name in ["NBUdiscountRate", "minimalStepPercentage", "yearlyPaymentsPercentageRange"]:
-        value_for_return = float(value) / 100
+        value_for_return = round(float(value) / 100, 5)
     elif "funders" in field_name:
         value_for_return = adapt_items_data(field_name, value)
         if "legalName" in field_name:
