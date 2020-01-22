@@ -1070,6 +1070,7 @@ Confirm Invalid Bid
   Input Date  data[period][endDate]  ${date}
   Click Element  xpath=//button[@class="bidAction"]
   Підтвердити дію
+  Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  ${locator.ModalOK}
   Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
