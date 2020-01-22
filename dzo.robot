@@ -328,7 +328,7 @@ Select CPV
 Отримати інформацію із тендера
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Switch Browser  ${username}
-  Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі" or "${TEST NAME}" == "Можливість дочекатися початку періоду очікування"  Sleep  360
+  Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі" or "${TEST NAME}" == "Можливість дочекатися початку періоду очікування" or "${TEST NAME}" == "Відображення дати закінчення періоду блокування перед початком аукціону"  Sleep  360
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Reload Page
   ${text}=  Run Keyword If
@@ -973,7 +973,7 @@ Confirm Invalid Bid
 Дискваліфікувати постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
   ${document}=  get_upload_file_path
-  Wait Until Keyword Succeeds  10 x  2 s  Element Should Be Visisble  xpath=//a[@data-bid-action="cancel"]
+  Wait Until Keyword Succeeds  10 x  2 s  Element Should Be Visible  xpath=//a[@data-bid-action="cancel"]
   Wait And Click  xpath=//a[@data-bid-action="cancel"]
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
