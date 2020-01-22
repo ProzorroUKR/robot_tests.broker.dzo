@@ -1058,18 +1058,21 @@ Confirm Invalid Bid
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
   Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
-  Wait Until Keyword Succeeds  5 x  1 s  Run Keywords
-  ...  Element Should Be Visible  xpath=//input[@name="data[contractNumber]"]
-  ...  AND  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
+  Wait Until Element Is Not Visible  xpath=//*[@id="jAlertBack"]
+#  Sleep  5
+#  Wait Until Keyword Succeeds  5 x  1 s  Run Keywords
+#  ...  Element Should Be Visible  xpath=//input[@name="data[contractNumber]"]
+#  ...  AND  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
   ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
   ${amount_net}=  Get Element Attribute  xpath=//input[@name="data[value][amountNet]"]@value
   ${amount_net}=  Convert To Number  ${amount_net}
   ${amount_net}=  Convert To String  ${amount_net - 10}
   Clear Element Text  xpath=//input[@name="data[value][amountNet]"]
   Input Text  xpath=//input[@name="data[value][amountNet]"]  ${amount_net}
-  Input Date  data[dateSigned]  ${date}
-  Input Date  data[period][startDate]  ${date}
-  Input Date  data[period][endDate]  ${date}
+  Input Date  data[dateSigned]  ${date.replace(".", "/")}
+  Input Date  data[period][startDate]  ${date.replace(".", "/")}
+  Input Date  data[period][endDate]  ${date.replace(".", "/")}
+  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
   Click Element  xpath=//button[@class="bidAction"]
   Підтвердити дію
   Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  ${locator.ModalOK}
