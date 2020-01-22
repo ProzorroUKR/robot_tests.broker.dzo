@@ -977,8 +977,8 @@ Confirm Invalid Bid
   Wait And Click  xpath=//a[@data-bid-action="cancel"]
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
-  Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
-  Click Element  xpath=//input[contains(@data-description,"Учасник не відповідає кваліфікаційним")]/..
+  Wait And Click  xpath=//div[contains(@class, "buttonAdd")]/div/button
+  Wait And Click  xpath=//input[contains(@data-description,"Учасник не відповідає кваліфікаційним")]/..
   Wait And Click  xpath=//button[@class="bidAction"]
   Підтвердити Дію
   ${is_eds_needed}=  Run Keyword And Return Status  Page Should Contain  Цей документ треба підтвердити ЕЦП.
@@ -986,7 +986,7 @@ Confirm Invalid Bid
   ...  Wait Until Keyword Succeeds  10 x  20 s  Дочекатися Кнопки Для Підпису
   ...  AND  Click Element  xpath=(//a[@data-bid-action="cancel"])[1]
   ...  AND  Накласти ЕЦП
-  Click Element  xpath=//a[@onclick="modalClose();"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  5 s  Run Keywords
   ...  Reload Page
   ...  AND  Page Should Contain  Дискваліфіковано
