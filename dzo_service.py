@@ -57,7 +57,7 @@ def adapt_data_for_role(role_name, tender_data):
         if "classification" in tender_data['data'] and tender_data['data']['classification']['id'] == "99999999-9":
             tender_data['data']['classification']['description'] = u"Не визначено"
         for item in tender_data['data']['items']:
-            item['unit']['name'] = DZO_dict.get(item['unit']['name'], item['unit']['name'])
+            # item['unit']['name'] = DZO_dict.get(item['unit']['name'], item['unit']['name'])
             if 'deliveryDate' in item:
                 date = parse_date(item['deliveryDate']['endDate'])
                 date = date.replace(hour=16, minute=0, second=0)
