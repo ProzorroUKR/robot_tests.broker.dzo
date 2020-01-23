@@ -1079,6 +1079,10 @@ Confirm Invalid Bid
 Підтвердити підписання контракту
   [Arguments]  ${username}  ${tender_uaid}  ${contract_num}
   ${document}=  get_upload_file_path
+  ${is_contract_modal_opened}=  Run Keyword And Return Status  Element Should Be Visible  xpath=//input[@name="data[value][amountNet]"]
+  Run Keyword If  not ${is_contract_modal_opened}  Run Keywords
+  ...  Page Should Contain Element  xpath=//a[@data-bid-action="contract"]/..
+  ...  AND  Wait And Click  xpath=//a[@data-bid-action="contract"]/..
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
   Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
