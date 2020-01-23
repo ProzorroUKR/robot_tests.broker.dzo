@@ -66,7 +66,8 @@ def adapt_data_for_role(role_name, tender_data):
                 item['deliveryAddress']['region'] = item['deliveryAddress']['region'].replace(u"місто Київ", u"м. Київ")
             if item['classification']['id'] == "99999999-9":
                 item['classification']['description'] = u"Не визначено"
-
+    for item in tender_data['data']['items']:
+        item['unit']['name'] = DZO_dict.get(item['unit']['name'], item['unit']['name'])
     return tender_data
 
 
