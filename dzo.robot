@@ -84,7 +84,11 @@ ${tender.view.funders[0].identifier.legalName}=  xpath=//div[@class="fundersItem
 ${tender.view.funders[0].identifier.scheme}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"ЄДРПОУ")]/following-sibling::td[1]
 ${tender.view.awards[0].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
 ${tender.view.awards[1].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
+${tender.view.awards[2].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
+${tender.view.awards[3].complaintPeriod.endDate}=  xpath=//span[@class="complaintEndDate"]/span[2]
 ${tender.view.contracts[0].status}=  xpath=(//div[@class="statusItem active"]/descendant::div[@class="statusName"])[last()]
+${tender.view.contracts[1].status}=  xpath=(//div[@class="statusItem active"]/descendant::div[@class="statusName"])[last()]
+${tender.view.contracts[2].status}=  xpath=(//div[@class="statusItem active"]/descendant::div[@class="statusName"])[last()]
 ${tender.view.contracts[1].dateSigned}=  xpath=//div[text()="Дата підписання"]/following-sibling::div
 ${tender.view.minimalStepPercentage}=  xpath=//td[contains(text(), "Мінімальний крок підвищення показника ефективності")]/following-sibling::td/span[1]
 ${tender.view.yearlyPaymentsPercentageRange}=  xpath=//td[contains(text(), "Фіксований відсоток суми скорочення")]/following-sibling::td/span[1]
@@ -661,7 +665,7 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
-  Run Keyword If  "${dzo_internal_id}" == "${None}" and "openProcedure" in "${SUITE NAME}" or "${save_key}" == "second_stage_data"  Sleep  360
+  Run Keyword If  "${dzo_internal_id}" == "${None}" and "openProcedure" in "${SUITE NAME}" or "${save_key}" == "second_stage_data"  Sleep  500
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
@@ -769,6 +773,8 @@ Input Tender Period End Date
 Активувати другий етап
   [Arguments]  ${username}  ${tender_uaid}
   ${tender_end_date}=  retrieve_date_for_second_stage
+  Wait Until Keyword Succeeds  30 x  30 s  Run Keywords
+  ...  Reload Page  Element Should Be Visible  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=//a[@data-msg="jAlert Close"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
@@ -872,13 +878,26 @@ Send Bid Esco
   Wait Until Page Contains  Ваша пропозиція  10
   Wait And Click  xpath=//a[contains(@class,'bidToEdit')]
   Choose File  xpath=/html/body/div[1]/form/input[2]  ${path}
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Sleep  5
   Run Keyword And Ignore Error  Wait Until Element Is Visible   xpath=//select[@class="documents_url"]
-  Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@class="documents_url"]  ${doc_type}
+  Run Keyword And Ignore Error  Select From List By Value  xpath=(//select[@class="documents_url"])[last()]  ${doc_type}
+  ${is_bottom}=  Run Keyword And Return Status  Element Should Be Visible  xpath=//div[@id="bottomFixed"]
+  Run Keyword If  ${is_bottom}  Click Element  xpath=//a[@class="close icons"]
   Wait And Click  xpath=//div[contains(@class,"hide_onBided")]/descendant::button[@value="save"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
-  Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
+  Wait And Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
   Click Element  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Capture Page Screenshot
+  Wait Until Keyword Succeeds  30 x  30 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Wait And Click  xpath=//a[contains(@class, "js-viewBid")]
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Page Should Contain Element  xpath=//*[contains(text(),"Інформація про пропозицію учасника")]
+  ...  AND  Page Should Not Contain Element  xpath=//div[@data-type="unuploaded"]
+  ...  AND  Click Element  xpath=//a[@onclick="modalClose();"]
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+
 
 Змінити документ в ставці
   [Arguments]  ${username}  ${tender_uaid}  ${path}  ${doc_id}  ${doc_type}=technicalSpecifications
@@ -914,10 +933,14 @@ Send Bid Esco
 
 Confirm Invalid Bid
   Wait And Click  xpath=//button[contains(@class, "invalidSave")]
+  Capture Page Screenshot
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]
   Input Text  xpath=//div[@class="form sms_sended"]/descendant::input[@name="checkMPhone"]  123456789
+  Capture Page Screenshot
   Click Element  xpath=//button[@class="bidAction"]
+  Capture Page Screenshot
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Capture Page Screenshot
 
 Змінити документацію в ставці
   [Arguments]  ${username}  ${tender_uaid}  ${doc_data}  ${doc_id}
@@ -999,6 +1022,7 @@ Confirm Invalid Bid
   ${document}=  get_upload_file_path
   Wait Until Keyword Succeeds  10 x  2 s  Element Should Be Visible  xpath=//a[@data-bid-action="cancel"]
   Wait And Click  xpath=//a[@data-bid-action="cancel"]
+  Wait Until Keyword Succeeds  20 x  5 s  Element Should Be Visible  xpath=//input[@name="title"]
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
   Wait And Click  xpath=//div[contains(@class, "buttonAdd")]/div/button
@@ -1101,8 +1125,11 @@ Confirm Invalid Bid
   Input Date  data[period][startDate]  ${date.replace(".", "/")}
   Input Date  data[period][endDate]  ${date.replace(".", "/")}
   Input Text  xpath=//input[@name="data[contractNumber]"]  123456
+  Capture Page Screenshot
   Click Element  xpath=//button[@class="bidAction"]
+  Capture Page Screenshot
   Підтвердити дію
+  Capture Page Screenshot
   Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  ${locator.ModalOK}
   Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords

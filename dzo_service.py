@@ -67,7 +67,8 @@ def adapt_data_for_role(role_name, tender_data):
             if item['classification']['id'] == "99999999-9":
                 item['classification']['description'] = u"Не визначено"
     for item in tender_data['data']['items']:
-        item['unit']['name'] = DZO_dict.get(item['unit']['name'], item['unit']['name'])
+        if item.has_key('unit'):
+            item['unit']['name'] = DZO_dict.get(item['unit']['name'], item['unit']['name'])
     return tender_data
 
 
