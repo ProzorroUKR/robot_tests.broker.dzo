@@ -774,7 +774,8 @@ Input Tender Period End Date
   [Arguments]  ${username}  ${tender_uaid}
   ${tender_end_date}=  retrieve_date_for_second_stage
   Wait Until Keyword Succeeds  30 x  30 s  Run Keywords
-  ...  Reload Page  Element Should Be Visible  xpath=//a[contains(@class, "save")]
+  ...  Reload Page
+  ...  AND  Element Should Be Visible  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=//a[@data-msg="jAlert Close"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
@@ -1046,6 +1047,7 @@ Confirm Invalid Bid
   Wait And Click  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="cancel"]
   Wait And Click  xpath=//input[contains(@data-description,"Учасник не відповідає кваліфікаційним")]/..
   Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Element Animation  xpath=//a[@onclick="modalClose();"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  10 x  5 s  Run Keywords
   ...  Reload Page
@@ -1158,6 +1160,7 @@ Confirm Invalid Bid
 #####################################################################################
 
 Підтвердити дію
+  Wait Element Animation  ${locator.ModalOK}
   Wait And Click  ${locator.ModalOK}
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Not Be Visible  id=jAlertBack
 
