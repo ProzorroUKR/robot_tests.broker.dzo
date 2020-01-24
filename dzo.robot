@@ -1026,6 +1026,7 @@ Confirm Invalid Bid
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
   Wait And Click  xpath=//div[contains(@class, "buttonAdd")]/div/button
+  Sleep  5
   Wait And Click  xpath=//input[contains(@data-description,"Учасник не відповідає кваліфікаційним")]/..
   Wait And Click  xpath=//button[@class="bidAction"]
   Підтвердити Дію
