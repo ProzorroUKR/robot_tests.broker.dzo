@@ -46,7 +46,7 @@ def convert_datetime_to_format(date, output_format):
 
 def retrieve_date_for_second_stage():
     now = datetime.now()
-    return (now + timedelta(minutes=10)).strftime("%d/%m/%Y %H:%M")
+    return (now + timedelta(minutes=15)).strftime("%d/%m/%Y %H:%M")
 
 
 def adapt_data_for_role(role_name, tender_data):

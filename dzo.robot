@@ -71,7 +71,8 @@ ${tender.view.mainProcurementCategory}=  xpath=//td[text()="Вид предме�
 ${tender.view.value.currency}=  xpath=//span[@class="price"]/span[@class="small"][2]/span[1]
 ${tender.view.value.valueAddedTaxIncluded}=  xpath=//span[@class="taxIncluded"]/span
 ${tender.view.tenderID}=  xpath=//span[@class="js-apiID"]
-${tender.view.procuringEntity.name}=  xpath=//td[text()="Найменування організації"]/following-sibling::td/span
+#${tender.view.procuringEntity.name}=  xpath=//td[text()="Найменування організації"]/following-sibling::td/span
+${tender.view.procuringEntity.name}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
 ${tender.view.minimalStep.amount}=  xpath=//td[contains(text(),'Розмір мінімального кроку')]/following-sibling::td/span[1]
 ${tender.view.funders[0].name}=  xpath=//div[@class="fundersItem"]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
 ${tender.view.funders[0].address.countryName}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"Юридична адреса")]/following-sibling::td[1]
@@ -772,10 +773,10 @@ Input Tender Period End Date
 
 Активувати другий етап
   [Arguments]  ${username}  ${tender_uaid}
-  ${tender_end_date}=  retrieve_date_for_second_stage
   Wait Until Keyword Succeeds  30 x  30 s  Run Keywords
   ...  Reload Page
   ...  AND  Element Should Be Visible  xpath=//a[contains(@class, "save")]
+  ${tender_end_date}=  retrieve_date_for_second_stage
   Wait And Click  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=//a[@data-msg="jAlert Close"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
@@ -962,7 +963,7 @@ Confirm Invalid Bid
   [Arguments]  ${username}  ${tender_uaid}  ${qualification_num}
   ${qualification_num}=  Convert To Integer  ${qualification_num}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
-  Wait And Click  xpath=(//div[contains(@class," award ")])[${qualification_num * -1 + 1}]/descendant::a[@data-bid-action="aply"]
+  Wait And Click  xpath=//div[contains(@class, "qualificationItem tenderLotItemElement awardLotStatus_active")]/descendant::*[text()="${qualification_num * -1 + 1}"]/../descendant::a[@data-bid-action="aply"]
   Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
   Wait And Click  xpath=//input[@name="data[qualified]"]/..
   Wait And Click  xpath=//input[@name="data[eligible]"]/..
@@ -971,7 +972,8 @@ Confirm Invalid Bid
   Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  5 s  Run Keywords
   ...  Reload Page
-  ...  AND  Page Should Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num * -1 + 1}]/descendant::a[@data-bid-action="award cancel"]
+  ...  AND  Page Should Contain Element  xpath=//div[contains(@class, "qualificationItem tenderLotItemElement awardLotStatus_active")]/descendant::*[text()="${qualification_num * -1 + 1}"]/../descendant::a[@data-bid-action="award cancel"]
+#  ...  AND  Page Should Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num * -1 + 1}]/descendant::a[@data-bid-action="award cancel"]
 
 Затвердити остаточне рішення кваліфікації
   [Arguments]  ${username}  ${tender_uaid}
