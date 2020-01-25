@@ -142,6 +142,8 @@ ${locator.bids.lotValues[0].value.amount}  xpath=//td[text()="Цінова пр�
 ${locator.bids.value.amount}  xpath=//td[text()="Цінова пропозиція"]/following-sibling::td[2]/span[1]
 ${locator.bids.status}  xpath=//td[text()="Статус пропозиції"]/following-sibling::td[2]
 
+${locator.complaint.status}  xpath=(//div[@class="complaintStatus"]/div/div[1])[last()]
+
 ${contract.value.amountNet}  xpath=//input[@name="data[value][amountNet]"]
 ${contract.value.amount}  xpath=//input[@name="data[value][amount]"]
 
@@ -462,6 +464,14 @@ Get From Item
   Sleep  360
   Wait And Click  xpath=//span[text()="Перебіг другого етапу процедури"]/..
 
+Отримати інформацію із скарги
+  [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}=${None}
+  refresh_tender   ${dzo_internal_id}
+  Reload Page
+  ${value}=  Get Text  ${locator.complaint.${field_name}}
+  ${value}=  convert_dzo_data  ${value}  ${field_name}
+  [Return]  ${value}
+
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
 ###############################################################################################################
@@ -666,7 +676,7 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
-  Run Keyword If  "${dzo_internal_id}" == "${None}" and "openProcedure" in "${SUITE NAME}" or "${save_key}" == "second_stage_data"  Sleep  500
+  Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
@@ -823,10 +833,63 @@ Input Tender Period End Date
   Input Text  xpath=//textarea[@name="resolution"]  ${answer_data.data.resolution}
   Click Element  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  1 s  Page Should Not Contain Element  xpath=//textarea[@name="resolution"]
-  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
 
+Створити вимогу про виправлення умов закупівлі
+  [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${document}=${None}
+  ${complaint_id}=  Create Claim  ${claim}  ${None}  ${document}
+  [Return]  ${complaint_id}
 
+Створити вимогу про виправлення умов лоту
+  [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${lot_id}  ${document}=${None}
+  ${complaint_id}=  Create Claim  ${claim}  ${lot_id}   ${document}
+  [Return]  ${complaint_id}
 
+Create Claim
+  [Arguments]  ${claim}  ${lot_id}=${None}  ${document}=${None}
+  ${current_url}=  Get Location
+  ${is_on_complaints_page}=  Run Keyword And Return Status  Should Contain  ${current_url}  complaints
+  Run Keyword If  not ${is_on_complaints_page}  Wait And Click  xpath=(//section[@class="content"]/descendant::a[contains(@href, 'complaints')])[1]
+  Wait And Click  xpath=//a[@class="addComplaint"]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]
+  Input Text  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]  ${claim.data.title}
+  Input Text  xpath=//form[@name="tender_complaint"]/descendant::textarea[@name="description"]  ${claim.data.description}
+  Run Keyword If  "${lot_id}" != "${None}"  Select From List By Label Contains Text  xpath=//select[@name="relatedLot"]  ${lot_id}
+  Run Keyword If  "${document}" != "${None}"  Run Keywords
+  ...  Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${document.split("/")[-1]}
+  ...  AND  Choose File  xpath=//input[@type="file"]  ${document}
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  ...  AND  Click Element  xpath=//button[contains(@class,"icon_upload")]
+  ...  AND  Sleep  5
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  60 x  20 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Not Contain  В процесі публікації
+  ${complaint_id}=  Get Text  xpath=(//div[contains(@class,"compStatus_claim")]/descendant::span[3])[last()]
+  ${complaint_id}=  convert_compaint_id_to_test_format  ${complaint_id}
+  [Return]  ${complaint_id}
+
+Скасувати вимогу про виправлення умов закупівлі
+  [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${cancellation_data}
+  Wait Until Keyword Succeeds  60 x  20 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Not Contain  В процесі публікації
+  Wait And Click  xpath=//a[@data-complaint-action="cancelled"][last()]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//textarea[@name="cancellationReason"]
+  Input Text  xpath=//textarea[@name="cancellationReason"]  ${cancellation_data.data.cancellationReason}
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  xpath=//textarea[@name="cancellationReason"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+
+Скасувати вимогу про виправлення умов лоту
+  [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${cancellation_data}
+  dzo.Скасувати вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${cancellation_data}
 
 ###############################################################################################################
 #########################################    ПРОПОЗИЦІЇ    ####################################################
@@ -1243,3 +1306,8 @@ Position Should Equals
   ${status}=  Run Keyword And Return Status  Should Be Equal  ${prev_vert_pos}  ${current_vert_pos}
   Set Test Variable  ${prev_vert_pos}  ${current_vert_pos}
   Should Be True  ${status}
+
+Select From List By Label Contains Text
+  [Arguments]  ${locator}  ${element_text}
+  ${label}=  Get Text  xpath=//*[contains(text(), "${element_text}")]
+  Select From List By Label  ${locator}  ${label}

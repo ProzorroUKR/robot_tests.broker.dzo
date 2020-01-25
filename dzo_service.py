@@ -133,6 +133,8 @@ def convert_dzo_data(value, field_name):
             u'ПЕРШИЙ ЕТАП ЗАВЕРШЕНО': "complete",
             u'ОСКАРЖЕННЯ ПРЕКВАЛІФІКАЦІЇ': "active.pre-qualification.stand-still",
             u'ВАШУ ПРОПОЗИЦІЮ ЗАБЛОКОВАНО ЧЕРЕЗ ЗМІНИ, ВНЕСЕНІ ЗАМОВНИКОМ В УМОВИ ОГОЛОШЕННЯ. ДЛЯ ПОВТОРНОЇ АКТИВАЦІЇ ПРОПОЗИЦІЇ, ЇЇ НЕОБХІДНО ПІДТВЕРДИТИ, ПОВТОРНО ЗБЕРІГШИ ЇЇ СКЛАД': "invalid",
+            u'ВІДКЛИКАНО': "cancelled",
+            u'РОЗГЛЯНУТО': "answered",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",
             u'виконання робіт': "executionOfWorks",
@@ -214,3 +216,7 @@ def get_milestone_by_lot_id(tender_data, lot_id):
 def refresh_tender(tender_id):
     resp = requests.get("https://www.sandbox.dzo.com.ua/cron/J7hdfks7_jlsdfn.php?tender_id={}&CDB_Number=0&run=KUgfjduk*tgkBkusdh&type=tenders".format(tender_id))
     return resp.content
+
+
+def convert_compaint_id_to_test_format(complaint_id):
+    return complaint_id[:-5] + complaint_id[-5:].lower()
