@@ -891,6 +891,21 @@ Create Claim
   [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${cancellation_data}
   dzo.Скасувати вимогу про виправлення умов закупівлі  ${username}  ${tender_uaid}  ${complaintID}  ${cancellation_data}
 
+Підтвердити вирішення вимоги про виправлення умов закупівлі
+  [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${confirmation_data}
+  Wait Until Keyword Succeeds  60 x  20 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//a[@data-complaint-action="estimate"]
+  Wait And Click  xpath=//a[@data-complaint-action="estimate"]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@name="estimateType"]
+  Click Element  xpath=//input[@name="estimateType" and @value="resolved_1"]/..
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  xpath=//textarea[@name="cancellationReason"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+
+
 ###############################################################################################################
 #########################################    ПРОПОЗИЦІЇ    ####################################################
 ###############################################################################################################
