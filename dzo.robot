@@ -466,11 +466,21 @@ Get From Item
 
 Отримати інформацію із скарги
   [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}=${None}
-  refresh_tender   ${dzo_internal_id}
-  Reload Page
-  ${value}=  Get Text  ${locator.complaint.${field_name}}
-  ${value}=  convert_dzo_data  ${value}  ${field_name}
+  Wait Until Keyword Succeeds  20 x  30 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Go To Complaint Page
+  ...  AND  Page Should Contain  ${complaintID}
+  ${value}=  Run Keyword If  "${field_name}" == "status"  Get Element Attribute  xpath=//span[text()="${complaintID}"]/ancestor::div[contains(@class, "compStatus_")]@class
+  ...  ELSE  Get Text  ${locator.complaint.${field_name}}
+  ${value}=  convert_dzo_data  ${value}  complaint.${field_name}
   [Return]  ${value}
+
+Go To Complaint Page
+  ${current_url}=  Get Location
+  ${is_on_complaints_page}=  Run Keyword And Return Status  Should Contain  ${current_url}  complaints
+  Run Keyword If  not ${is_on_complaints_page}  Wait And Click  xpath=(//section[@class="content"]/descendant::a[contains(@href, 'complaints')])[1]
+
 
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
