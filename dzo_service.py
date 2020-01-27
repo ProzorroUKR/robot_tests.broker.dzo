@@ -109,7 +109,7 @@ def convert_dzo_data(value, field_name):
     elif field_name == "funders[0].identifier.scheme":
         value_for_return = value.split(":")[0]
     elif field_name == "complaint.status":
-        class_with_status = [_class for _class in value if "compStatus_" in _class][0]
+        class_with_status = [_class for _class in value.split(" ") if "compStatus_" in _class][0]
         value_for_return = class_with_status.replace("compStatus_", "")
     elif field_name == "agreementDuration":
         l = value.split(" ")
