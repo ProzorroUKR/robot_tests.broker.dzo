@@ -899,7 +899,7 @@ Create Claim
   ...  AND  Page Should Contain Element  xpath=//a[@data-complaint-action="estimate"]
   Wait And Click  xpath=//a[@data-complaint-action="estimate"]
   Підтвердити Дію
-  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@name="estimateType"]
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@name="estimateType" and @value="resolved_1"]/..
   Click Element  xpath=//input[@name="estimateType" and @value="resolved_1"]/..
   Wait And Click  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  xpath=//textarea[@name="cancellationReason"]
