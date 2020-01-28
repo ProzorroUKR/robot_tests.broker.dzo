@@ -1260,6 +1260,20 @@ Confirm Invalid Bid
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//a[contains(@href, "/contract/documents")]
+#  ...  AND  Page Should Contain  Завершена
+  ${is_eds_needed}=  Run Keyword And Return Status  Run Keywords
+  ...  Wait And Click  xpath=//a[@data-bid-action="contract"]
+  ...  AND  Sleep  5
+  ...  AND  Page Should Contain  Цей документ необхідно підтвердити ЕЦП.
+  Run Keyword If  ${is_eds_needed}  Run Keywords
+  ...  Wait Until Keyword Succeeds  10 x  20 s  Дочекатися Кнопки Для Підпису
+  ...  AND  Click Element  xpath=(//a[@data-bid-action="aply"])[1]
+  ...  AND  Накласти ЕЦП
+  Click Element  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
   ...  AND  Page Should Contain  Завершена
 
 Встановити дату підписання угоди
