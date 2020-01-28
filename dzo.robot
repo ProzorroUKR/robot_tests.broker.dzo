@@ -203,7 +203,9 @@ Login
   Select CPV  ${plan_data.data.classification.id}
   Click Element  xpath=//input[@name="procuringEntity[manual]"]/..
   Clear Element Text  xpath=//input[@name="data[procuringEntity][name]"]
+  Sleep  2
   Input Text  xpath=//input[@name="data[procuringEntity][name]"]  ${plan_data.data.procuringEntity.name}
+  Sleep  2
 #  Clear Element Text  xpath=//input[@name="data[procuringEntity][identifier][id]"]
   Input Text  xpath=//input[@name="data[procuringEntity][identifier][id]"]  ${plan_data.data.procuringEntity.identifier.id}
   Wait And Input Text  xpath=//input[@name="data[budget][description]"]  ${plan_data.data.budget.description}
@@ -333,6 +335,7 @@ Select CPV
   Switch Browser  ${username}
   ${text}=  Run Keyword If  "item" in "${field_name}"  Get From Item  ${field_name}
   ...  ELSE  Get Text  ${plan.view.${field_name}}
+  ${text}=  Set Variable If  "deliveryDate" in "${field_name}"  ${text} 00:00  ${text}
   ${value}=  convert_dzo_data  ${text}  ${field_name}
   [Return]  ${value}
 
@@ -340,7 +343,7 @@ Select CPV
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Switch Browser  ${username}
   Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі" or "${TEST NAME}" == "Можливість дочекатися початку періоду очікування" or "${TEST NAME}" == "Відображення дати закінчення періоду блокування перед початком аукціону"  Sleep  360
-  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
+  Run Keyword If  "planning" not in "${SUITE NAME.lower()}"  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Reload Page
   ${text}=  Run Keyword If
   ...  "value.amount" in "${field_name}" and "contracts" in "${field_name}"  Get Text  xpath=//div[text()="Ціна договору"]/following-sibling::div
