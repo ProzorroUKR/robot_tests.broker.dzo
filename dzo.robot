@@ -964,6 +964,8 @@ Create Claim
   Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfQualified]"]/..
   ${is_self_eligible}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//input[@name="data[selfEligible]"]/..
   Run Keyword If  ${is_self_qualified}  Wait And Click  xpath=//input[@name="data[selfEligible]"]/..
+  ${is_bottom}=  Run Keyword And Return Status  Element Should Be Visible  xpath=//div[@id="bottomFixed"]
+  Run Keyword If  ${is_bottom}  Click Element  xpath=//a[@class="close icons"]
   Wait And Click  name=do
   Wait And Click  xpath=//a[@data-msg="jAlert Close"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
