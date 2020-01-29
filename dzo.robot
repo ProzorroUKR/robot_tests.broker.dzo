@@ -1275,7 +1275,7 @@ Confirm Invalid Bid
   ...  Wait Until Keyword Succeeds  10 x  20 s  Дочекатися Кнопки Для Підпису
   ...  AND  Click Element  xpath=(//a[@data-bid-action="aply"])[1]
   ...  AND  Накласти ЕЦП
-  Click Element  xpath=//a[@onclick="modalClose();"]
+  Run Keyword And Ignore Error  Click Element  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
