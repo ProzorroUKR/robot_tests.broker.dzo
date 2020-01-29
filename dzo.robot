@@ -192,11 +192,13 @@ Login
   ${breakdowns_length}=  Get Length  ${plan_data.data.budget.breakdown}
   ${items}=  Get From Dictionary  ${plan_data.data}  items
   ${items_length}=  Get Length  ${items}
+  ${procurementMethodType}=  Set Variable If  "${plan_data.data.tender.procurementMethodType}" == "reporting" or "${plan_data.data.tender.procurementMethodType}" == "negotiation"
+  ...  limited_${plan_data.data.tender.procurementMethodType}  open_${plan_data.data.tender.procurementMethodType}
   Click Element  xpath=//div[contains(text(),"Меню користувача")]
   Click Element  xpath=//a[@href="/cabinet/plans"]
   Click Element  xpath=//a[@href="/cabinet/plans/nulled"]
   Click Element  xpath=//a[@href="/plans/new"]
-  Select From List By Value  name=plan_method  open_${plan_data.data.tender.procurementMethodType}
+  Select From List By Value  name=plan_method  ${procurementMethodType}
   Input Text  name=data[budget][amount]  ${amount}
   Select From List By Value  name=data[budget][currency]  ${plan_data.data.budget.breakdown[0].value.currency}
   Wait And Click  xpath=//a[@data-class="ДК021"]
@@ -506,7 +508,7 @@ Go To Complaint Page
   ${rate}=  Run Keyword If  ${tender_data.data.has_key("NBUdiscountRate")}  Convert To String  ${tender_data.data.NBUdiscountRate * 100}
   ${valueAddedTaxIncluded}=  Run Keyword If  "${tender_data.data.procurementMethodType}" != "esco"  Set Variable If  ${tender_data.data.value.valueAddedTaxIncluded}  true  false
   ${enquiry_end_date}=  Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  convert_datetime_to_format  ${tender_data.data.enquiryPeriod.endDate}  %d/%m/%Y %H:%M
-  ${tender_end_date}=  convert_datetime_to_format  ${tender_data.data.tenderPeriod.endDate}  %d/%m/%Y %H:%M
+  ${tender_end_date}=   Run Keyword If  ${tender_data.data.has_key("tenderPeriod")}  convert_datetime_to_format  ${tender_data.data.tenderPeriod.endDate}  %d/%m/%Y %H:%M
   ${procurementMethodType}=  Set Variable If  ${tender_data.data.has_key("procurementMethodType")}  ${tender_data.data.procurementMethodType}  open_belowThreshold
   ${file_path}=  Get Variable Value  ${ARTIFACT_FILE}  artifact_plan.yaml
   ${artifact}=  load_data_from  ${file_path}
@@ -553,15 +555,16 @@ Go To Complaint Page
   Run Keyword If  ${tender_data.data.has_key('funders')}
   ...  Execute Javascript  $('.js-choosenInit')[0].value = ${tender_data.data.funders[0].name.replace(u"Світовий Банк","0").replace(u"Глобальний фонд","1")}
 
-  Run Keyword If  ${tender_data.data.has_key("features")}  Add Features  ${tender_data}
+  Run Keyword If  ${tender_data.data.has_key("features")} and "${tender_data.data.procurementMethodType}" != "reporting" and "${tender_data.data.procurementMethodType}" != "negotiation"  Add Features  ${tender_data}
 
   Run Keyword If  ${tender_data.data.has_key("enquiryPeriod")}  Run Keywords
   ...  Input Date  data[enquiryPeriod][endDate]  ${enquiry_end_date.split(" ")[0]}
   ...  AND  Input Date  enquiryPeriod_time  ${enquiry_end_date.split(" ")[1]}
-  Input Date  data[tenderPeriod][endDate]  ${tender_end_date.split(" ")[0]}
-  Input Date  tenderPeriod_time  ${tender_end_date.split(" ")[1]}
+  Run Keyword If  ${tender_data.data.has_key("tenderPeriod")}  Run Keywords
+  ...  Input Date  data[tenderPeriod][endDate]  ${tender_end_date.split(" ")[0]}
+  ...  AND  Input Date  tenderPeriod_time  ${tender_end_date.split(" ")[1]}
 #  Click Element  xpath=//select[@name="tender_enquiry_timeout"]
-  Click Element  xpath=//*[contains(text(),"Надайте календарну")]
+  Run Keyword If  ${tender_data.data.has_key("tenderPeriod")}  Click Element  xpath=//*[contains(text(),"Надайте календарну")]
   Wait Until Element Is Not Visible  xpath=//div[@id="ui-datepicker-div"]
   Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}');
   Wait And Click  xpath=//button[@value="publicate"]
@@ -580,12 +583,12 @@ Input Text En
 Fill Form For Tender Without Lots
   [Arguments]  ${tender_data}
   ${amount}=  add_second_sign_after_point  ${tender_data.data.value.amount}
-  ${minimal_step_amount}=  add_second_sign_after_point  ${tender_data.data.minimalStep.amount}
+  ${minimal_step_amount}=  Run Keyword If  ${tender_data.data.has_key("minimalStep")}   add_second_sign_after_point  ${tender_data.data.minimalStep.amount}
   ${items}=  Get From Dictionary  ${tender_data.data}  items
   ${items_length}=  Get Length  ${items}
   ${milestones_length}=  Get Length  ${tender_data.data.milestones}
   Input Text  xpath=//input[@name="data[value][amount]"]  ${amount}
-  Input Text  xpath=//input[@name="data[minimalStep][amount]"]  ${minimal_step_amount}
+  Run Keyword If  ${tender_data.data.has_key("minimalStep")}  Input Text  xpath=//input[@name="data[minimalStep][amount]"]  ${minimal_step_amount}
   Wait And Click  xpath=//section[contains(@id, "multiItems")]/a
   :FOR  ${index}  IN RANGE  ${items_length}
   \  Run Keyword If  ${index} != 0  Click Element  xpath=//section[contains(@id, "multiItems")]/descendant::a[@class="addMultiItem"]
@@ -699,7 +702,7 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
-  Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
+  Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
@@ -721,6 +724,38 @@ Status Should Be
   [Arguments]  ${username}  ${tender_uaid}
   Switch Browser  ${username}
   Run Keyword If  "${TEST NAME}" != "Можливість укласти угоду для закупівлі"  Reload Page
+
+
+Створити постачальника, додати документацію і підтвердити його
+  [Arguments]  ${username}  ${tender_uaid}  ${supplier_data}  ${document}
+  Wait Until Keyword Succeeds  10 x  1 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//a[contains(@class, "tenderSignCommand")]
+  Sleep  30
+  Накласти ЕЦП
+  Wait Until Keyword Succeeds  10 x  1 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//a[contains(@class, "addAward")]
+  Wait And Click  xpath=//a[contains(@class, "addAward")]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//*[@name="data[suppliers][0][name]" ]
+  Input Text  xpath=//*[@name="data[suppliers][0][name]"]  ${supplier_data.data.suppliers[0].name}
+  Select From List By Value  xpath=//*[@name="data[suppliers][0][identifier][scheme]"]  ${supplier_data.data.suppliers[0].identifier.scheme}
+  Input Text  xpath=//*[@name="data[suppliers][0][identifier][id]"]  ${supplier_data.data.suppliers[0].identifier.id}
+  Select From List By Value  xpath=//*[@name="data[suppliers][0][scale]"]  ${supplier_data.data.suppliers[0].scale}
+  Select From List By Value  xpath=//*[@name="data[suppliers][0][address][countryName]"]  ${supplier_data.data.suppliers[0].address.countryName}
+  Input Text  xpath=//*[@name="data[suppliers][0][address][region]"]  ${supplier_data.data.suppliers[0].address.region}
+  Input Text  xpath=//*[@name="data[suppliers][0][address][locality]"]  ${supplier_data.data.suppliers[0].address.locality}
+  Input Text  xpath=//*[@name="data[suppliers][0][address][postalCode]"]  ${supplier_data.data.suppliers[0].address.postalCode}
+  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][name]"]  ${supplier_data.data.suppliers[0].contactPoint.name}
+  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][email]"]  ${supplier_data.data.suppliers[0].contactPoint.email}
+  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][telephone]"]  ${supplier_data.data.suppliers[0].contactPoint.telephone}
+  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][faxNumber]"]  ${supplier_data.data.suppliers[0].contactPoint.faxNumber}
+  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][url]"]  ${supplier_data.data.suppliers[0].contactPoint.url}
+  Input Text  xpath=//*[@name="data[value][amount]"]  ${supplier_data.data.value.amount}
+  Wait And Click   xpath=//button[text()="Зберегти"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
 
 
 ###############################################################################################################
@@ -1237,6 +1272,7 @@ Confirm Invalid Bid
   Run Keyword If  not ${is_contract_modal_opened}  Run Keywords
   ...  Page Should Contain Element  xpath=//a[@data-bid-action="contract"]/..
   ...  AND  Wait And Click  xpath=//a[@data-bid-action="contract"]/..
+  Wait Until Keyword Succeeds  10 x  1 s  Page Should Contain Element xpath=//input[@type="file"]
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
   Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
@@ -1272,7 +1308,7 @@ Confirm Invalid Bid
   ...  AND  Sleep  5
   ...  AND  Page Should Contain  Цей документ необхідно підтвердити ЕЦП.
   Run Keyword If  ${is_eds_needed}  Run Keywords
-  ...  Wait Until Keyword Succeeds  10 x  20 s  Дочекатися Кнопки Для Підпису
+  ...  Wait Until Keyword Succeeds  10 x  20 s  Дочекатися Кнопки Для Підпису Контракту
   ...  AND  Click Element  xpath=(//a[@data-bid-action="aply"])[1]
   ...  AND  Накласти ЕЦП
   Run Keyword And Ignore Error  Click Element  xpath=//a[@onclick="modalClose();"]
@@ -1280,6 +1316,12 @@ Confirm Invalid Bid
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
   ...  AND  Page Should Contain  Завершена
+
+
+Дочекатися Кнопки Для Підпису Контракту
+  Reload Page
+  Wait And Click  xpath=//a[@data-bid-action="contract"]/..
+  Wait Until Page Contains Element  xpath=//div[contains(@class, "awardActionSign")]  10
 
 Встановити дату підписання угоди
   [Arguments]  ${username}  ${tender_uaid}  ${contract_index}  ${fieldvalue}
