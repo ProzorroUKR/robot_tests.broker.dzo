@@ -923,10 +923,10 @@ Create Claim
   Wait And Click  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
-#  Wait Until Keyword Succeeds  60 x  20 s  Run Keywords
-#  ...  refresh_tender   ${dzo_internal_id}
-#  ...  AND  Reload Page
-#  ...  AND  Page Should Not Contain  В процесі публікації
+  Wait Until Keyword Succeeds  60 x  20 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Not Contain  В процесі публікації
   ${complaint_id}=  Get Text  xpath=(//div[contains(@class,"compStatus_claim")]/descendant::span[3])[last()]
   ${complaint_id}=  convert_compaint_id_to_test_format  ${complaint_id}
   [Return]  ${complaint_id}
