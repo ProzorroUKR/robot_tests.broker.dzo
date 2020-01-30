@@ -703,6 +703,8 @@ Add Feature
   [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
   Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
+#  Run Keyword If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору"  Sleep  360
+  refresh_tender  ${dzo_internal_id}
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
@@ -728,10 +730,10 @@ Status Should Be
 
 Створити постачальника, додати документацію і підтвердити його
   [Arguments]  ${username}  ${tender_uaid}  ${supplier_data}  ${document}
+  Sleep  30
   Wait Until Keyword Succeeds  10 x  1 s  Run Keywords
   ...  Reload Page
   ...  AND  Page Should Contain Element  xpath=//a[contains(@class, "tenderSignCommand")]
-  Sleep  30
   Накласти ЕЦП
   Wait Until Keyword Succeeds  10 x  1 s  Run Keywords
   ...  Reload Page
@@ -747,11 +749,12 @@ Status Should Be
   Select From List By Value  xpath=//*[@name="data[suppliers][0][address][region]"]  ${supplier_data.data.suppliers[0].address.region}
   Input Text  xpath=//*[@name="data[suppliers][0][address][locality]"]  ${supplier_data.data.suppliers[0].address.locality}
   Input Text  xpath=//*[@name="data[suppliers][0][address][postalCode]"]  ${supplier_data.data.suppliers[0].address.postalCode}
-  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][name]"]  ${supplier_data.data.suppliers[0].contactPoint.name}
+  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][name]"]  ${supplier_data.data.suppliers[0].contactPoint.name[:-2]}
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][email]"]  ${supplier_data.data.suppliers[0].contactPoint.email}
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][telephone]"]  ${supplier_data.data.suppliers[0].contactPoint.telephone}
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][faxNumber]"]  ${supplier_data.data.suppliers[0].contactPoint.faxNumber}
-  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][url]"]  ${supplier_data.data.suppliers[0].contactPoint.url}
+#  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][url]"]  ${supplier_data.data.suppliers[0].contactPoint.url}
+  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][url]"]  http://sfs.gov.ua/
   Input Text  xpath=//*[@name="data[value][amount]"]  ${supplier_data.data.value.amount}
   Wait And Click   xpath=//button[text()="Зберегти"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
@@ -1287,7 +1290,7 @@ Confirm Invalid Bid
   ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
   ${amount_net}=  Get Element Attribute  xpath=//input[@name="data[value][amountNet]"]@value
   ${amount_net}=  Convert To Number  ${amount_net}
-  ${amount_net}=  Convert To String  ${amount_net - 10}
+  ${amount_net}=  add_second_sign_after_point  ${amount_net - 10}
   Clear Element Text  xpath=//input[@name="data[value][amountNet]"]
   Input Text  xpath=//input[@name="data[value][amountNet]"]  ${amount_net}
   Input Date  data[dateSigned]  ${date.replace(".", "/")}
