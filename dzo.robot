@@ -744,7 +744,7 @@ Status Should Be
   Input Text  xpath=//*[@name="data[suppliers][0][identifier][id]"]  ${supplier_data.data.suppliers[0].identifier.id}
   Select From List By Value  xpath=//*[@name="data[suppliers][0][scale]"]  ${supplier_data.data.suppliers[0].scale}
   Select From List By Value  xpath=//*[@name="data[suppliers][0][address][countryName]"]  ${supplier_data.data.suppliers[0].address.countryName}
-  Input Text  xpath=//*[@name="data[suppliers][0][address][region]"]  ${supplier_data.data.suppliers[0].address.region}
+  Select From List By Value  xpath=//*[@name="data[suppliers][0][address][region]"]  ${supplier_data.data.suppliers[0].address.region}
   Input Text  xpath=//*[@name="data[suppliers][0][address][locality]"]  ${supplier_data.data.suppliers[0].address.locality}
   Input Text  xpath=//*[@name="data[suppliers][0][address][postalCode]"]  ${supplier_data.data.suppliers[0].address.postalCode}
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][name]"]  ${supplier_data.data.suppliers[0].contactPoint.name}
@@ -1272,7 +1272,7 @@ Confirm Invalid Bid
   Run Keyword If  not ${is_contract_modal_opened}  Run Keywords
   ...  Page Should Contain Element  xpath=//a[@data-bid-action="contract"]/..
   ...  AND  Wait And Click  xpath=//a[@data-bid-action="contract"]/..
-  Wait Until Keyword Succeeds  10 x  1 s  Page Should Contain Element xpath=//input[@type="file"]
+  Wait Until Keyword Succeeds  10 x  1 s  Page Should Contain Element  xpath=//input[@type="file"]
   Choose File  xpath=//input[@type="file"]  ${document}
   Input Text  xpath=//input[@name="title"]  test
   Click Element  xpath=//div[contains(@class, "buttonAdd")]/div/button
