@@ -1312,7 +1312,7 @@ Confirm Invalid Bid
   ...  AND  Page Should Contain  Цей документ необхідно підтвердити ЕЦП.
   Run Keyword If  ${is_eds_needed}  Run Keywords
   ...  Wait Until Keyword Succeeds  10 x  20 s  Дочекатися Кнопки Для Підпису Контракту
-  ...  AND  Click Element  xpath=(//a[@data-bid-action="aply"])[1]
+#  ...  AND  Click Element  xpath=(//a[@data-bid-action="aply"])[1]
   ...  AND  Накласти ЕЦП
   Run Keyword And Ignore Error  Click Element  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
@@ -1324,7 +1324,7 @@ Confirm Invalid Bid
 Дочекатися Кнопки Для Підпису Контракту
   Reload Page
   Wait And Click  xpath=//a[@data-bid-action="contract"]/..
-  Wait Until Page Contains Element  xpath=//div[contains(@class, "awardActionSign")]  10
+  Wait Until Page Contains Element  xpath=//a[contains(@class, "tenderSignCommand")]  10
 
 Встановити дату підписання угоди
   [Arguments]  ${username}  ${tender_uaid}  ${contract_index}  ${fieldvalue}
