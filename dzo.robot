@@ -924,7 +924,8 @@ Create Claim
   ...  AND  Click Element  xpath=//button[contains(@class,"icon_upload")]
   ...  AND  Sleep  5
   Wait And Click  xpath=//button[@class="bidAction"]
-  Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]
+  Run Keyword And Ignore Error  Підтвердити Дію
+  Wait Until Keyword Succeeds  10 x  5 s  Page Should Not Contain Element  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  60 x  20 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
