@@ -73,6 +73,26 @@ ${tender.view.value.valueAddedTaxIncluded}=  xpath=//span[@class="taxIncluded"]/
 ${tender.view.tenderID}=  xpath=//span[@class="js-apiID"]
 #${tender.view.procuringEntity.name}=  xpath=//td[text()="Найменування організації"]/following-sibling::td/span
 ${tender.view.procuringEntity.name}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
+${tender.view.procuringEntity.address.countryName}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[text()="Юридична адреса"]/following-sibling::td[1]
+${tender.view.procuringEntity.address.locality}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[text()="Юридична адреса"]/following-sibling::td[1]
+${tender.view.procuringEntity.address.postalCode}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[text()="Юридична адреса"]/following-sibling::td[1]
+${tender.view.procuringEntity.address.region}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[text()="Юридична адреса"]/following-sibling::td[1]
+${tender.view.procuringEntity.address.streetAddress}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[text()="Юридична адреса"]/following-sibling::td[1]
+${tender.view.procuringEntity.contactPoint.name}=  xpath=//div[contains(@class,"contactsList")]/descendant::span[contains(@class, "contactFIO")]
+${tender.view.procuringEntity.contactPoint.telephone}=  xpath=//div[contains(@class,"contactsList")]/descendant::div[@data-svg="/images/svg/orgstruct_phone.svg"]
+#${tender.view.procuringEntity.contactPoint.url}
+${tender.view.procuringEntity.identifier.legalName}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
+${tender.view.procuringEntity.identifier.scheme}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[contains(text(),"ЄДРПОУ")]
+${tender.view.procuringEntity.identifier.id}=  xpath=//section[contains(@class,"orgInfo")]/descendant::td[contains(text(),"ЄДРПОУ")]/following-sibling::td[1]
+${tender.view.documents[0].title}=  xpath=//span[@class="docType docTitle"]
+${tender.view.awards[0].documents[0].title}
+${tender.view.awards[0].status}=  xpath=(//div[@class="qualificationBidAmount"])[2]/div[1]
+${tender.view.awards[0].suppliers[0].address.countryName}
+${tender.view.awards[0].suppliers[0].address.locality}
+${tender.view.awards[0].suppliers[0].address.postalCode}
+${tender.view.awards[0].suppliers[0].address.region}
+${tender.view.awards[0].suppliers[0].address.streetAddress}
+
 ${tender.view.minimalStep.amount}=  xpath=//td[contains(text(),'Розмір мінімального кроку')]/following-sibling::td/span[1]
 ${tender.view.funders[0].name}=  xpath=//div[@class="fundersItem"]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
 ${tender.view.funders[0].address.countryName}=  xpath=//div[@class="fundersItem"]/descendant::td[contains(text(),"Юридична адреса")]/following-sibling::td[1]
@@ -150,6 +170,12 @@ ${locator.complaint.status}  xpath=(//div[@class="complaintStatus"]/div/div[1])[
 
 ${contract.value.amountNet}  xpath=//input[@name="data[value][amountNet]"]
 ${contract.value.amount}  xpath=//input[@name="data[value][amount]"]
+
+${award.view.awards[0].suppliers[0].address.countryName}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
+${award.view.awards[0].suppliers[0].address.locality}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
+${award.view.awards[0].suppliers[0].address.postalCode}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
+${award.view.awards[0].suppliers[0].address.region}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
+${award.view.awards[0].suppliers[0].address.streetAddress}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
 
 ${locator.ModalOK}=  xpath=//a[@data-msg="jAlert OK"]
 
@@ -347,17 +373,38 @@ Select CPV
   Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі" or "${TEST NAME}" == "Можливість дочекатися початку періоду очікування" or "${TEST NAME}" == "Відображення дати закінчення періоду блокування перед початком аукціону"  Sleep  360
   Run Keyword If  "planning" not in "${SUITE NAME.lower()}"  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Reload Page
+  Run Keyword If  "status" in "${field_name}" and "reporting" in "${SUITE NAME.lower()}"  Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
+  ...  refresh_tender  ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain  Завершена
   ${text}=  Run Keyword If
   ...  "value.amount" in "${field_name}" and "contracts" in "${field_name}"  Get Text  xpath=//div[text()="Ціна договору"]/following-sibling::div
   ...  ELSE IF  "value.amountNet" in "${field_name}" and "contracts" in "${field_name}"  Get Text  xpath=//div[text()="Ціна договору без ПДВ"]/following-sibling::div
   ...  ELSE IF  "value.amount" in "${field_name}"  Get Amount
   ...  ELSE IF  "milestones" in "${field_name}"  Get From Milestone  ${field_name}
   ...  ELSE IF  "item" in "${field_name}"  Get From Item  ${field_name}
+  ...  ELSE IF  "awards[0].documents[0].title" in "${field_name}"  Get Award Document Title
+  ...  ELSE IF  "awards[0].suppliers" in "${field_name}"  Get Award Info  ${field_name}
   ...  ELSE IF  "qualificationPeriod.endDate" in "${field_name}"  Run Keyword And Return  Get Element Attribute  xpath=//div[contains(@class, "prequalificationDoneDate")]/span[2]@data-qualificationperiod-enddate
   ...  ELSE IF  "${field_name}" == "complaintPeriod.endDate"  Run Keyword And Return  Get Element Attribute  xpath=//div[@data-status="1.1"]@data-dateorig
   ...  ELSE  Get Text  ${tender.view.${field_name}}
   ${value}=  convert_dzo_data  ${text}  ${field_name}
 #  ${value}=  Set Variable If  "amount" in "${field_name}"  ${value.replace("`", "")}  ${value}
+  [Return]  ${value}
+
+Get Award Document Title
+  Wait And Click  xpath=//a[contains(@href, "award") and contains(@href, "documents") and not (contains(@href, "contract"))]
+  Wait Until Keyword Succeeds  10 x  2 s  Page Should Contain Element  xpath=//span[@class="docTitle"]
+  ${value}=  Get Text  xpath=//span[@class="docTitle"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+  [Return]  ${value}
+
+Get Award Info
+  [Arguments]  ${field_name}
+  Wait And Click  xpath=//a[@class="biderInfo"]
+  Wait Until Keyword Succeeds  10 x  1 s  Page Should Contain Element  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
+  ${value}=  Get Text  ${award.view.${field_name}}
+  ${value}=  convert_dzo_data  ${value}  ${field_name}
   [Return]  ${value}
 
 Get Amount

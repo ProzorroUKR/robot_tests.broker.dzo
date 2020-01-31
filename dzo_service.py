@@ -113,6 +113,8 @@ def convert_dzo_data(value, field_name):
     elif field_name == "complaint.status":
         class_with_status = [_class for _class in value.split(" ") if "compStatus_" in _class][0]
         value_for_return = class_with_status.replace("compStatus_", "")
+    elif "address" in field_name:
+        value_for_return = adapt_items_data(field_name, value)
     elif field_name == "agreementDuration":
         l = value.split(" ")
         value_for_return = "P{}Y{}M{}D".format(l[0], l[2], l[4])
@@ -143,6 +145,7 @@ def convert_dzo_data(value, field_name):
             u'ВІДХИЛЕНО': "invalid",
             u'РОЗГЛЯНУТО': "answered",
             u'ВИРІШЕНА': "resolved",
+            u'Переможець': "active",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",
             u'виконання робіт': "executionOfWorks",
