@@ -1017,13 +1017,12 @@ Create Claim
 
 Відповісти на вимогу про виправлення визначення переможця
   [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}  ${award_index}
-  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
-  Wait And Click  xpath=(//section[@class="content"]/descendant::a[contains(@href, 'complaints')])[1]
-  Wait Until Keyword Succeeds  30 x  10 s  Run Keywords
-  ...  refresh_tender  ${dzo_internal_id}
-  ...  AND  Reload Page
-  ...  AND  Page Should Contain  ${complaintID}
-  Wait And Click  xpath=//span[contains(text(), "${complaintID}")]/ancestor::div[contains(@class, "compStatus_claim")]/descendant::a[@class="answerComplaint"]
+#  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
+  refresh_tender  ${dzo_internal_id}
+  Reload Page
+  Wait And Click  xpath=//a[contains(@href,"award") and contains(@href, "complaints")]
+  Wait Until Keyword Succeeds  20 x  1 s  Page Should Contain Element  xpath=//a[@class="answerComplaint"]
+  Wait And Click  xpath=//a[@class="answerComplaint"]
   Wait And Click  xpath=//input[@value="${answer_data.data.resolutionType}"]/..
   Input Text  xpath=//textarea[@name="resolution"]  ${answer_data.data.resolution}
   Click Element  xpath=//button[@class="bidAction"]
@@ -1033,6 +1032,34 @@ Create Claim
 
 Створити вимогу про виправлення визначення переможця
   [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${award_index}  ${document}=${None}
+  Wait Until Keyword Succeeds  60 x  20 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//a[contains(@href,"complaints/add")]
+  Wait And Click  xpath=//a[contains(@href,"complaints/add")]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]
+  Run Keyword If  "${document}" != "${None}"  Run Keywords
+  ...  Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${document.split("/")[-1]}
+  ...  AND  Choose File  xpath=//input[@type="file"]  ${document}
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  ...  AND  Click Element  xpath=//button[contains(@class,"icon_upload")]
+  ...  AND  Sleep  5
+  Input Text  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]  ${claim.data.title}
+  Input Text  xpath=//form[@name="tender_complaint"]/descendant::textarea[@name="description"]  ${claim.data.description}
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Run Keyword And Ignore Error  Підтвердити Дію
+  Wait Until Keyword Succeeds  10 x  5 s  Page Should Not Contain Element  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  60 x  20 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Locator Should Match X Times  xpath=//a[contains(@href,"award") and contains(@href, "complaints")]  2
+  Wait And Click  xpath=//a[contains(@href,"award") and contains(@href, "complaints") and not(contains(@href, "add"))]
+  Wait Until Keyword Succeeds  10 x  2 s  Page Should Contain Element  xpath=//div[contains(@class,"question")]/div/span[3]
+  ${complaint_id}=  Get Text  xpath=//div[contains(@class,"question")]/div/span[3]
+  ${complaint_id}=  convert_compaint_id_to_test_format  ${complaint_id}
+  [Return]  ${complaint_id}
 
 ###############################################################################################################
 #########################################    ПРОПОЗИЦІЇ    ####################################################
