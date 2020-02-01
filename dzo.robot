@@ -759,7 +759,7 @@ Add Feature
   Wait Until Keyword Succeeds  10 x  1 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]/a[contains(@href,"/tenders/")]  1
   Click Element  xpath=//a[contains(@class, "tenderLink")]
   ${internal_id}=  Run Keyword If  "${dzo_internal_id}" == "${None}"  Get Text  id=tender_id
-  ...  ELSE  Set Variable  ${internal_id}
+  ...  ELSE  Set Variable  ${dzo_internal_id}
   Set Global Variable  ${dzo_internal_id}  ${internal_id}
   Run Keyword If  "${SUITE NAME.lower()}" == "qualification" and "${TEST NAME}" == "Можливість знайти закупівлю по ідентифікатору"
   ...  Wait Until Keyword Succeeds  40 x  30 s  Status Should Be  ${username}  ${tender_uaid}  active.qualification
@@ -1014,6 +1014,25 @@ Create Claim
   Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  xpath=//textarea[@name="cancellationReason"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
 
+
+Відповісти на вимогу про виправлення визначення переможця
+  [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${answer_data}  ${award_index}
+  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
+  Wait And Click  xpath=(//section[@class="content"]/descendant::a[contains(@href, 'complaints')])[1]
+  Wait Until Keyword Succeeds  30 x  10 s  Run Keywords
+  ...  refresh_tender  ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain  ${complaintID}
+  Wait And Click  xpath=//span[contains(text(), "${complaintID}")]/ancestor::div[contains(@class, "compStatus_claim")]/descendant::a[@class="answerComplaint"]
+  Wait And Click  xpath=//input[@value="${answer_data.data.resolutionType}"]/..
+  Input Text  xpath=//textarea[@name="resolution"]  ${answer_data.data.resolution}
+  Click Element  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  1 s  Page Should Not Contain Element  xpath=//textarea[@name="resolution"]
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+
+
+Створити вимогу про виправлення визначення переможця
+  [Arguments]  ${username}  ${tender_uaid}  ${claim}  ${award_index}  ${document}=${None}
 
 ###############################################################################################################
 #########################################    ПРОПОЗИЦІЇ    ####################################################
