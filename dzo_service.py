@@ -123,8 +123,8 @@ def convert_dzo_data(value, field_name):
     elif "funders" in field_name:
         value_for_return = adapt_items_data(field_name, value)
         if "legalName" in field_name:
-            value_for_return = {"Глобальний фонд": "Глобальний Фонд для боротьби зі СНІДом, туберкульозом і малярією",
-                                "Світовий Банк": "Міжнародний банк реконструкції та розвитку (МБРР)"}.get(value, value)
+            value_for_return = {u"Глобальний фонд": u"Глобальний Фонд для боротьби зі СНІДом, туберкульозом і малярією",
+                                u"Світовий Банк": u"Міжнародний банк реконструкції та розвитку (МБРР)"}.get(value, value)
     # elif "unit" in field_name:
     #     value_for_return = DZO_dict.get(value, value)
     else:
@@ -162,6 +162,7 @@ def convert_dzo_data(value, field_name):
             u'Співфінансування з бюджетних коштів': "budget",
             u'Допорогові закупівлі': "belowThreshold",
             u'Конкурентний діалог 1-ий етап': "competitiveDialogueUA",
+            u'Конкурентний діалог з публікацією англійською мовою 1-ий етап': "competitiveDialogueEU",
             u'Відкриті торги для закупівлі енергосервісу': "esco",
             u'Переговорна процедура для потреб оборони': "aboveThresholdUA.defense",
             u'Укладання рамкової угоди': "closeFrameworkAgreementUA",
