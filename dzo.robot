@@ -1081,14 +1081,15 @@ Create Claim
   ...  AND  Locator Should Match X Times  xpath=//a[contains(@href,"award") and contains(@href, "complaints")]  2
   Wait And Click  xpath=//a[contains(@href,"award") and contains(@href, "complaints") and not(contains(@href, "add"))]
   Wait Until Keyword Succeeds  10 x  2 s  Page Should Contain Element  xpath=//div[contains(@class,"question")]/div/span[3]
-  ${complaint_id}=  Get Text  xpath=//div[contains(@class,"question")]/div/span[3]
+  ${complaint_id}=  Get Text  xpath=(//div[contains(@class,"question")]/div/span[3])[last()]
   ${complaint_id}=  convert_compaint_id_to_test_format  ${complaint_id}
   [Return]  ${complaint_id}
 
 Підтвердити вирішення вимоги про виправлення визначення переможця
   [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${confirmation_data}  ${award_index}
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
-  ...  Reload Page
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
   ...  AND  Wait And Click  xpath=//a[contains(@href, "award") and contains(@href, "complaints") and not(contains(@href, "add"))]
   ...  AND  Wait Until Keyword Succeeds  10 x  1 s  Page Should Contain  Оскарження кваліфікації
   ...  AND  Page Should Contain Element  xpath=//span[contains(text(), "${complaintID}")]/ancestor::div[contains(@class, "compStatus_")]/descendant::a[@data-complaint-action="estimate"]
@@ -1103,14 +1104,15 @@ Create Claim
 Скасувати вимогу про виправлення визначення переможця
   [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${cancellation_data}  ${award_index}
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
-  ...  Reload Page
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
   ...  AND  Wait And Click  xpath=//a[contains(@href, "award") and contains(@href, "complaints") and not(contains(@href, "add"))]
   ...  AND  Wait Until Keyword Succeeds  10 x  1 s  Page Should Contain  Оскарження кваліфікації
   ...  AND  Page Should Contain Element  xpath=//span[contains(text(), "${complaintID}")]/ancestor::div[contains(@class, "compStatus_")]/descendant::a[@data-complaint-action="cancelled"]
   Wait And Click  xpath=//span[contains(text(), "${complaintID}")]/ancestor::div[contains(@class, "compStatus_")]/descendant::a[@data-complaint-action="cancelled"]
   Підтвердити Дію
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//textarea[@name="cancellationReason"]
-  Click Element  xpath=//textarea[@name="cancellationReason"]  ${cancellation_data.data.cancellationReason}
+  Input Text  xpath=//textarea[@name="cancellationReason"]  ${cancellation_data.data.cancellationReason}
   Wait And Click  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  xpath=//textarea[@name="cancellationReason"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
