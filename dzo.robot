@@ -372,6 +372,7 @@ Select CPV
   Switch Browser  ${username}
   Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі" or "${TEST NAME}" == "Можливість дочекатися початку періоду очікування" or "${TEST NAME}" == "Відображення дати закінчення періоду блокування перед початком аукціону"  Sleep  360
   Run Keyword If  "planning" not in "${SUITE NAME.lower()}"  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
+  Run Keyword If  "Відображення вартості угоди" in "${TEST NAME}"  Sleep  360
   Reload Page
   Run Keyword If  "status" in "${field_name}" and "reporting" in "${SUITE NAME.lower()}"  Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
   ...  refresh_tender  ${dzo_internal_id}
@@ -522,6 +523,7 @@ Get From Item
 
 Отримати інформацію із скарги
   [Arguments]  ${username}  ${tender_uaid}  ${complaintID}  ${field_name}  ${award_index}=${None}
+  Run Keyword And Return If  "визначення переможця" in "${TEST NAME}"  Get Award Complaint Info  ${complaintID}
   Wait Until Keyword Succeeds  20 x  30 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
@@ -530,6 +532,17 @@ Get From Item
   ${value}=  Run Keyword If  "${field_name}" == "status"  Get Element Attribute  xpath=//span[text()="${complaintID}"]/ancestor::div[contains(@class, "compStatus_")]@class
   ...  ELSE  Get Text  xpath=//span[text()="${complaintID}"]/ancestor::div[contains(@class, "compStatus_")]${locator.complaint.${field_name}}
   ${value}=  convert_dzo_data  ${value}  complaint.${field_name}
+  [Return]  ${value}
+
+Get Award Complaint Info
+  [Arguments]  ${complaintID}
+  Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Wait And Click  xpath=//a[contains(@href, "award") and contains(@href, "complaints")]
+  ...  AND  Wait Until Keyword Succeeds  10 x  1 s  Page Should Contain  Оскарження кваліфікації
+  ...  AND  Page Should Contain  ${complaintID}
+  ${value}=  Get Element Attribute  xpath=//span[contains(text(), "${complaintID}")]/ancestor::div[contains(@class, "compStatus_")]@class
+  ${value}=  convert_dzo_data  ${value}  complaint.status
   [Return]  ${value}
 
 Go To Complaint Page
