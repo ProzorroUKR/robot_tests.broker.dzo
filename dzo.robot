@@ -523,6 +523,7 @@ Get From Item
 Отримати тендер другого етапу та зберегти його
   [Arguments]  ${username}  ${tender_uaid}
   Sleep  360
+  Reload Page
   Wait And Click  xpath=//span[text()="Перебіг другого етапу процедури"]/..
 
 Отримати інформацію із скарги
