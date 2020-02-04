@@ -573,11 +573,13 @@ Go To Complaint Page
 
 Отримати посилання на аукціон для учасника
   [Arguments]  ${username}  ${tender_uaid}  ${relatedLot}=${Empty}
-  refresh_tender   ${dzo_internal_id}
-  Reload Page
+  Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//a[@class="reverse getAuctionUrl"]
   Wait And Click  xpath=//a[@class="reverse getAuctionUrl"]
-  Wait Until Page Contains Element   xpath=//a[contains(text(),"Перейдіть до аукціону")]
-  ${value}=   Get Element Attribute   xpath=//a[contains(text(),"Перейдіть до аукціону")]@href
+  Wait Until Page Contains Element   xpath=//a[contains(@href,"auction-staging")]
+  ${value}=   Get Element Attribute   xpath=//a[contains(@href,"auction-staging")]@href
   [Return]  ${value}
 
 ###############################################################################################################
@@ -1128,6 +1130,7 @@ Create Claim
   ...  AND  Reload Page
   ...  AND  Wait And Click  xpath=//a[contains(@href, "award") and contains(@href, "complaints") and not(contains(@href, "add"))]
   ...  AND  Wait Until Keyword Succeeds  10 x  1 s  Page Should Contain  Оскарження кваліфікації
+  ...  AND  Execute Javascript  document.querySelector('.message').scrollTo(0, document.querySelector('.message').scrollHeight)
   ...  AND  Page Should Contain Element  xpath=//span[contains(text(), "${complaintID}")]/ancestor::div[contains(@class, "compStatus_")]/descendant::a[@data-complaint-action="cancelled"]
   Wait And Click  xpath=//span[contains(text(), "${complaintID}")]/ancestor::div[contains(@class, "compStatus_")]/descendant::a[@data-complaint-action="cancelled"]
   Підтвердити Дію
