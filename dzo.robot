@@ -543,7 +543,8 @@ Get From Item
 Get Award Complaint Info
   [Arguments]  ${complaintID}  ${field_name}
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
-  ...  Reload Page
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
   ...  AND  Wait And Click  xpath=//a[contains(@href, "award") and contains(@href, "complaints")]
   ...  AND  Wait Until Keyword Succeeds  10 x  1 s  Page Should Contain  Оскарження кваліфікації
   ...  AND  Page Should Contain  ${complaintID}
