@@ -104,7 +104,7 @@ def convert_dzo_data(value, field_name):
         value_for_return = float(value.replace("`", ""))
     elif "Date" in field_name:
         value_for_return = convert_time_to_tests_format(value)
-        if field_name == "awards[0].complaintPeriod.endDate":
+        if "awards" in field_name and "complaintPeriod.endDate" in field_name:
             value_for_return = value_for_return.replace(":00+", ":59+")
     elif field_name == "funders[0].identifier.id":
         value_for_return = value.split(":")[1]

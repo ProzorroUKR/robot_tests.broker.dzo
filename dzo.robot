@@ -548,7 +548,7 @@ Get Award Complaint Info
   ...  AND  Page Should Contain  ${complaintID}
   ${value}=  Run Keyword If  "${field_name}" == "status"  Get Element Attribute  xpath=//span[contains(text(), "${complaintID}")]/ancestor::div[contains(@class, "compStatus_")]@class
   ...  ELSE  Get Text  xpath=//span[text()="${complaintID}"]/ancestor::div[contains(@class, "compStatus_")]${locator.complaint.${field_name}}
-  ${value}=  convert_dzo_data  ${value}  complaint.status
+  ${value}=  convert_dzo_data  ${value}  complaint.${field_name}
   [Return]  ${value}
 
 Go To Complaint Page
@@ -565,12 +565,18 @@ Go To Complaint Page
 
 Отримати посилання на аукціон для глядача
   [Arguments]  ${username}  ${tender_uaid}  ${lot_id}=${Empty}
+  refresh_tender   ${dzo_internal_id}
+  Reload Page
   ${value}=  Get Element Attribute  xpath=//a[contains(@href,"auction-staging")]@href
   [Return]  ${value}
 
 Отримати посилання на аукціон для учасника
   [Arguments]  ${username}  ${tender_uaid}  ${relatedLot}=${Empty}
-  ${value}=  Get Element Attribute  xpath=//a[contains(@href,"auction-staging")]@href
+  refresh_tender   ${dzo_internal_id}
+  Reload Page
+  Wait And Click  xpath=//a[@class="reverse getAuctionUrl"]
+  Wait Until Page Contains Element   xpath=//a[contains(text(),"Перейдіть до аукціону")]
+  ${value}=   Get Element Attribute   xpath=//a[contains(text(),"Перейдіть до аукціону")]@href
   [Return]  ${value}
 
 ###############################################################################################################
@@ -1095,6 +1101,7 @@ Create Claim
   Wait Until Keyword Succeeds  10 x  2 s  Page Should Contain Element  xpath=//div[contains(@class,"question")]/div/span[3]
   ${complaint_id}=  Get Text  xpath=(//div[contains(@class,"question")]/div/span[3])[last()]
   ${complaint_id}=  convert_compaint_id_to_test_format  ${complaint_id}
+  Run Keyword If  "${document}" != "${None}"  Sleep  60
   [Return]  ${complaint_id}
 
 Підтвердити вирішення вимоги про виправлення визначення переможця
