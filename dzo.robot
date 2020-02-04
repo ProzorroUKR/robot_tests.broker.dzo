@@ -1067,7 +1067,7 @@ Create Claim
   ...  AND  Sleep  5
   Input Text  xpath=//form[@name="tender_complaint"]/descendant::input[@name="title"]  ${claim.data.title}
   Input Text  xpath=//form[@name="tender_complaint"]/descendant::textarea[@name="description"]  ${claim.data.description}
-  Select From List By Value  xpath=//select[@name="status"]  claim
+  Run Keyword And Ignore Error  Select From List By Value  xpath=//select[@name="status"]  claim
   Capture Page Screenshot
   Wait And Click  xpath=//button[@class="bidAction"]
   Capture Page Screenshot
