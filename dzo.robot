@@ -563,6 +563,16 @@ Go To Complaint Page
   ${value}=  Get Text  xpath=//span[@class="docTitle"]
   [Return]  ${value}
 
+Отримати посилання на аукціон для глядача
+  [Arguments]  ${username}  ${tender_uaid}  ${lot_id}=${Empty}
+  ${value}=  Get Element Attribute  xpath=//a[contains(@href,"auction-staging")]@href
+  [Return]  ${value}
+
+Отримати посилання на аукціон для учасника
+  [Arguments]  ${username}  ${tender_uaid}  ${relatedLot}=${Empty}
+  ${value}=  Get Element Attribute  xpath=//a[contains(@href,"auction-staging")]@href
+  [Return]  ${value}
+
 ###############################################################################################################
 ###################################    СТВОРЕННЯ ТЕНДЕРУ    ###################################################
 ###############################################################################################################
