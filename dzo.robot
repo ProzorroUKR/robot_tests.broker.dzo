@@ -121,6 +121,7 @@ ${tender.view.NBUdiscountRate}=  xpath=//td[text()="Облікова ставк�
 ${tender.view.maxAwardsCount}=  xpath=//td[contains(text(), "Кіл-ть учасників")]/following-sibling::td[1]
 ${tender.view.agreementDuration}=  xpath=//td[contains(text(), "Строк, на який укладається рамкова угода")]/following-sibling::td[1]
 ${tender.view.auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
+${tender.view.lots[0].auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
