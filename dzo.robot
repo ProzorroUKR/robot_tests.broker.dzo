@@ -900,8 +900,8 @@ Input Tender Period End Date
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(text(), 'Процедура закупівлі')]
   Wait And Click  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=//input[@value="Визначте організацію-донора"]
-  Wait Until Element Is Visible  xpath=//li[text()="${funders_data.funders[0].name}"]
-  Wait Until Keyword Succeeds  5 x  1 s  CLick Element  xpath=//li[text()="${funders_data.funders[0].name}"]
+  Wait Until Element Is Visible  xpath=//li[text()="${funders_data.name}"]
+  Wait Until Keyword Succeeds  5 x  1 s  CLick Element  xpath=//li[text()="${funders_data.name}"]
   Wait And Click  xpath=//button[@value="save"]
 
 Змінити лот
