@@ -978,7 +978,7 @@ Input Tender Period End Date
   Wait And Input Text  xpath=//div[contains(text(),'${question_id}')]/../following-sibling::div/descendant::textarea[@name="answer"]  ${answer_data.data.answer}
   Wait And Click  xpath=//button[contains(text(), 'Опублікувати відповідь')]
   Wait And Click  xpath=//a[@data-msg="jAlert Close"]
-  Wait Until Keyword Succeeds  30 x  1 s  Page Should Not Contain Element  xpath=//div[@id="jAlertBack"]
+#  Wait Until Keyword Succeeds  30 x  1 s  Page Should Not Contain Element  xpath=//div[@id="jAlertBack"]
 
 ###############################################################################################################
 #############################################    СКАРГИ    ####################################################
