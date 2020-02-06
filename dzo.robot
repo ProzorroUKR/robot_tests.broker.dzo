@@ -942,12 +942,12 @@ Input Tender Period End Date
   ${tender_end_date}=  retrieve_date_for_second_stage
   Wait And Click  xpath=//a[contains(@class, "save")]
   Capture Page Screenshot  test_screenshot.png
-  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+  Run Keyword And Ignore Error  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
   Input Date  data[tenderPeriod][endDate]  ${tender_end_date.split(" ")[0]}
   Input Date  tenderPeriod_time  ${tender_end_date.split(" ")[1]}
   Wait And Click  xpath=//button[@value="save"]
-
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
 ###############################################################################################################
 ##########################################    ЗАПИТАННЯ    ####################################################
@@ -969,6 +969,7 @@ Input Tender Period End Date
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(@href, 'questions')]
   Wait And Input Text  xpath=//div[contains(text(),'${question_id}')]/../following-sibling::div/descendant::textarea[@name="answer"]  ${answer_data.data.answer}
   Wait And Click  xpath=//button[contains(text(), 'Опублікувати відповідь')]
+  Wait Until Keyword Succeeds  30 x  1 s  Page Should Not Contain Element  xpath=//div[@id="jAlertBack"]
 
 ###############################################################################################################
 #############################################    СКАРГИ    ####################################################
@@ -1578,7 +1579,7 @@ Confirm Invalid Bid
 
 Wait And Click
   [Arguments]  ${locator}
-  Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  ${locator}
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  ${locator}
   Scroll To Element  ${locator}
   Click Element  ${locator}
 
