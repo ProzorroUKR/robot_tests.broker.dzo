@@ -955,6 +955,7 @@ Input Tender Period End Date
   Input Date  data[tenderPeriod][endDate]  ${tender_end_date.split(" ")[0]}
   Input Date  tenderPeriod_time  ${tender_end_date.split(" ")[1]}
   Wait And Click  xpath=//button[@value="save"]
+  Capture Page Screenshot  test2_screenshot.png
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
 ###############################################################################################################
