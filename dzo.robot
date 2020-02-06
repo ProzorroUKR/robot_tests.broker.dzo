@@ -402,8 +402,9 @@ Select CPV
 
 Get Qualification Status
   [Arguments]  ${field_name}
-  ${index}=  Get Regexp Matches  ${field_name}  \\[(\\d+)\\]  1
-  ${value}=  Get Element Attribute  xpath=(//div[@class="num l" and text()="${index[0]}"])[last()]/ancestor::div[@data-status]@data-status
+  ${match}=  Get Regexp Matches  ${field_name}  \\[(\\d+)\\]  1
+  ${index}=  Convert To Integer  ${match[0]}
+  ${value}=  Get Element Attribute  xpath=(//div[@class="num l" and text()="${index + 1}"])[last()]/ancestor::div[@data-status]@data-status
   [Return]  ${value}
 
 
