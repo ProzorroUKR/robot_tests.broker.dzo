@@ -1578,7 +1578,7 @@ Confirm Invalid Bid
 
 Wait And Click
   [Arguments]  ${locator}
-  Wait Until Keyword Succeeds  5 x  1 s  Element Should Be Visible  ${locator}
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  ${locator}
   Scroll To Element  ${locator}
   Click Element  ${locator}
 
