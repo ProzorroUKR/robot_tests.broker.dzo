@@ -392,12 +392,20 @@ Select CPV
   ...  ELSE IF  "item" in "${field_name}"  Get From Item  ${field_name}
   ...  ELSE IF  "awards[0].documents[0].title" in "${field_name}"  Get Award Document Title
   ...  ELSE IF  "awards[0].suppliers" in "${field_name}"  Get Award Info  ${field_name}
+  ...  ELSE IF  "qualifications" in "${field_name}" and "status" in "${field_name}"  Get Qualification Status  ${field_name}
   ...  ELSE IF  "qualificationPeriod.endDate" in "${field_name}"  Run Keyword And Return  Get Element Attribute  xpath=//div[contains(@class, "prequalificationDoneDate")]/span[2]@data-qualificationperiod-enddate
   ...  ELSE IF  "${field_name}" == "complaintPeriod.endDate"  Run Keyword And Return  Get Element Attribute  xpath=//div[@data-status="1.1"]@data-dateorig
   ...  ELSE  Get Text  ${tender.view.${field_name}}
   ${value}=  convert_dzo_data  ${text}  ${field_name}
 #  ${value}=  Set Variable If  "amount" in "${field_name}"  ${value.replace("`", "")}  ${value}
   [Return]  ${value}
+
+Get Qualification Status
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  \\[(\\d+)\\]  1
+  ${value}=  Get Element Attribute  xpath=(//div[@class="num l" and text()="${index[0]}"])[last()]/ancestor::div[@data-status]@data-status
+  [Return]  ${value}
+
 
 Get Award Document Title
   Wait And Click  xpath=//a[contains(@href, "award") and contains(@href, "documents") and not (contains(@href, "contract"))]
