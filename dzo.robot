@@ -122,6 +122,8 @@ ${tender.view.maxAwardsCount}=  xpath=//td[contains(text(), "Кіл-ть уча�
 ${tender.view.agreementDuration}=  xpath=//td[contains(text(), "Строк, на який укладається рамкова угода")]/following-sibling::td[1]
 ${tender.view.auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
 ${tender.view.lots[0].auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
+${tender.view.agreements[0].agreementID}=  xpath=//div[contains(text(),"Ідентифікатор рамкової угоди")]/following-sibling::div
+${tender.view.agreements[0].status}=  xpath=//div[contains(text(),"Статус угоди")]/following-sibling::div
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
@@ -666,7 +668,7 @@ Go To Complaint Page
   Run Keyword If  ${tender_data.data.has_key("tenderPeriod")}  Click Element  xpath=//*[contains(text(),"Надайте календарну")]
   Wait Until Element Is Not Visible  xpath=//div[@id="ui-datepicker-div"]
 #  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}');
-  Run Keyword If  "Complaints" in "${SUITE NAME}" and "Reporting" not in "${SUITE NAME}" and "Negotiation" not in "${SUITE NAME}"  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}&submissionMethodDetails=quick(mode:fast-forward)');
+  Run Keyword If  "Complaints" in "${SUITE NAME}" or "${procurementMethodType}" == "closeFrameworkAgreementUA" and "Reporting" not in "${SUITE NAME}" and "Negotiation" not in "${SUITE NAME}"  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}&submissionMethodDetails=quick(mode:fast-forward)');
   ...  ELSE IF  "Reporting" not in "${SUITE NAME}" and "Negotiation" not in "${SUITE NAME}"  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}&submissionMethodDetails=quick');
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Page Contains Element  xpath=//span[@class="js-apiID"]

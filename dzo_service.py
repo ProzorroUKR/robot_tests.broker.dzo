@@ -147,6 +147,7 @@ def convert_dzo_data(value, field_name):
             u'ВІДХИЛЕНО': "invalid",
             u'РОЗГЛЯНУТО': "answered",
             u'ВИРІШЕНА': "resolved",
+            u'Укладена рамкова угода': "active",
             u'Переможець': "active",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",
