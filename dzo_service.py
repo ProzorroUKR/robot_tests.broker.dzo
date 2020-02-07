@@ -77,7 +77,7 @@ def adapt_data_for_role(role_name, tender_data):
 
 
 def add_second_sign_after_point(amount):
-    amount = str(repr(amount))
+    amount = str(repr(round(amount, 2)))
     if '.' in amount and len(amount.split('.')[1]) == 1:
         amount += '0'
     return amount
