@@ -48,7 +48,7 @@ def convert_datetime_to_format(date, output_format):
 
 def retrieve_date_for_second_stage():
     now = datetime.now()
-    return (now + timedelta(minutes=15)).strftime("%d/%m/%Y %H:%M")
+    return (now + timedelta(minutes=20)).strftime("%d/%m/%Y %H:%M")
 
 
 def adapt_data_for_role(role_name, tender_data):
@@ -77,7 +77,7 @@ def adapt_data_for_role(role_name, tender_data):
 
 
 def add_second_sign_after_point(amount):
-    amount = str(repr(amount))
+    amount = str(repr(round(amount, 2)))
     if '.' in amount and len(amount.split('.')[1]) == 1:
         amount += '0'
     return amount
@@ -147,6 +147,7 @@ def convert_dzo_data(value, field_name):
             u'ВІДХИЛЕНО': "invalid",
             u'РОЗГЛЯНУТО': "answered",
             u'ВИРІШЕНА': "resolved",
+            u'Укладена рамкова угода': "active",
             u'Переможець': "active",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",

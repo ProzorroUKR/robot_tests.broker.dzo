@@ -122,6 +122,8 @@ ${tender.view.maxAwardsCount}=  xpath=//td[contains(text(), "Кіл-ть уча�
 ${tender.view.agreementDuration}=  xpath=//td[contains(text(), "Строк, на який укладається рамкова угода")]/following-sibling::td[1]
 ${tender.view.auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
 ${tender.view.lots[0].auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
+${tender.view.agreements[0].agreementID}=  xpath=//div[contains(text(),"Ідентифікатор рамкової угоди")]/following-sibling::div
+${tender.view.agreements[0].status}=  xpath=//div[contains(text(),"Статус угоди")]/following-sibling::div
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
@@ -392,12 +394,21 @@ Select CPV
   ...  ELSE IF  "item" in "${field_name}"  Get From Item  ${field_name}
   ...  ELSE IF  "awards[0].documents[0].title" in "${field_name}"  Get Award Document Title
   ...  ELSE IF  "awards[0].suppliers" in "${field_name}"  Get Award Info  ${field_name}
+  ...  ELSE IF  "qualifications" in "${field_name}" and "status" in "${field_name}"  Get Qualification Status  ${field_name}
   ...  ELSE IF  "qualificationPeriod.endDate" in "${field_name}"  Run Keyword And Return  Get Element Attribute  xpath=//div[contains(@class, "prequalificationDoneDate")]/span[2]@data-qualificationperiod-enddate
   ...  ELSE IF  "${field_name}" == "complaintPeriod.endDate"  Run Keyword And Return  Get Element Attribute  xpath=//div[@data-status="1.1"]@data-dateorig
   ...  ELSE  Get Text  ${tender.view.${field_name}}
   ${value}=  convert_dzo_data  ${text}  ${field_name}
 #  ${value}=  Set Variable If  "amount" in "${field_name}"  ${value.replace("`", "")}  ${value}
   [Return]  ${value}
+
+Get Qualification Status
+  [Arguments]  ${field_name}
+  ${match}=  Get Regexp Matches  ${field_name}  \\[(\\d+)\\]  1
+  ${index}=  Convert To Integer  ${match[0]}
+  ${value}=  Get Element Attribute  xpath=(//div[@class="num l" and text()="${index + 1}"])[last()]/ancestor::div[@data-status]@data-status
+  [Return]  ${value}
+
 
 Get Award Document Title
   Wait And Click  xpath=//a[contains(@href, "award") and contains(@href, "documents") and not (contains(@href, "contract"))]
@@ -657,7 +668,7 @@ Go To Complaint Page
   Run Keyword If  ${tender_data.data.has_key("tenderPeriod")}  Click Element  xpath=//*[contains(text(),"Надайте календарну")]
   Wait Until Element Is Not Visible  xpath=//div[@id="ui-datepicker-div"]
 #  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}');
-  Run Keyword If  "Complaints" in "${SUITE NAME}" and "Reporting" not in "${SUITE NAME}" and "Negotiation" not in "${SUITE NAME}"  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}&submissionMethodDetails=quick(mode:fast-forward)');
+  Run Keyword If  "Complaints" in "${SUITE NAME}" or "${procurementMethodType}" == "closeFrameworkAgreementUA" and "Reporting" not in "${SUITE NAME}" and "Negotiation" not in "${SUITE NAME}"  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}&submissionMethodDetails=quick(mode:fast-forward)');
   ...  ELSE IF  "Reporting" not in "${SUITE NAME}" and "Negotiation" not in "${SUITE NAME}"  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}&submissionMethodDetails=quick');
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Page Contains Element  xpath=//span[@class="js-apiID"]
@@ -947,6 +958,7 @@ Input Tender Period End Date
   Input Date  data[tenderPeriod][endDate]  ${tender_end_date.split(" ")[0]}
   Input Date  tenderPeriod_time  ${tender_end_date.split(" ")[1]}
   Wait And Click  xpath=//button[@value="save"]
+  Capture Page Screenshot  test2_screenshot.png
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
 ###############################################################################################################
@@ -969,7 +981,8 @@ Input Tender Period End Date
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(@href, 'questions')]
   Wait And Input Text  xpath=//div[contains(text(),'${question_id}')]/../following-sibling::div/descendant::textarea[@name="answer"]  ${answer_data.data.answer}
   Wait And Click  xpath=//button[contains(text(), 'Опублікувати відповідь')]
-  Wait Until Keyword Succeeds  30 x  1 s  Page Should Not Contain Element  xpath=//div[@id="jAlertBack"]
+  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+#  Wait Until Keyword Succeeds  30 x  1 s  Page Should Not Contain Element  xpath=//div[@id="jAlertBack"]
 
 ###############################################################################################################
 #############################################    СКАРГИ    ####################################################
@@ -1504,7 +1517,7 @@ Confirm Invalid Bid
   ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
   ${amount_net}=  Get Element Attribute  xpath=//input[@name="data[value][amountNet]"]@value
   ${amount_net}=  Convert To Number  ${amount_net}
-  ${amount_net}=  add_second_sign_after_point  ${amount_net - 10}
+  ${amount_net}=  add_second_sign_after_point  ${amount_net / 1.2}
   Clear Element Text  xpath=//input[@name="data[value][amountNet]"]
   Input Text  xpath=//input[@name="data[value][amountNet]"]  ${amount_net}
   Input Date  data[dateSigned]  ${date.replace(".", "/")}
