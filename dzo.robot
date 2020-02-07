@@ -1466,6 +1466,15 @@ Confirm Invalid Bid
   Wait And Click  xpath=//a[@data-bid-action="award cancel"]
   Підтвердити Дію
 
+Затвердити постачальників
+  [Arguments]  ${username}  ${tender_uaid}
+  Wait Until Keyword Succeeds  20 x  30 s  Run Keywords
+  ...  refresh_tender   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Element Should Be Visible  xpath=//a[@data-bid-action="done"]
+  Wait And Click  xpath=//a[@data-bid-action="done"]
+  Підтвердити Дію
+
 Накласти ЕЦП
 #  Wait Until Element Is Visible  xpath=//a[contains(@class, "tenderSignCommand")]
   Wait And Click  xpath=//a[contains(@class, "tenderSignCommand")]
@@ -1572,6 +1581,36 @@ Confirm Invalid Bid
   [Arguments]  ${username}  ${path}  ${tender_uaid}  ${contract_index}  ${doc_type}=documents
   Log  ${path}
 
+
+###############################################################################################################
+################################################    УГОДИ    ##################################################
+###############################################################################################################
+
+Пошук угоди по ідентифікатору
+  [Arguments]  ${username}  ${agreement_uaid}  ${save_key}=agreement_data
+  ${tender_uaid}=  Set Variable  ${agreement_uaid[:-3]}
+  Switch Browser  ${username}
+  Run Keyword If  "${TEST NAME}" == "Можливість знайти угоду по ідентифікатору"  Run Keywords
+  ...  Sleep  400
+  ...  Set Global Variable  ${dzo_internal_id}  ${None}
+#  refresh_tender  ${dzo_internal_id}
+  Go To  https://www.sandbox.dzo.com.ua/tenders/public
+  Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
+  Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
+  Click Element  xpath=(//button[text()="Пошук"])[1]
+  Wait Until Keyword Succeeds  10 x  1 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]/a[contains(@href,"/tenders/")]  1
+  Click Element  xpath=//a[contains(@class, "tenderLink")]
+  Wait And Click  xpath=//nav[contains(@class,"infoBlock")]/descendant::a[contains(@href, "agreements")]
+  ${internal_id}=  Run Keyword If  "${dzo_internal_id}" == "${None}"  Get Text  xpath=//a[@title="Оголошення в ЦБД"]/span
+  ...  ELSE  Set Variable  ${dzo_internal_id}
+  Set Global Variable  ${dzo_internal_id}  ${internal_id}
+#  Run Keyword If  "${SUITE NAME.lower()}" == "qualification" and "${TEST NAME}" == "Можливість знайти закупівлю по ідентифікатору"
+#  ...  Wait Until Keyword Succeeds  40 x  30 s  Status Should Be  ${username}  ${tender_uaid}  active.qualification
+
+Отримати інформацію із угоди
+  [Arguments]  ${username}  ${agreement_uaid}  ${field_name}
+  ${value}=  Get Text  ${locator.agreement.${field_name}}
+  [Return]  ${value}
 
 #####################################################################################
 
