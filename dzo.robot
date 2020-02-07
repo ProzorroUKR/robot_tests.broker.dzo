@@ -124,6 +124,10 @@ ${tender.view.auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата п
 ${tender.view.lots[0].auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
 ${tender.view.agreements[0].agreementID}=  xpath=//div[contains(text(),"Ідентифікатор рамкової угоди")]/following-sibling::div
 ${tender.view.agreements[0].status}=  xpath=//div[contains(text(),"Статус угоди")]/following-sibling::div
+${locator.agreement.changes.rationaleType}=  xpath=(//td[contains(text(),"Підстава внесення змін")]/following-sibling::td[1])
+${locator.agreement.changes.rationale}=  xpath=(//h3[contains(text(),"Деталізація внесених змін")]/following-sibling::table/tbody/tr[2]/td[1])
+${locator.agreement.changes.status}=  xpath=(//div[@class="changeStatus"])
+
 
 ${tender.edit.description}=  xpath=//input[@name="data[description]"]
 ${tender.edit.tenderPeriod.endDate}=  xpath=//input[@name="data[tenderPeriod][endDate]"]
@@ -1382,11 +1386,12 @@ Confirm Invalid Bid
 
 Завантажити документ рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
+  ${index}=  Convert To Integer  ${award_num}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait Until Keyword Succeeds  30 x  10 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
-  ...  AND  Element Should Be Visible  xpath=//a[@data-bid-action="aply"]
+  ...  AND  Element Should Be Visible  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="aply"]
   Wait And Click  xpath=//a[@data-bid-action="aply"]
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@placeholder="Вкажіть назву докумету"]
   Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${document.split("/")[-1]}
@@ -1592,7 +1597,7 @@ Confirm Invalid Bid
   Switch Browser  ${username}
   Run Keyword If  "${TEST NAME}" == "Можливість знайти угоду по ідентифікатору"  Run Keywords
   ...  Sleep  400
-  ...  Set Global Variable  ${dzo_internal_id}  ${None}
+  ...  AND  Set Global Variable  ${dzo_internal_id}  ${None}
 #  refresh_tender  ${dzo_internal_id}
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
@@ -1609,7 +1614,11 @@ Confirm Invalid Bid
 
 Отримати інформацію із угоди
   [Arguments]  ${username}  ${agreement_uaid}  ${field_name}
-  ${value}=  Get Text  ${locator.agreement.${field_name}}
+  ${match}=  Get Regexp Matches  ${field_name}  \\[(\\d+)\\]  1
+  ${index}=  Convert To Integer  ${match[0]}
+  ${field_name}=  Remove String Using Regexp  ${field_name}  \\[(\\d+)\\]
+  ${value}=  Get Text  ${locator.agreement.${field_name}}[${index + 1}]
+  ${value}=  convert_agreement  ${value}
   [Return]  ${value}
 
 #####################################################################################
