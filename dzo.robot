@@ -1453,28 +1453,28 @@ Confirm Invalid Bid
 
 Відхилити кваліфікацію
   [Arguments]  ${username}  ${tender_uaid}  ${qualification_num}
-  ${qualification_num}=  Convert To Integer  ${qualification_num}
+  ${index}=  Convert To Integer  ${qualification_num}
   refresh_tender   ${dzo_internal_id}
   Reload Page
-  Wait And Click  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="cancel"]
+  Wait And Click  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="cancel"]
   Wait And Click  xpath=//input[contains(@data-description,"Учасник не відповідає кваліфікаційним")]/..
   Wait And Click  xpath=//button[@class="bidAction"]
   Wait Element Animation  xpath=//a[@onclick="modalClose();"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  10 x  5 s  Run Keywords
   ...  Reload Page
-  ...  AND  Page Should Not Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="cancel"]
+  ...  AND  Page Should Not Contain Element  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="cancel"]
 
 Скасувати кваліфікацію
   [Arguments]  ${username}  ${tender_uaid}  ${qualification_num}
-  ${qualification_num}=  Convert To Integer  ${qualification_num}
+  ${index}=  Convert To Integer  ${qualification_num}
   refresh_tender   ${dzo_internal_id}
   Reload Page
-  Wait And Click  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="award cancel"]
+  Wait And Click  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="award cancel"]
   Підтвердити Дію
   Wait Until Keyword Succeeds  10 x  5 s  Run Keywords
   ...  Reload Page
-  ...  AND  Page Should Not Contain Element  xpath=(//div[contains(@class," award ")])[${qualification_num + 1}]/descendant::a[@data-bid-action="award cancel"]
+  ...  AND  Page Should Not Contain Element  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="award cancel"]
 
 Дочекатися Кнопки Для Підпису
   Reload Page
