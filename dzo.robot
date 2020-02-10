@@ -964,6 +964,12 @@ Input Tender Period End Date
   Wait And Click  xpath=//button[@value="save"]
   Capture Page Screenshot  test2_screenshot.png
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Wait And Click  xpath=//a[contains(@class, "save")]
+  Run Keyword And Ignore Error  Wait And Click  xpath=//a[@data-msg="jAlert Close"]
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Wait And Click  xpath=//button[@value="save"]
+  Capture Page Screenshot  test2_screenshot.png
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
 
 ###############################################################################################################
 ##########################################    ЗАПИТАННЯ    ####################################################
