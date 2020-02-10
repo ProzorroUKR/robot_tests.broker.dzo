@@ -191,6 +191,17 @@ def convert_dzo_data(value, field_name):
     return value_for_return
 
 
+def convert_agreement(value):
+    return {
+        u"Підтверджена зміна": "active",
+        u"Скасована зміна": "cancelled",
+        u"Припинення участі у рамковій угоді учасника": "partyWithdrawal",
+        u"Зміна сторонніх показників (курсу, тарифів...)": "thirdParty",
+        u"Зміна ціни за одиницю товару": "itemPriceVariation",
+        u"Зміна ціни у зв’язку із зміною ставок податків і зборів": "taxRate",
+    }.get(value, value)
+
+
 def convert_string_from_dict_dzo(string):
     return DZO_dict.get(string, string)
 
