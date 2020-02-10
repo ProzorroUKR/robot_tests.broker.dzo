@@ -1387,12 +1387,13 @@ Confirm Invalid Bid
 Завантажити документ рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
   ${index}=  Convert To Integer  ${award_num}
+  ${apply_locator}=  Set Variable If  "${MODE}" == "openeu"  xpath=//a[@data-bid-action="aply"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="aply"]
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait Until Keyword Succeeds  30 x  10 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
-  ...  AND  Element Should Be Visible  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="aply"]
-  Wait And Click  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="aply"]
+  ...  AND  Element Should Be Visible  ${apply_locator}
+  Wait And Click  ${apply_locator}
   Wait Element Animation  xpath=//input[@placeholder="Вкажіть назву докумету"]
 #  Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//input[@placeholder="Вкажіть назву докумету"]
   Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${document.split("/")[-1]}
@@ -1492,6 +1493,7 @@ Confirm Invalid Bid
   ...  AND  Element Should Be Visible  xpath=//a[@data-bid-action="done"]
   Wait And Click  xpath=//a[@data-bid-action="done"]
   Підтвердити Дію
+  Run Keyword If  "${MODE}" == "open_framework"  Sleep  1000
 
 Накласти ЕЦП
 #  Wait Until Element Is Visible  xpath=//a[contains(@class, "tenderSignCommand")]
