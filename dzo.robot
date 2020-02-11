@@ -1203,7 +1203,7 @@ Create Claim
   ...  AND  Locator Should Match X Times  xpath=//a[contains(@href,"award") and contains(@href, "complaints")]  2
   Wait And Click  xpath=//a[contains(@href,"award") and contains(@href, "complaints") and not(contains(@href, "add"))]
   Wait Until Keyword Succeeds  10 x  2 s  Page Should Contain Element  xpath=//div[contains(@class,"question")]/div/span[3]
-  ${complaint_id}=  Get Text  xpath=//div[contains(@class,"question")]/div/span[3]
+  ${complaint_id}=  Get Text  xpath=(//div[contains(@class,"question")]/div/span[3])[last()]
   ${complaint_id}=  convert_compaint_id_to_test_format  ${complaint_id}
   [Return]  ${complaint_id}
 
@@ -1417,7 +1417,7 @@ Confirm Invalid Bid
 Підтвердити постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
   ${index}=  Convert To Integer  ${award_num}
-  ${notice_locator}=  Set Variable If  "${MODE}" in "openeu open_competitive_dialogue"  xpath=//a[text()="Повідомлення"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[text()="Повідомлення"]
+  ${notice_locator}=  Set Variable If  "${MODE}" in "openeu open_competitive_dialogue"  xpath=//div[contains(@class,"qualificationItem")]/descendant::a[text()="Повідомлення"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[text()="Повідомлення"]
   Run Keyword If  "${TEST NAME}" == "Неможливість підтвердити постачальника після закінчення періоду кваліфікації"  Sleep  600
   refresh_tender   ${dzo_internal_id}
   Reload Page
@@ -1683,6 +1683,7 @@ Confirm Invalid Bid
   ...  AND  Підтвердити Дію
   ...  AND  Page Should Contain  Цей документ необхідно підтвердити ЕЦП.
   Накласти ЕЦП
+  Sleep  360
 
 
 #####################################################################################
