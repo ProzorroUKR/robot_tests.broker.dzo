@@ -1555,16 +1555,16 @@ Confirm Invalid Bid
 #  Wait Until Keyword Succeeds  5 x  1 s  Run Keywords
 #  ...  Element Should Be Visible  xpath=//input[@name="data[contractNumber]"]
 #  ...  AND  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
-  ${date}=  Run Keyword If  "${MODE}" == "reporting"  Set Variable  29/02/2020
+  ${date}=  Run Keyword If  "${MODE}" == "reporting"  retrieve_date_for_second_stage
   ...  ELSE  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
   ${amount_net}=  Get Element Attribute  xpath=//input[@name="data[value][amountNet]"]@value
   ${amount_net}=  Convert To Number  ${amount_net}
   ${amount_net}=  add_second_sign_after_point_with_round  ${amount_net / 1.2}
   Clear Element Text  xpath=//input[@name="data[value][amountNet]"]
   Input Text  xpath=//input[@name="data[value][amountNet]"]  ${amount_net}
-  Input Date  data[dateSigned]  ${date.replace(".", "/")}
-  Input Date  data[period][startDate]  ${date.replace(".", "/")}
-  Input Date  data[period][endDate]  ${date.replace(".", "/")}
+  Input Date  data[dateSigned]  ${date.replace(".", "/").split(" ")[0]}
+  Input Date  data[period][startDate]  ${date.replace(".", "/").split(" ")[0]}
+  Input Date  data[period][endDate]  ${date.replace(".", "/").split(" ")[0]}
   Input Text  xpath=//input[@name="data[contractNumber]"]  123456
   Capture Page Screenshot
   Click Element  xpath=//button[@class="bidAction"]
@@ -1576,7 +1576,7 @@ Confirm Invalid Bid
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
-  ...  AND  Page Should Contain Element  xpath=//a[contains(@href, "/contract/documents")]
+  ...  AND  Run Keyword If  "${MODE}" != "reporting"  Page Should Contain Element  xpath=//a[contains(@href, "/contract/documents")]
 #  ...  AND  Page Should Contain  Завершена
   ${is_eds_needed}=  Run Keyword And Return Status  Run Keywords
   ...  Wait And Click  xpath=//a[@data-bid-action="contract"]
