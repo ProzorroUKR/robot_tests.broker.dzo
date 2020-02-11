@@ -866,9 +866,10 @@ Status Should Be
   Wait And Click   xpath=//button[text()="Зберегти"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
-  Wait And Click  "xpath=//a[text()='Необхідний  ЕЦП/КЕП']"
+  Wait And Click  xpath=//a[contains(text(),'ЕЦП/КЕП')]
   Wait Element Animation  xpath=//a[contains(@class,"tenderSignCommand")]
   Накласти ЕЦП
+  Sleep  360
 
 
 ###############################################################################################################
@@ -1205,6 +1206,7 @@ Create Claim
   Wait Until Keyword Succeeds  10 x  2 s  Page Should Contain Element  xpath=//div[contains(@class,"question")]/div/span[3]
   ${complaint_id}=  Get Text  xpath=(//div[contains(@class,"question")]/div/span[3])[last()]
   ${complaint_id}=  convert_compaint_id_to_test_format  ${complaint_id}
+  Sleep  300
   [Return]  ${complaint_id}
 
 ###############################################################################################################
@@ -1553,7 +1555,8 @@ Confirm Invalid Bid
 #  Wait Until Keyword Succeeds  5 x  1 s  Run Keywords
 #  ...  Element Should Be Visible  xpath=//input[@name="data[contractNumber]"]
 #  ...  AND  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
-  ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
+  ${date}=  Run Keyword If  "${MODE}" == "reporting"  Set Variable  29/02/2020
+  ...  ELSE  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
   ${amount_net}=  Get Element Attribute  xpath=//input[@name="data[value][amountNet]"]@value
   ${amount_net}=  Convert To Number  ${amount_net}
   ${amount_net}=  add_second_sign_after_point_with_round  ${amount_net / 1.2}
