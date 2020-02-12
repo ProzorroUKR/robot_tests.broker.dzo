@@ -642,6 +642,10 @@ Go To Complaint Page
   ...  AND  Input Text  xpath=//div[contains(@class,"durationPicker-select-field-0-M")]/div/input  ${tender_data.data.agreementDuration[3]}
   ...  AND  Input Text  xpath=//div[contains(@class,"durationPicker-select-field-0-D")]/div/input  ${tender_data.data.agreementDuration[5]}
 
+  Run Keyword If  "${MODE}" == "negotiation"  Run Keywords
+  ...  Wait And Click  xpath=//input[@value="${tender_data.data.cause}"]/..
+  ...  AND  Input Text  xpath=//input[@name="data[causeDescription]"]  ${tender_data.data.causeDescription}
+
   Select From List By Value  xpath=//select[@name="data[mainProcurementCategory]"]  ${tender_data.data.mainProcurementCategory}
   Input Text  xpath=//input[@name="data[title]"]  ${tender_data.data.title}
   Input Text En  xpath=//input[@name="data[title_en]"]  ${tender_data.data.title_en}
@@ -837,6 +841,7 @@ Status Should Be
 
 Створити постачальника, додати документацію і підтвердити його
   [Arguments]  ${username}  ${tender_uaid}  ${supplier_data}  ${document}
+  ${filePath}=  get_upload_file_path
   Sleep  30
   Wait Until Keyword Succeeds  10 x  1 s  Run Keywords
   ...  Reload Page
@@ -864,8 +869,22 @@ Status Should Be
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][url]"]  http://sfs.gov.ua/
   Input Text  xpath=//*[@name="data[value][amount]"]  ${supplier_data.data.value.amount}
   Wait And Click   xpath=//button[text()="Зберегти"]
-  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Wait Until Keyword Succeeds  20 x  5 s  Element Should Be Visible  xpath=//a[@onclick="modalClose();"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Run Keyword If  "${MODE}" == "negotiation"  Run Keywords
+  ...  Wait And Click  xpath=//a[@data-bid-action="aply"]
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
+  ...  AND  Choose File  xpath=//input[@type="file"]  ${document}
+  ...  AND  Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  test
+  ...  AND  Wait And Click  xpath=//button[text()="Додати"]
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Wait And Click  xpath=//input[@name="data[qualified]"]/..
+  ...  AND  Wait And Click  xpath=//button[@class="bidAction"]
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//a[@onclick="modalClose();"]
+  ...  AND  Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  20 x  3 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Element Should Be Visible  xpath=//a[contains(text(),'ЕЦП/КЕП')]
   Wait And Click  xpath=//a[contains(text(),'ЕЦП/КЕП')]
   Wait Element Animation  xpath=//a[contains(@class,"tenderSignCommand")]
   Накласти ЕЦП
@@ -1687,6 +1706,15 @@ Confirm Invalid Bid
   ...  AND  Page Should Contain  Цей документ необхідно підтвердити ЕЦП.
   Накласти ЕЦП
   Sleep  360
+
+Отримати доступ до угоди
+  [Arguments]  ${username}  ${agreement_uaid}
+  Log  ${agreement_uaid}
+
+Завантажити документ в рамкову угоду
+  [Arguments]  ${username}  ${filepath}  ${agreement_uaid}
+  Log  ${filepath}
+
 
 
 #####################################################################################
