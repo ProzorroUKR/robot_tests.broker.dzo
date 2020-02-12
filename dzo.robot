@@ -810,9 +810,9 @@ Add Feature
   [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
   Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
-#  Run Keyword If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору"  Sleep  360
+  ${search_page}=  Set Variable If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору"  https://www.sandbox.dzo.com.ua/cabinet/tenders/purchase  https://www.sandbox.dzo.com.ua/tenders/public
   refresh_tender  ${dzo_internal_id}
-  Go To  https://www.sandbox.dzo.com.ua/tenders/public
+  Go To  ${search_page}
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
   Click Element  xpath=(//button[text()="Пошук"])[1]
@@ -866,6 +866,10 @@ Status Should Be
   Wait And Click   xpath=//button[text()="Зберегти"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Wait And Click  xpath=//a[contains(text(),'ЕЦП/КЕП')]
+  Wait Element Animation  xpath=//a[contains(@class,"tenderSignCommand")]
+  Накласти ЕЦП
+  Sleep  360
 
 
 ###############################################################################################################
@@ -1166,7 +1170,7 @@ Create Claim
   Wait Until Keyword Succeeds  10 x  1 s  Element Should Be Visible  xpath=//textarea[@name="cancellationReason"]
   Input Text  xpath=//textarea[@name="cancellationReason"]  ${cancellation_data.data.cancellationReason}
   Wait And Click  xpath=//button[@class="bidAction"]
-  Wait Until Keyword Succeeds  10 x  1 s  Page Should Not Contain Element  xpath=//textarea[@name="cancellationReason"]
+  Wait Until Keyword Succeeds  10 x  3 s  Page Should Not Contain Element  xpath=//textarea[@name="cancellationReason"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
 
 Створити скаргу про виправлення визначення переможця
@@ -1200,8 +1204,9 @@ Create Claim
   ...  AND  Locator Should Match X Times  xpath=//a[contains(@href,"award") and contains(@href, "complaints")]  2
   Wait And Click  xpath=//a[contains(@href,"award") and contains(@href, "complaints") and not(contains(@href, "add"))]
   Wait Until Keyword Succeeds  10 x  2 s  Page Should Contain Element  xpath=//div[contains(@class,"question")]/div/span[3]
-  ${complaint_id}=  Get Text  xpath=//div[contains(@class,"question")]/div/span[3]
+  ${complaint_id}=  Get Text  xpath=(//div[contains(@class,"question")]/div/span[3])[last()]
   ${complaint_id}=  convert_compaint_id_to_test_format  ${complaint_id}
+  Sleep  300
   [Return]  ${complaint_id}
 
 ###############################################################################################################
@@ -1393,7 +1398,7 @@ Confirm Invalid Bid
 Завантажити документ рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
   ${index}=  Convert To Integer  ${award_num}
-  ${apply_locator}=  Set Variable If  "${MODE}" == "openeu"  xpath=//a[@data-bid-action="aply"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="aply"]
+  ${apply_locator}=  Set Variable If  "${MODE}" in "openeu open_competitive_dialogue"  xpath=//a[@data-bid-action="aply"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="aply"]
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait Until Keyword Succeeds  30 x  10 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
@@ -1414,6 +1419,7 @@ Confirm Invalid Bid
 Підтвердити постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
   ${index}=  Convert To Integer  ${award_num}
+  ${notice_locator}=  Set Variable If  "${MODE}" in "openeu open_competitive_dialogue"  xpath=//div[contains(@class,"qualificationItem")]/descendant::a[text()="Повідомлення"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[text()="Повідомлення"]
   Run Keyword If  "${TEST NAME}" == "Неможливість підтвердити постачальника після закінчення періоду кваліфікації"  Sleep  600
   refresh_tender   ${dzo_internal_id}
   Reload Page
@@ -1432,7 +1438,7 @@ Confirm Invalid Bid
   Wait Until Keyword Succeeds  30 x  10 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
-  ...  AND  Element Should Be Visible  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[text()="Повідомлення"]
+  ...  AND  Element Should Be Visible  ${notice_locator}
 
 Дискваліфікувати постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
@@ -1549,15 +1555,16 @@ Confirm Invalid Bid
 #  Wait Until Keyword Succeeds  5 x  1 s  Run Keywords
 #  ...  Element Should Be Visible  xpath=//input[@name="data[contractNumber]"]
 #  ...  AND  Input Text  xpath=//input[@name="data[contractNumber]"]  123456
-  ${date}=  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
+  ${date}=  Run Keyword If  "${MODE}" == "reporting"  retrieve_date_for_second_stage
+  ...  ELSE  Get Text  xpath=//span[contains(text(), "Мінімальна можлива дата")]/following-sibling::span
   ${amount_net}=  Get Element Attribute  xpath=//input[@name="data[value][amountNet]"]@value
   ${amount_net}=  Convert To Number  ${amount_net}
   ${amount_net}=  add_second_sign_after_point_with_round  ${amount_net / 1.2}
   Clear Element Text  xpath=//input[@name="data[value][amountNet]"]
   Input Text  xpath=//input[@name="data[value][amountNet]"]  ${amount_net}
-  Input Date  data[dateSigned]  ${date.replace(".", "/")}
-  Input Date  data[period][startDate]  ${date.replace(".", "/")}
-  Input Date  data[period][endDate]  ${date.replace(".", "/")}
+  Input Date  data[dateSigned]  ${date.replace(".", "/").split(" ")[0]}
+  Input Date  data[period][startDate]  ${date.replace(".", "/").split(" ")[0]}
+  Input Date  data[period][endDate]  ${date.replace(".", "/").split(" ")[0]}
   Input Text  xpath=//input[@name="data[contractNumber]"]  123456
   Capture Page Screenshot
   Click Element  xpath=//button[@class="bidAction"]
@@ -1569,7 +1576,7 @@ Confirm Invalid Bid
   Wait Until Keyword Succeeds  20 x  20 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
   ...  AND  Reload Page
-  ...  AND  Page Should Contain Element  xpath=//a[contains(@href, "/contract/documents")]
+  ...  AND  Run Keyword If  "${MODE}" != "reporting"  Page Should Contain Element  xpath=//a[contains(@href, "/contract/documents")]
 #  ...  AND  Page Should Contain  Завершена
   ${is_eds_needed}=  Run Keyword And Return Status  Run Keywords
   ...  Wait And Click  xpath=//a[@data-bid-action="contract"]
@@ -1679,6 +1686,7 @@ Confirm Invalid Bid
   ...  AND  Підтвердити Дію
   ...  AND  Page Should Contain  Цей документ необхідно підтвердити ЕЦП.
   Накласти ЕЦП
+  Sleep  360
 
 
 #####################################################################################
