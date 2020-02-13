@@ -156,6 +156,8 @@ def convert_dzo_data(value, field_name):
             u'ВИРІШЕНА': "resolved",
             u'Укладена рамкова угода': "active",
             u'Переможець': "active",
+            u'Переможець переговорів': "active",
+            u'ПІДГОТОВКА УГОДИ': "pending",
             u'Післяоплата': "postpayment",
             u'Аванс': "prepayment",
             u'виконання робіт': "executionOfWorks",

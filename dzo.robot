@@ -33,7 +33,7 @@ ${plan.view.classification.id}=  xpath=//td[text()="Класифікація з�
 
 ${tender.view.items.description}=  xpath=//td[contains(text(),"Опис окремої частини")]/following-sibling::td[1]
 ${tender.view.items.quantity}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[1]
-${tender.view.items.deliveryDate.endDate}=  xpath=//td[contains(text(),"Кінцевий строк поставки")]/following-sibling::td[1]
+${tender.view.items.deliveryDate.endDate}=  xpath=//*[contains(text(),"Кінцевий строк поставки")]/../following-sibling::span[2]
 ${tender.view.items.unit.code}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[2]
 ${tender.view.items.unit.name}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[2]
 ${tender.view.items.classification.description}=  xpath=//td[contains(text(),"Класифікація за ДК 021")]/following-sibling::td[1]/span[2]
@@ -124,6 +124,9 @@ ${tender.view.auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата п
 ${tender.view.lots[0].auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
 ${tender.view.agreements[0].agreementID}=  xpath=//div[contains(text(),"Ідентифікатор рамкової угоди")]/following-sibling::div
 ${tender.view.agreements[0].status}=  xpath=//div[contains(text(),"Статус угоди")]/following-sibling::div
+${tender.view.causeDescription}=  xpath=//td[contains(text(), "Підстава")]/following-sibling::td[1]
+${tender.view.cause}=  xpath=//td[contains(text(), "Обгрунтування")]/following-sibling::td[1]
+
 ${locator.agreement.changes.rationaleType}=  xpath=(//td[contains(text(),"Підстава внесення змін")]/following-sibling::td[1])
 ${locator.agreement.changes.rationale}=  xpath=(//h3[contains(text(),"Деталізація внесених змін")]/following-sibling::table/tbody/tr[2]/td[1])
 ${locator.agreement.changes.status}=  xpath=(//div[@class="changeStatus"])
@@ -1632,6 +1635,20 @@ Confirm Invalid Bid
 Завантажити документ в угоду
   [Arguments]  ${username}  ${path}  ${tender_uaid}  ${contract_index}  ${doc_type}=documents
   Log  ${path}
+
+
+Внести зміну в угоду
+  [Arguments]  ${username}  ${agreement_uaid}  ${change_data}
+  Wait And Click  xpath=//a[@data-agreement-action="change"]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[rationale]"]
+  ${date}=  Get Text  xpath=//span[contains(text(), "Дата підписання зміни")]/following-sibling::span
+  Input Text  xpath=//input[@name="data[rationale]"]  ${change_data.data.rationale}
+  Select From List By Value  xpath=//select[@name="data[rationaleType]"]  ${change_data.data.rationaleType}
+  Input Text  xpath=//input[@name="data[dateSigned]"]  ${${date.replace(".","/")}}
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  2 s  Page Should Contain  Внести зміни до угоди
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
 
 
 ###############################################################################################################
