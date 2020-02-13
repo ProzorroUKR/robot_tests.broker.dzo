@@ -124,8 +124,8 @@ ${tender.view.auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата п
 ${tender.view.lots[0].auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
 ${tender.view.agreements[0].agreementID}=  xpath=//div[contains(text(),"Ідентифікатор рамкової угоди")]/following-sibling::div
 ${tender.view.agreements[0].status}=  xpath=//div[contains(text(),"Статус угоди")]/following-sibling::div
-${tender.view.causeDescription}=  xpath=//td[contains(text(), "Підстава")]/following-sibling::td[1]
-${tender.view.cause}=  xpath=//td[contains(text(), "Обгрунтування")]/following-sibling::td[1]
+${tender.view.causeDescription}=  xpath=//td[contains(text(), "Обгрунтування")]/following-sibling::td[1]
+${tender.view.cause}=  xpath=//td[contains(text(), "Підстава")]/following-sibling::td[1]
 
 ${locator.agreement.changes.rationaleType}=  xpath=(//td[contains(text(),"Підстава внесення змін")]/following-sibling::td[1])
 ${locator.agreement.changes.rationale}=  xpath=(//h3[contains(text(),"Деталізація внесених змін")]/following-sibling::table/tbody/tr[2]/td[1])
@@ -187,6 +187,9 @@ ${award.view.awards[0].suppliers[0].address.locality}  xpath=//div[contains(@cla
 ${award.view.awards[0].suppliers[0].address.postalCode}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
 ${award.view.awards[0].suppliers[0].address.region}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
 ${award.view.awards[0].suppliers[0].address.streetAddress}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
+${award.view.awards[0].suppliers[0].contactPoint.telephone}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Телефон"]/following-sibling::td
+${award.view.awards[0].suppliers[0].contactPoint.name}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Особа відповідальна за процедуру"]/following-sibling::td
+${award.view.awards[0].suppliers[0].contactPoint.email}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="E-mail"]/following-sibling::td
 
 ${locator.ModalOK}=  xpath=//a[@data-msg="jAlert OK"]
 
@@ -844,7 +847,6 @@ Status Should Be
 
 Створити постачальника, додати документацію і підтвердити його
   [Arguments]  ${username}  ${tender_uaid}  ${supplier_data}  ${document}
-  ${filePath}=  get_upload_file_path
   Sleep  30
   Wait Until Keyword Succeeds  10 x  1 s  Run Keywords
   ...  Reload Page
@@ -878,7 +880,7 @@ Status Should Be
   ...  Wait And Click  xpath=//a[@data-bid-action="aply"]
   ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
   ...  AND  Choose File  xpath=//input[@type="file"]  ${document}
-  ...  AND  Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  test
+  ...  AND  Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${document.split("/")[-1]}
   ...  AND  Wait And Click  xpath=//button[text()="Додати"]
   ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
   ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Wait And Click  xpath=//input[@name="data[qualified]"]/..
