@@ -1647,7 +1647,7 @@ Confirm Invalid Bid
   ${date}=  Get Text  xpath=//span[contains(text(), "Дата підписання зміни")]/following-sibling::span
   Input Text  xpath=//input[@name="data[rationale]"]  ${change_data.data.rationale}
   Select From List By Value  xpath=//select[@name="data[rationaleType]"]  ${change_data.data.rationaleType}
-  Input Text  xpath=//input[@name="data[dateSigned]"]  ${${date.replace(".","/")}}
+  Input Date  xpath=//input[@name="data[dateSigned]"]  ${${date.replace(".","/")}}
   Wait And Click  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  2 s  Page Should Contain  Внести зміни до угоди
   Wait And Click  xpath=//a[@onclick="modalClose();"]
@@ -1664,7 +1664,7 @@ Confirm Invalid Bid
   Run Keyword If  "${TEST NAME}" == "Можливість знайти угоду по ідентифікатору"  Run Keywords
   ...  Sleep  400
   ...  AND  Set Global Variable  ${dzo_internal_id}  ${None}
-#  refresh_tender  ${dzo_internal_id}
+#  refresh_agreement  ${dzo_internal_id}
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
@@ -1683,7 +1683,7 @@ Confirm Invalid Bid
   ${match}=  Get Regexp Matches  ${field_name}  \\[(\\d+)\\]  1
   ${index}=  Convert To Integer  ${match[0]}
   ${field_name}=  Remove String Using Regexp  ${field_name}  \\[(\\d+)\\]
-  refresh_tender  ${dzo_internal_id}
+  refresh_agreement  ${dzo_internal_id}
   Reload Page
   ${value}=  Get Text  ${locator.agreement.${field_name}}[${index + 1}]
   ${value}=  convert_agreement  ${value}
@@ -1692,7 +1692,7 @@ Confirm Invalid Bid
 Встановити ціну за одиницю для контракту
   [Arguments]  ${username}  ${tender_uaid}  ${contract_data}
   ${amount}=  Convert To String  ${contract_data.data.unitPrices[0].value.amount}
-  refresh_tender   ${dzo_internal_id}
+  refresh_agreement   ${dzo_internal_id}
   Reload Page
   Wait And Click  xpath=//a[contains(@href, "${contract_data.data.id}") and @data-bid-action="active"]
   Підтвердити Дію
@@ -1704,7 +1704,7 @@ Confirm Invalid Bid
 
 Зареєструвати угоду
   [Arguments]  ${username}  ${tender_uaid}  ${period}
-  refresh_tender   ${dzo_internal_id}
+  refresh_agreement   ${dzo_internal_id}
   Reload Page
   Wait And Click  xpath=//a[@data-bid-question="agreement_active_sure"]
   Підтвердити Дію

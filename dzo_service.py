@@ -263,5 +263,10 @@ def refresh_tender(tender_id):
     return resp.content
 
 
+def refresh_agreement(tender_id):
+    resp = requests.get("https://www.sandbox.dzo.com.ua/cron/J7hdfks7_jlsdfn.php?tender_id={}&CDB_Number=0&run=KUgfjduk*tgkBkusdh&type=agreements".format(tender_id))
+    return resp.content
+
+
 def convert_compaint_id_to_test_format(complaint_id):
     return complaint_id[:-5] + complaint_id[-5:].lower()
