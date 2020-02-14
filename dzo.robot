@@ -33,7 +33,7 @@ ${plan.view.classification.id}=  xpath=//td[text()="Класифікація з�
 
 ${tender.view.items.description}=  xpath=//td[contains(text(),"Опис окремої частини")]/following-sibling::td[1]
 ${tender.view.items.quantity}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[1]
-${tender.view.items.deliveryDate.endDate}=  xpath=//td[contains(text(),"Кінцевий строк поставки")]/following-sibling::td[1]
+${tender.view.items.deliveryDate.endDate}=  xpath=//*[contains(text(),"Кінцевий строк поставки")]/../following-sibling::span[2]
 ${tender.view.items.unit.code}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[2]
 ${tender.view.items.unit.name}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[2]
 ${tender.view.items.classification.description}=  xpath=//td[contains(text(),"Класифікація за ДК 021")]/following-sibling::td[1]/span[2]
@@ -124,6 +124,9 @@ ${tender.view.auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата п
 ${tender.view.lots[0].auctionPeriod.startDate}=  xpath=//td[contains(text(),"Дата початку аукціону")]/following-sibling::td[1]/span
 ${tender.view.agreements[0].agreementID}=  xpath=//div[contains(text(),"Ідентифікатор рамкової угоди")]/following-sibling::div
 ${tender.view.agreements[0].status}=  xpath=//div[contains(text(),"Статус угоди")]/following-sibling::div
+${tender.view.causeDescription}=  xpath=//td[contains(text(), "Обгрунтування")]/following-sibling::td[1]
+${tender.view.cause}=  xpath=//td[contains(text(), "Підстава")]/following-sibling::td[1]
+
 ${locator.agreement.changes.rationaleType}=  xpath=(//td[contains(text(),"Підстава внесення змін")]/following-sibling::td[1])
 ${locator.agreement.changes.rationale}=  xpath=(//h3[contains(text(),"Деталізація внесених змін")]/following-sibling::table/tbody/tr[2]/td[1])
 ${locator.agreement.changes.status}=  xpath=(//div[@class="changeStatus"])
@@ -184,6 +187,9 @@ ${award.view.awards[0].suppliers[0].address.locality}  xpath=//div[contains(@cla
 ${award.view.awards[0].suppliers[0].address.postalCode}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
 ${award.view.awards[0].suppliers[0].address.region}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
 ${award.view.awards[0].suppliers[0].address.streetAddress}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
+${award.view.awards[0].suppliers[0].contactPoint.telephone}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Телефон"]/following-sibling::td
+${award.view.awards[0].suppliers[0].contactPoint.name}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Особа відповідальна за процедуру"]/following-sibling::td
+${award.view.awards[0].suppliers[0].contactPoint.email}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="E-mail"]/following-sibling::td
 
 ${locator.ModalOK}=  xpath=//a[@data-msg="jAlert OK"]
 
@@ -642,6 +648,10 @@ Go To Complaint Page
   ...  AND  Input Text  xpath=//div[contains(@class,"durationPicker-select-field-0-M")]/div/input  ${tender_data.data.agreementDuration[3]}
   ...  AND  Input Text  xpath=//div[contains(@class,"durationPicker-select-field-0-D")]/div/input  ${tender_data.data.agreementDuration[5]}
 
+  Run Keyword If  "${MODE}" == "negotiation"  Run Keywords
+  ...  Wait And Click  xpath=//input[@value="${tender_data.data.cause}"]/..
+  ...  AND  Input Text  xpath=//input[@name="data[causeDescription]"]  ${tender_data.data.causeDescription}
+
   Select From List By Value  xpath=//select[@name="data[mainProcurementCategory]"]  ${tender_data.data.mainProcurementCategory}
   Input Text  xpath=//input[@name="data[title]"]  ${tender_data.data.title}
   Input Text En  xpath=//input[@name="data[title_en]"]  ${tender_data.data.title_en}
@@ -809,8 +819,8 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
-  Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
-  ${search_page}=  Set Variable If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору"  https://www.sandbox.dzo.com.ua/cabinet/tenders/purchase  https://www.sandbox.dzo.com.ua/tenders/public
+  Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}" or "Negotiation" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
+  ${search_page}=  Set Variable If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору" and "Viewer" not in "${username}"  https://www.sandbox.dzo.com.ua/cabinet/tenders/purchase  https://www.sandbox.dzo.com.ua/tenders/public
   refresh_tender  ${dzo_internal_id}
   Go To  ${search_page}
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
@@ -864,8 +874,22 @@ Status Should Be
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][url]"]  http://sfs.gov.ua/
   Input Text  xpath=//*[@name="data[value][amount]"]  ${supplier_data.data.value.amount}
   Wait And Click   xpath=//button[text()="Зберегти"]
-  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//div[@id="jAlertBack"]
+  Wait Until Keyword Succeeds  20 x  5 s  Element Should Be Visible  xpath=//a[@onclick="modalClose();"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Run Keyword If  "${MODE}" == "negotiation"  Run Keywords
+  ...  Wait And Click  xpath=//a[@data-bid-action="aply"]
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
+  ...  AND  Choose File  xpath=//input[@type="file"]  ${document}
+  ...  AND  Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${document.split("/")[-1]}
+  ...  AND  Wait And Click  xpath=//button[text()="Додати"]
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Wait And Click  xpath=//input[@name="data[qualified]"]/..
+  ...  AND  Wait And Click  xpath=//button[@class="bidAction"]
+  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//a[@onclick="modalClose();"]
+  ...  AND  Wait And Click  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  20 x  3 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Element Should Be Visible  xpath=//a[contains(text(),'ЕЦП/КЕП')]
   Wait And Click  xpath=//a[contains(text(),'ЕЦП/КЕП')]
   Wait Element Animation  xpath=//a[contains(@class,"tenderSignCommand")]
   Накласти ЕЦП
@@ -1615,6 +1639,20 @@ Confirm Invalid Bid
   Log  ${path}
 
 
+Внести зміну в угоду
+  [Arguments]  ${username}  ${agreement_uaid}  ${change_data}
+  Wait And Click  xpath=//a[@data-agreement-action="change"]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[rationale]"]
+  ${date}=  Get Text  xpath=//span[contains(text(), "Дата підписання зміни")]/following-sibling::span
+  Input Text  xpath=//input[@name="data[rationale]"]  ${change_data.data.rationale}
+  Select From List By Value  xpath=//select[@name="data[rationaleType]"]  ${change_data.data.rationaleType}
+  Input Date  xpath=//input[@name="data[dateSigned]"]  ${${date.replace(".","/")}}
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  2 s  Page Should Contain  Внести зміни до угоди
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+
+
 ###############################################################################################################
 ################################################    УГОДИ    ##################################################
 ###############################################################################################################
@@ -1626,7 +1664,7 @@ Confirm Invalid Bid
   Run Keyword If  "${TEST NAME}" == "Можливість знайти угоду по ідентифікатору"  Run Keywords
   ...  Sleep  400
   ...  AND  Set Global Variable  ${dzo_internal_id}  ${None}
-#  refresh_tender  ${dzo_internal_id}
+#  refresh_agreement  ${dzo_internal_id}
   Go To  https://www.sandbox.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
@@ -1645,7 +1683,7 @@ Confirm Invalid Bid
   ${match}=  Get Regexp Matches  ${field_name}  \\[(\\d+)\\]  1
   ${index}=  Convert To Integer  ${match[0]}
   ${field_name}=  Remove String Using Regexp  ${field_name}  \\[(\\d+)\\]
-  refresh_tender  ${dzo_internal_id}
+  refresh_agreement  ${dzo_internal_id}
   Reload Page
   ${value}=  Get Text  ${locator.agreement.${field_name}}[${index + 1}]
   ${value}=  convert_agreement  ${value}
@@ -1654,7 +1692,7 @@ Confirm Invalid Bid
 Встановити ціну за одиницю для контракту
   [Arguments]  ${username}  ${tender_uaid}  ${contract_data}
   ${amount}=  Convert To String  ${contract_data.data.unitPrices[0].value.amount}
-  refresh_tender   ${dzo_internal_id}
+  refresh_agreement   ${dzo_internal_id}
   Reload Page
   Wait And Click  xpath=//a[contains(@href, "${contract_data.data.id}") and @data-bid-action="active"]
   Підтвердити Дію
@@ -1666,7 +1704,7 @@ Confirm Invalid Bid
 
 Зареєструвати угоду
   [Arguments]  ${username}  ${tender_uaid}  ${period}
-  refresh_tender   ${dzo_internal_id}
+  refresh_agreement   ${dzo_internal_id}
   Reload Page
   Wait And Click  xpath=//a[@data-bid-question="agreement_active_sure"]
   Підтвердити Дію
@@ -1687,6 +1725,15 @@ Confirm Invalid Bid
   ...  AND  Page Should Contain  Цей документ необхідно підтвердити ЕЦП.
   Накласти ЕЦП
   Sleep  360
+
+Отримати доступ до угоди
+  [Arguments]  ${username}  ${agreement_uaid}
+  Log  ${agreement_uaid}
+
+Завантажити документ в рамкову угоду
+  [Arguments]  ${username}  ${filepath}  ${agreement_uaid}
+  Log  ${filepath}
+
 
 
 #####################################################################################
