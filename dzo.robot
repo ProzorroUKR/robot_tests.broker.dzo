@@ -1305,7 +1305,7 @@ Send Bid Esco
 
 Завантажити документ в ставку
   [Arguments]  ${username}  ${path}  ${tender_uaid}  ${doc_name}=documents  ${doc_type}=qualificationDocuments
-  ${doc_type}=  Set Variable If  "${doc_type}" == "${None}"  qualificationDocuments  ${doc_type}
+  ${doc_type}=  Set Variable If  "${doc_type}" == "${None}" or "${doc_type}" == "winningBid"  qualificationDocuments  ${doc_type}
   Wait Until Page Contains  Ваша пропозиція  10
   Wait And Click  xpath=//a[contains(@class,'bidToEdit')]
   Choose File  xpath=/html/body/div[1]/form/input[2]  ${path}
@@ -1639,20 +1639,6 @@ Confirm Invalid Bid
   Log  ${path}
 
 
-Внести зміну в угоду
-  [Arguments]  ${username}  ${agreement_uaid}  ${change_data}
-  Wait And Click  xpath=//a[@data-agreement-action="change"]
-  Підтвердити Дію
-  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[rationale]"]
-  ${date}=  Get Text  xpath=//span[contains(text(), "Дата підписання зміни")]/following-sibling::span
-  Input Text  xpath=//input[@name="data[rationale]"]  ${change_data.data.rationale}
-  Select From List By Value  xpath=//select[@name="data[rationaleType]"]  ${change_data.data.rationaleType}
-  Input Date  xpath=//input[@name="data[dateSigned]"]  ${${date.replace(".","/")}}
-  Wait And Click  xpath=//button[@class="bidAction"]
-  Wait Until Keyword Succeeds  20 x  2 s  Page Should Contain  Внести зміни до угоди
-  Wait And Click  xpath=//a[@onclick="modalClose();"]
-
-
 ###############################################################################################################
 ################################################    УГОДИ    ##################################################
 ###############################################################################################################
@@ -1734,7 +1720,50 @@ Confirm Invalid Bid
   [Arguments]  ${username}  ${filepath}  ${agreement_uaid}
   Log  ${filepath}
 
+Внести зміну в угоду
+  [Arguments]  ${username}  ${agreement_uaid}  ${change_data}
+  Wait And Click  xpath=//a[@data-agreement-action="change"]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[rationale]"]
+  ${date}=  Get Text  xpath=//span[contains(text(), "Дата підписання зміни")]/following-sibling::span
+  Input Text  xpath=//input[@name="data[rationale]"]  ${change_data.data.rationale}
+  Select From List By Value  xpath=//select[@name="data[rationaleType]"]  ${change_data.data.rationaleType}
+  Input Date  data[dateSigned]  ${date.replace(".","/")}
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  2 s  Page Should Not Contain  Дата підписання зміни до угоди повинна бути не раніше
+  Wait And Input Text  xpath=//input[contains(@name,"feature[modifications_items]")]  10
+  Wait And Click  xpath=//button[@class="bidAction"]
 
+Оновити властивості угоди
+  [Arguments]  ${username}  ${agreement_uaid}  ${data}
+  Wait And Click  xpath=//a[@data-agreement-action="change"]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[rationale]"]
+  Run Keyword If  ${data.data.modifications[0].has_key("addend")}  Select From List By Value  //select[contains(@name,"feature[modifications_items]")]  addend
+  ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  Select From List By Value  //select[contains(@name,"feature[modifications_items]")]  factor
+  ${field_value}=  Convert To Integer  ${data.data.modifications[0].addend * 100}
+  ${field_value}=  Convert To String  ${data.data.modifications[0].addend}
+  Wait And Input Text  xpath=//input[contains(@name,"feature[modifications_items]")]  ${field_value}
+  Wait And Click  xpath=//button[@class="bidAction"]
+
+Завантажити документ для зміни у рамковій угоді
+  [Arguments]  ${username}  ${filepath}  ${agreement_uaid}  ${item_id}
+  Wait And Click  xpath=//a[@data-agreement-action="change"]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[rationale]"]
+  Choose File  xpath=//input[@type="file"]  ${filepath}
+  Input Text  xpath=//input[@placeholder="Вкажіть назву докумету"]  ${filepath.split("/")[-1]}
+  Wait And Click  xpath=//button[text()="Додати"]
+  Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
+  Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  5 s  Page Should Contain  Дані поточної зміни завантажуються до ЦБД
+  Wait And Click  xpath=//a[@onclick="modalClose();"]
+
+Застосувати зміну для угоди
+  [Arguments]  ${username}  ${agreement_uaid}  ${dateSigned}  ${status}
+  Wait And Click  xpath=//a[@data-agreement-action="active"]
+  Підтвердити Дію
+  Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
 
 #####################################################################################
 
