@@ -1347,7 +1347,7 @@ Send Bid Esco
 Змінити цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
-  Run Keyword And Return If  "Можливість підтвердити цінову пропозицію після зміни умов тендера" in "${TEST NAME}"  Confirm Invalid Bid
+  Run Keyword And Return If  "Можливість підтвердити цінову пропозицію після зміни умов" in "${TEST NAME}"  Confirm Invalid Bid
   ${amount}=  add_second_sign_after_point  ${fieldvalue}
   Wait And Click  xpath=//a[text()="Процедура закупівлі"]
   Wait And Click  xpath=//a[contains(@class, "bidToEdit")]
@@ -1696,9 +1696,11 @@ Confirm Invalid Bid
   Підтвердити Дію
   Wait Element Animation  xpath=//input[@name="data[agreementNumber]"]
   ${date}=  Get Text  xpath=//span[contains(text(), "дата підписання угоди")]/following-sibling::span
+  ${end_date}=  Add Time To Date  ${date}  8 days  date_format=%d.%m.%Y  result_format=%d/%m/%Y
   Input Date  data[dateSigned]  ${date.replace(".","/")}
   Input Date  data[period][startDate]  ${date.replace(".", "/")}
-  Input Date  data[period][endDate]  ${date.replace(".", "/")}
+  Input Date  data[period][endDate]  ${end_date}
+#  Input Date  data[period][endDate]  ${date.replace(".", "/")}
   Wait And Input Text  xpath=//input[@name="data[agreementNumber]"]  123456789
   Wait And Click  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//*[@id="jAlertBack"]
@@ -1741,8 +1743,9 @@ Confirm Invalid Bid
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[rationale]"]
   Run Keyword If  ${data.data.modifications[0].has_key("addend")}  Select From List By Value  //select[contains(@name,"feature[modifications_items]")]  addend
   ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  Select From List By Value  //select[contains(@name,"feature[modifications_items]")]  factor
-  ${field_value}=  Convert To Integer  ${data.data.modifications[0].addend * 100}
-  ${field_value}=  Convert To String  ${data.data.modifications[0].addend}
+  ${field_value}=  add_second_sign_after_point  ${data.data.modifications[0].addend}
+#  ${field_value}=  Convert To Integer  ${data.data.modifications[0].addend * 100}
+#  ${field_value}=  Convert To String  ${field_value}
   Wait And Input Text  xpath=//input[contains(@name,"feature[modifications_items]")]  ${field_value}
   Wait And Click  xpath=//button[@class="bidAction"]
 
@@ -1761,9 +1764,19 @@ Confirm Invalid Bid
 
 Застосувати зміну для угоди
   [Arguments]  ${username}  ${agreement_uaid}  ${dateSigned}  ${status}
+  Wait Until Keyword Succeeds  10 x  20 s  Run Keywords
+  ...  refresh_agreement   ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//a[@data-agreement-action="active"]
   Wait And Click  xpath=//a[@data-agreement-action="active"]
   Підтвердити Дію
   Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
+
+
+
+Створити тендер другого етапу
+  [Arguments]  ${username}  ${tender_data}
+  Log  ${tender_data}
 
 #####################################################################################
 
