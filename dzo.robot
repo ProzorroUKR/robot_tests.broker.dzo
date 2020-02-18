@@ -1644,8 +1644,8 @@ Confirm Invalid Bid
 ###############################################################################################################
 
 Пошук угоди по ідентифікатору
-  [Arguments]  ${username}  ${agreement_uaid}  ${save_key}=agreement_data
-  ${tender_uaid}=  Set Variable  ${agreement_uaid[:-3]}
+  [Arguments]  ${username}  ${agreement_uaid}  ${save_key}=agreement_data  ${tender_uaid}=${None}
+  ${tender_uaid}=  Set Variable If  "${tender_uaid}" == "${None}"  ${agreement_uaid[:-3]}  ${tender_uaid}
   Switch Browser  ${username}
   Run Keyword If  "${TEST NAME}" == "Можливість знайти угоду по ідентифікатору"  Run Keywords
   ...  Sleep  400
@@ -1733,7 +1733,8 @@ Confirm Invalid Bid
   Input Date  data[dateSigned]  ${date.replace(".","/")}
   Wait And Click  xpath=//button[@class="bidAction"]
   Wait Until Keyword Succeeds  20 x  2 s  Page Should Not Contain  Дата підписання зміни до угоди повинна бути не раніше
-  Wait And Input Text  xpath=//input[contains(@name,"feature[modifications_items]")]  10
+  Run Keyword If  "${change_data.data.rationaleType}" != "partyWithdrawal"  Wait And Input Text  xpath=//input[contains(@name,"feature[modifications_items]")]  10
+  ...  ELSE  Wait And Click  xpath=(//input[contains(@name,"feature[modifications_contracts]")]/..)[1]
   Wait And Click  xpath=//button[@class="bidAction"]
 
 Оновити властивості угоди
@@ -1743,10 +1744,13 @@ Confirm Invalid Bid
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[rationale]"]
   Run Keyword If  ${data.data.modifications[0].has_key("addend")}  Select From List By Value  //select[contains(@name,"feature[modifications_items]")]  addend
   ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  Select From List By Value  //select[contains(@name,"feature[modifications_items]")]  factor
-  ${field_value}=  add_second_sign_after_point  ${data.data.modifications[0].addend}
+  ...  ELSE IF  ${data.data.modifications[0].has_key("contractId")}  Wait And Click  xpath=(//input[contains(@name,"feature[modifications_contracts]")]/..)[1]
+  ${field_value}=  Run Keyword If  ${data.data.modifications[0].has_key("addend")}  add_second_sign_after_point  ${data.data.modifications[0].addend}
+  ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  add_second_sign_after_point  ${data.data.modifications[0].factor}
 #  ${field_value}=  Convert To Integer  ${data.data.modifications[0].addend * 100}
 #  ${field_value}=  Convert To String  ${field_value}
-  Wait And Input Text  xpath=//input[contains(@name,"feature[modifications_items]")]  ${field_value}
+  Run Keyword If  ${data.data.modifications[0].has_key("contractId")}  Wait And Click  //input[@name="feature[modifications_contracts][${data.data.modifications[0].contractId}]"]/..
+  ...  ELSE  Wait And Input Text  xpath=//input[contains(@name,"feature[modifications_items]")]  ${field_value}
   Wait And Click  xpath=//button[@class="bidAction"]
 
 Завантажити документ для зміни у рамковій угоді
@@ -1768,6 +1772,10 @@ Confirm Invalid Bid
   ...  refresh_agreement   ${dzo_internal_id}
   ...  AND  Reload Page
   ...  AND  Page Should Contain Element  xpath=//a[@data-agreement-action="active"]
+  Run Keyword And Return If  "${status}" == "cancelled"  Run Keywords
+  ...  Wait And Click  xpath=//a[@data-agreement-action="cancelled"]
+  ...  AND  Підтвердити Дію
+  ...  AND  Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
   Wait And Click  xpath=//a[@data-agreement-action="active"]
   Підтвердити Дію
   Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
@@ -1776,7 +1784,15 @@ Confirm Invalid Bid
 
 Створити тендер другого етапу
   [Arguments]  ${username}  ${tender_data}
-  Log  ${tender_data}
+  ${file_path}=  Get Variable Value  ${ARTIFACT_FILE}  artifact.yaml
+  ${artifact}=  load_data_from  ${file_path}
+  ${tender_uaid}=  Set Variable  ${artifact.tender_uaid}
+  dzo.Пошук угоди по ідентифікатору  ${username}  ${tender_uaid}  ${None}  ${tender_uaid}
+  Wait And Click  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
+  Wait And Click  xpath=//button[@value="publicate"]
+  Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
+  ${tender_uaid}=  Get Text  xpath=//span[@class="js-apiID"]
+  [Return]  ${tender_uaid}
 
 #####################################################################################
 
