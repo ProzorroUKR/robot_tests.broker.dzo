@@ -1788,6 +1788,23 @@ Confirm Invalid Bid
   ${artifact}=  load_data_from  ${file_path}
   ${tender_uaid}=  Set Variable  ${artifact.tender_uaid}
   dzo.Пошук угоди по ідентифікатору  ${username}  ${tender_uaid}  ${None}  ${tender_uaid}
+  Wait And Click  xpath=//a[contains(@class, "tenderSignCommand")]
+  Select Window  NEW
+  Wait And Click  xpath=//a[@class="js-oldPageLink"]
+  ${status}=  Run Keyword And Return Status  Wait Until Keyword Succeeds  30 x  1 s  Page Should Contain  Оберіть файл з особистим ключем (зазвичай з ім'ям Key-6.dat) та вкажіть пароль захисту
+  Run Keyword If  ${status}  Wait Until Keyword Succeeds  30 x  20 s  Run Keywords
+  ...  Wait And Select From List By Label  id=CAsServersSelect  Тестовий ЦСК АТ "ІІТ"
+  ...  AND  Execute Javascript  var element = document.getElementById('PKeyFileInput'); element.style.visibility="visible";
+  ...  AND  Choose File  id=PKeyFileInput  ${CURDIR}/Key-6.dat
+  ...  AND  Input text  id=PKeyPassword  12345677
+  ...  AND  Wait And Click  id=PKeyReadButton
+  ...  AND  Wait Until Page Contains  Ключ успішно завантажено  10
+  Wait And Click  id=SignDataButton
+  Wait Until Keyword Succeeds  60 x  1 s  Page Should Contain  Попередній підпис успішно завантажено
+  Wait And Click  xpath=//button[text()="Підписати зміни"]
+  Wait Until Keyword Succeeds  60 x  1 s  Page Should Contain  Підпис успішно накладено та передано у ЦБД
+  Select Window  MAIN
+  Wait Until Keyword Succeeds  10 x  20 s  Page Should Contain Element  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
   Wait And Click  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
