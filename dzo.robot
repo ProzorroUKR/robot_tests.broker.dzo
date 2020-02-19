@@ -1746,7 +1746,7 @@ Confirm Invalid Bid
   ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  Select From List By Value  //select[contains(@name,"feature[modifications_items]")]  factor
   ...  ELSE IF  ${data.data.modifications[0].has_key("contractId")}  Wait And Click  xpath=(//input[contains(@name,"feature[modifications_contracts]")]/..)[1]
   ${field_value}=  Run Keyword If  ${data.data.modifications[0].has_key("addend")}  add_second_sign_after_point  ${data.data.modifications[0].addend}
-  ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  add_second_sign_after_point  ${data.data.modifications[0].factor}
+  ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  Convert To String  ${(${data.data.modifications[0].factor} - 1) * 100}
 #  ${field_value}=  Convert To Integer  ${data.data.modifications[0].addend * 100}
 #  ${field_value}=  Convert To String  ${field_value}
   Run Keyword If  ${data.data.modifications[0].has_key("contractId")}  Wait And Click  //input[@name="feature[modifications_contracts][${data.data.modifications[0].contractId}]"]/..
@@ -1804,7 +1804,9 @@ Confirm Invalid Bid
   Wait And Click  xpath=//button[text()="Підписати зміни"]
   Wait Until Keyword Succeeds  60 x  1 s  Page Should Contain  Підпис успішно накладено та передано у ЦБД
   Select Window  MAIN
-  Wait Until Keyword Succeeds  10 x  20 s  Page Should Contain Element  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
+  Wait Until Keyword Succeeds  10 x  20 s  Run Keywords
+  ...  Reload Page
+  ...  AND  Page Should Contain Element  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
   Wait And Click  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
