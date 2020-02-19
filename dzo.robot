@@ -819,7 +819,8 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
-  Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}" or "Negotiation" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
+  ${dzo_internal_id}=  Set Variable If  "Selection" in "${SUITE NAME}" and "${TEST NAME}" == "Можливість оголосити тендер другого етапу"  ${None}
+  Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}" or "Negotiation" in "${SUITE NAME}" or "Selection" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
   ${search_page}=  Set Variable If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору" and "Viewer" not in "${username}"  https://www.sandbox.dzo.com.ua/cabinet/tenders/purchase  https://www.sandbox.dzo.com.ua/tenders/public
   refresh_tender  ${dzo_internal_id}
   Go To  ${search_page}
@@ -1742,16 +1743,20 @@ Confirm Invalid Bid
   Wait And Click  xpath=//a[@data-agreement-action="change"]
   Підтвердити Дію
   Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[rationale]"]
+  Capture Page Screenshot
   Run Keyword If  ${data.data.modifications[0].has_key("addend")}  Select From List By Value  //select[contains(@name,"feature[modifications_items]")]  addend
   ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  Select From List By Value  //select[contains(@name,"feature[modifications_items]")]  factor
   ...  ELSE IF  ${data.data.modifications[0].has_key("contractId")}  Wait And Click  xpath=(//input[contains(@name,"feature[modifications_contracts]")]/..)[1]
+  Capture Page Screenshot
   ${field_value}=  Run Keyword If  ${data.data.modifications[0].has_key("addend")}  add_second_sign_after_point  ${data.data.modifications[0].addend}
-  ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  Convert To String  ${(${data.data.modifications[0].factor} - 1) * 100}
+  ...  ELSE IF  ${data.data.modifications[0].has_key("factor")}  Evaluate  str((${data.data.modifications[0].factor} - 1) * 100)
 #  ${field_value}=  Convert To Integer  ${data.data.modifications[0].addend * 100}
 #  ${field_value}=  Convert To String  ${field_value}
-  Run Keyword If  ${data.data.modifications[0].has_key("contractId")}  Wait And Click  //input[@name="feature[modifications_contracts][${data.data.modifications[0].contractId}]"]/..
+  Run Keyword If  ${data.data.modifications[0].has_key("contractId")}  Wait And Click  xpath=//input[@name="feature[modifications_contracts][${data.data.modifications[0].contractId}]"]/..
   ...  ELSE  Wait And Input Text  xpath=//input[contains(@name,"feature[modifications_items]")]  ${field_value}
+  Capture Page Screenshot
   Wait And Click  xpath=//button[@class="bidAction"]
+  Capture Page Screenshot
 
 Завантажити документ для зміни у рамковій угоді
   [Arguments]  ${username}  ${filepath}  ${agreement_uaid}  ${item_id}
