@@ -353,8 +353,8 @@ Select CPV
   [Arguments]  ${username}  ${plan_uaid}
   Switch Browser  ${username}
   Run Keyword If  "planning" in "${SUITE NAME.lower()}"  Sleep  360
-#  ${url}=  Set Variable If  'Viewer' in '${username}'  https://www.sandbox.dzo.com.ua/tenders/plans?test_mode=0  https://www.sandbox.dzo.com.ua/tenders/plans
-  Go To  https://www.sandbox.dzo.com.ua/tenders/plans
+  ${search_page}=  Set Variable If  "Viewer" not in "${username}"  https://www.stage.dzo.com.ua/cabinet/plans  https://www.stage.dzo.com.ua/tenders/plans
+  Go To  ${search_page}
   Select From List By Value  xpath=//select[@name="filter[object]"]  planID
   Input Text  xpath=//input[@name="filter[search]"]  ${plan_uaid}
   Click Element  xpath=//button[contains(@class,"not_toExtend")]
@@ -820,8 +820,9 @@ Add Feature
   [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
   ${dzo_internal_id}=  Set Variable If  "Selection" in "${SUITE NAME}" and "${TEST NAME}" == "Можливість оголосити тендер другого етапу"  ${None}
-  Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}" or "Negotiation" in "${SUITE NAME}" or "Selection" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  500
-  ${search_page}=  Set Variable If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору" and "Viewer" not in "${username}"  https://www.sandbox.dzo.com.ua/cabinet/tenders/purchase  https://www.sandbox.dzo.com.ua/tenders/public
+  Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}" or "Negotiation" in "${SUITE NAME}" or "Selection" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  360
+#  ${search_page}=  Set Variable If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору" and "Viewer" not in "${username}"  https://www.stage.dzo.com.ua/cabinet/tenders/purchase  https://www.stage.dzo.com.ua/tenders/public
+  ${search_page}=  Set Variable If  "Viewer" not in "${username}"  https://www.stage.dzo.com.ua/cabinet/tenders/purchase  https://www.stage.dzo.com.ua/tenders/public
   refresh_tender  ${dzo_internal_id}
   Go To  ${search_page}
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
@@ -1652,7 +1653,7 @@ Confirm Invalid Bid
   ...  Sleep  400
   ...  AND  Set Global Variable  ${dzo_internal_id}  ${None}
 #  refresh_agreement  ${dzo_internal_id}
-  Go To  https://www.sandbox.dzo.com.ua/tenders/public
+  Go To  https://www.stage.dzo.com.ua/tenders/public
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
   Click Element  xpath=(//button[text()="Пошук"])[1]
