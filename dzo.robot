@@ -32,7 +32,8 @@ ${plan.view.classification.scheme}=  xpath=//td[text()="Класифікація
 ${plan.view.classification.id}=  xpath=//td[text()="Класифікація за ДК 021-2015 (CPV)"]/following-sibling::td[1]/span[1]
 
 ${tender.view.items.description}=  xpath=//td[contains(text(),"Опис окремої частини")]/following-sibling::td[1]
-${tender.view.items.quantity}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[1]
+#${tender.view.items.quantity}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[1]
+${tender.view.items.quantity}=  xpath=//td[3]/div/span[2]
 ${tender.view.items.deliveryDate.endDate}=  xpath=//*[contains(text(),"Кінцевий строк поставки")]/../following-sibling::span[2]
 ${tender.view.items.unit.code}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[2]
 ${tender.view.items.unit.name}=  xpath=//td[contains(text(),"Кількість")]/following-sibling::td[1]/span[2]
@@ -51,6 +52,7 @@ ${tender.edit.lot.value.amount}  xpath=//input[@name="data[lots][0][value][amoun
 ${tender.edit.lot.description}  xpath=//input[@name="data[lots][0][description]"]
 ${tender.edit.lot.minimalStep.amount}  xpath=//input[@name="data[lots][0][minimalStep][amount]"]
 ${tender.edit.maxAwardsCount}  xpath=//input[@name="data[maxAwardsCount]"]
+${tender.edit.items[0].quantity}  xpath=//input[@name="data[items][0][quantity]"]
 
 ${milestone_index}
 ${tender.view.milestones.code}=  xpath=//h3[contains(text(),"Умови оплати")]/../descendant::div[${milestone_index}]/descendant::td[text()="Тип оплати"]/following-sibling::td
@@ -92,6 +94,8 @@ ${tender.view.awards[0].suppliers[0].address.locality}
 ${tender.view.awards[0].suppliers[0].address.postalCode}
 ${tender.view.awards[0].suppliers[0].address.region}
 ${tender.view.awards[0].suppliers[0].address.streetAddress}
+${tender.view.lots[0].title}  xpath=(//span[@class="js-lot-title"])[1]
+${tender.view.lots[0].minimalStep.amount}  xpath=(//td[contains(text(),"Розмір мінімального кроку")]/following-sibling::td/span[1])[1]
 
 ${tender.view.minimalStep.amount}=  xpath=//td[contains(text(),'Розмір мінімального кроку')]/following-sibling::td/span[1]
 ${tender.view.funders[0].name}=  xpath=//div[@class="fundersItem"]/descendant::td[text()="Найменування організації"]/following-sibling::td[1]
@@ -384,7 +388,7 @@ Select CPV
 Отримати інформацію із тендера
   [Arguments]  ${username}  ${tender_uaid}  ${field_name}
   Switch Browser  ${username}
-  Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі" or "${TEST NAME}" == "Можливість дочекатися початку періоду очікування" or "${TEST NAME}" == "Відображення дати закінчення періоду блокування перед початком аукціону"  Sleep  360
+  Run Keyword If  "${TEST NAME}" == "Відображення статусу підписаної угоди з постачальником закупівлі" or "${TEST NAME}" == "Можливість дочекатися початку періоду очікування" or "${TEST NAME}" == "Відображення дати закінчення періоду блокування перед початком аукціону"  Sleep  300
   Run Keyword If  "planning" not in "${SUITE NAME.lower()}"  Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Run Keyword If  "Відображення вартості угоди" in "${TEST NAME}"  Run Keywords
   ...  Sleep  360
@@ -819,7 +823,7 @@ Add Feature
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}  ${save_key}=tender_data
   Switch Browser  ${username}
-  ${dzo_internal_id}=  Set Variable If  "Selection" in "${SUITE NAME}" and "${TEST NAME}" == "Можливість оголосити тендер другого етапу"  ${None}
+  ${dzo_internal_id}=  Set Variable If  "Selection" in "${SUITE NAME}" and "${TEST NAME}" == "Можливість оголосити тендер другого етапу"  ${None}  ${dzo_internal_id}
   Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}" or "Negotiation" in "${SUITE NAME}" or "Selection" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  360
 #  ${search_page}=  Set Variable If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору" and "Viewer" not in "${username}"  https://www.stage.dzo.com.ua/cabinet/tenders/purchase  https://www.stage.dzo.com.ua/tenders/public
   ${search_page}=  Set Variable If  "Viewer" not in "${username}"  https://www.stage.dzo.com.ua/cabinet/tenders/purchase  https://www.stage.dzo.com.ua/tenders/public
@@ -904,12 +908,18 @@ Status Should Be
 
 Внести зміни в тендер
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
-  ${fieldvalue}=  Run Keyword If  "${fieldname}" == "maxAwardsCount"  Convert To String  ${fieldvalue}
+  ${fieldvalue}=  Run Keyword If  "${fieldname}" == "maxAwardsCount" or "quantity" in "${fieldname}" or "amount" in "${fieldname}"  Convert To String  ${fieldvalue}
   ...  ELSE  Set Variable  ${fieldvalue}
   Switch Browser  ${username}
+  refresh_tender  ${dzo_internal_id}
   Reload Page
   Wait And Click  xpath=//section[@class="content"]/descendant::a[contains(text(), 'Процедура закупівлі')]
+  Run Keyword If  "framework_selection" in "${MODE}"  Wait Until Keyword Succeeds  10 x  20 s  Run Keywords
+  ...  refresh_tender  ${dzo_internal_id}
+  ...  AND  Reload Page
+  ...  AND  Element Should Be Visible  xpath=//a[contains(@class, "save")]
   Wait And Click  xpath=//a[contains(@class, "save")]
+  Run Keyword If  "items" in "${fieldname}" or "minimalStep" in "${fieldname}"  Wait And Click  xpath=//section[contains(@id, "multiLots")]/a
   Run Keyword If  "Date" in "${fieldname}"  Input Tender Period End Date  ${fieldvalue}
   ...  ELSE  Input Text  ${tender.edit.${fieldname}}  ${fieldvalue}
   Wait And Click  xpath=//button[@value="save"]
@@ -1424,7 +1434,7 @@ Confirm Invalid Bid
 Завантажити документ рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${document}  ${tender_uaid}  ${award_num}
   ${index}=  Convert To Integer  ${award_num}
-  ${apply_locator}=  Set Variable If  "${MODE}" in "openeu open_competitive_dialogue"  xpath=//a[@data-bid-action="aply"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="aply"]
+  ${apply_locator}=  Set Variable If  "${MODE}" in "openeu open_competitive_dialogue framework_selection"  xpath=//a[@data-bid-action="aply"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[@data-bid-action="aply"]
   Пошук тендера у разі наявності змін  ${TENDER['LAST_MODIFICATION_DATE']}  ${username}  ${tender_uaid}
   Wait Until Keyword Succeeds  30 x  10 s  Run Keywords
   ...  refresh_tender   ${dzo_internal_id}
@@ -1445,7 +1455,7 @@ Confirm Invalid Bid
 Підтвердити постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
   ${index}=  Convert To Integer  ${award_num}
-  ${notice_locator}=  Set Variable If  "${MODE}" in "openeu open_competitive_dialogue"  xpath=//div[contains(@class,"qualificationItem")]/descendant::a[text()="Повідомлення"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[text()="Повідомлення"]
+  ${notice_locator}=  Set Variable If  "${MODE}" in "openeu open_competitive_dialogue framework_selection"  xpath=//div[contains(@class,"qualificationItem")]/descendant::a[text()="Повідомлення"]  xpath=//div[@class="num l" and text()="${index + 1}"]/../descendant::a[text()="Повідомлення"]
   Run Keyword If  "${TEST NAME}" == "Неможливість підтвердити постачальника після закінчення періоду кваліфікації"  Sleep  600
   refresh_tender   ${dzo_internal_id}
   Reload Page
@@ -1814,6 +1824,7 @@ Confirm Invalid Bid
   ...  Reload Page
   ...  AND  Page Should Contain Element  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
   Wait And Click  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
+  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=200&submissionMethodDetails=quick');
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
   ${tender_uaid}=  Get Text  xpath=//span[@class="js-apiID"]

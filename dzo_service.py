@@ -142,6 +142,7 @@ def convert_dzo_data(value, field_name):
     else:
         value_for_return = {
             u'ПЕРІОД УТОЧНЕНЬ': "active.enquiries",
+            u'ПЕРІОД ЗАПРОШЕННЯ': "active.enquiries",
             u'ПЕРІОД ПОДАННЯ ПРОПОЗИЦІЙ': "active.tendering",
             u'АУКЦІОН': "active.auction",
             u'КВАЛІФІКАЦІЯ': "active.qualification",
