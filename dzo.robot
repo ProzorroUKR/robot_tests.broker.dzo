@@ -353,7 +353,7 @@ Select CPV
   [Arguments]  ${username}  ${plan_uaid}
   Switch Browser  ${username}
   Run Keyword If  "planning" in "${SUITE NAME.lower()}"  Sleep  360
-  ${search_page}=  Set Variable If  "Viewer" not in "${username}"  https://www.stage.dzo.com.ua/cabinet/plans  https://www.stage.dzo.com.ua/tenders/plans
+  ${search_page}=  Set Variable If  "Owner" in "${username}"  https://www.stage.dzo.com.ua/cabinet/plans/publicated  https://www.stage.dzo.com.ua/tenders/plans
   Go To  ${search_page}
   Select From List By Value  xpath=//select[@name="filter[object]"]  planID
   Input Text  xpath=//input[@name="filter[search]"]  ${plan_uaid}
