@@ -827,12 +827,13 @@ Add Feature
   Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}" or "Negotiation" in "${SUITE NAME}" or "Selection" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  360
 #  ${search_page}=  Set Variable If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору" and "Viewer" not in "${username}"  https://www.stage.dzo.com.ua/cabinet/tenders/purchase  https://www.stage.dzo.com.ua/tenders/public
   ${search_page}=  Set Variable If  "Owner" in "${username}"  https://www.stage.dzo.com.ua/cabinet/tenders/purchase  https://www.stage.dzo.com.ua/tenders/public
+  ${dzo_internal_id}=  Set Variable If  "${username}" == "DZO_Viewer" and "${TEST NAME}" == "Можливість знайти тендер по ідентифікатору"  ${USERS.users['Tender_Owner'].id_map['${tender_uaid}']}  ${dzo_internal_id}
   refresh_tender  ${dzo_internal_id}
   Go To  ${search_page}
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
   Input Text  xpath=//input[@name="filter[search]"]  ${tender_uaid}
   Click Element  xpath=(//button[text()="Пошук"])[1]
-  Wait Until Keyword Succeeds  10 x  1 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]/a[contains(@href,"/tenders/")]  1
+  Wait Until Keyword Succeeds  10 x  30 s  Locator Should Match X Times  xpath=//section[contains(@class,"list")]/descendant::div[contains(@class, "item")]/a[contains(@href,"/tenders/")]  1
   Click Element  xpath=//a[contains(@class, "tenderLink")]
   ${internal_id}=  Run Keyword If  "${dzo_internal_id}" == "${None}"  Get Text  id=tender_id
   ...  ELSE  Set Variable  ${dzo_internal_id}
@@ -1824,7 +1825,7 @@ Confirm Invalid Bid
   ...  Reload Page
   ...  AND  Page Should Contain Element  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
   Wait And Click  xpath=//a[text()="Оголосити відбір для закупівлі за рамковою угодою"]
-  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=200&submissionMethodDetails=quick');
+  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=160&submissionMethodDetails=quick');
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
   ${tender_uaid}=  Get Text  xpath=//span[@class="js-apiID"]

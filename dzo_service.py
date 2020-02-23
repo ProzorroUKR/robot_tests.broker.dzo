@@ -110,6 +110,8 @@ def convert_date_to_slash_format(isodate):
 
 
 def convert_dzo_data(value, field_name):
+    if "contracts" in field_name and "status" in field_name and value == u"ЗАВЕРШЕНА":
+        value = "active"
     if "contracts" in field_name and "amount" in field_name:
         value = value.split(" ")[0]
     if "amount" in field_name or "quantity" in field_name or "duration.days" in field_name or "maxAwardsCount" in field_name:
@@ -148,7 +150,7 @@ def convert_dzo_data(value, field_name):
             u'КВАЛІФІКАЦІЯ': "active.qualification",
             u'ПРЕКВАЛІФІКАЦІЯ': "active.pre-qualification",
             u'ЗАПЛАНОВАНИЙ': "scheduled",
-            u'ЗАВЕРШЕНА': "active",
+            u'ЗАВЕРШЕНА': "complete",
             u'ОЧІКУВАННЯ АКТИВАЦІЇ 2ГО ЕТАПУ': "active.stage2.pending",
             u'ПЕРШИЙ ЕТАП ЗАВЕРШЕНО': "complete",
             u'ОСКАРЖЕННЯ ПРЕКВАЛІФІКАЦІЇ': "active.pre-qualification.stand-still",
