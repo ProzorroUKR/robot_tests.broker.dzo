@@ -472,7 +472,9 @@ Get From Item
   ${item_index}=  Convert To Integer  ${match[0]}
   ${item_index}=  Set Variable  ${item_index + 1}
   ${field_name}=  Remove String Using Regexp  ${field_name}  \\[(\\d+)\\]
-  ${value}=  Get Text  ${tender.view.${field_name}}
+  ${value}=  Run Keyword If  "deliveryDate.endDate" in ${field_name}
+  ...  Get Text  xpath=(//*[contains(text(),"Кінцевий строк поставки")]/../following-sibling::span[2])[${item_index}]
+  ...  ELSE  Get Text  ${tender.view.${field_name}}
   [Return]  ${value}
 
 Отримати інформацію із лоту
@@ -892,7 +894,7 @@ Status Should Be
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][url]"]  http://sfs.gov.ua/
   Input Text  xpath=//*[@name="data[value][amount]"]  ${supplier_data.data.value.amount}
   Wait And Click   xpath=//button[text()="Зберегти"]
-  Wait Until Keyword Succeeds  20 x  5 s  Element Should Be Visible  xpath=//a[@onclick="modalClose();"]
+  Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
   Run Keyword If  "${MODE}" == "negotiation"  Run Keywords
   ...  Wait And Click  xpath=//a[@data-bid-action="aply"]
@@ -903,7 +905,7 @@ Status Should Be
   ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//input[@name="data[qualified]"]/..
   ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Wait And Click  xpath=//input[@name="data[qualified]"]/..
   ...  AND  Wait And Click  xpath=//button[@class="bidAction"]
-  ...  AND  Wait Until Keyword Succeeds  20 x  1 s  Element Should Be Visible  xpath=//a[@onclick="modalClose();"]
+  ...  AND  Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
   ...  AND  Wait And Click  xpath=//a[@onclick="modalClose();"]
   Wait Until Keyword Succeeds  20 x  3 s  Run Keywords
   ...  Reload Page

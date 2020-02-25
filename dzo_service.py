@@ -59,6 +59,14 @@ def adapt_data_for_role(role_name, tender_data):
         tender_data['data']['procuringEntity']['name'] = u"ТОВ prozorroytenderowner"
         tender_data['data']['procuringEntity']['identifier']['id'] = "31212423"
         tender_data['data']['procuringEntity']['identifier']['legalName'] = u"ТОВ prozorroytenderowner"
+        if tender_data['data']['procuringEntity'].has_key('address'):
+            tender_data['data']['procuringEntity']['address']['locality'] = "prozorroytenderowner"
+            tender_data['data']['procuringEntity']['address']['region'] = u"м. Київ"
+            tender_data['data']['procuringEntity']['address']['postalCode'] = "41241"
+            tender_data['data']['procuringEntity']['address']['postalCode'] = "prozorroytenderowner"
+        if tender_data['data']['procuringEntity'].has_key('contactPoint'):
+            tender_data['data']['procuringEntity']['contactPoint']['name'] = "prozorroytenderowner prozorroytenderowner prozorroytenderowner"
+            tender_data['data']['procuringEntity']['contactPoint']['telephone'] = "+380993531028"
         if "classification" in tender_data['data'] and tender_data['data']['classification']['id'] == "99999999-9":
             tender_data['data']['classification']['description'] = u"Не визначено"
         for item in tender_data['data']['items']:
