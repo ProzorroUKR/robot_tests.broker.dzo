@@ -186,6 +186,8 @@ ${locator.complaint.status}  xpath=(//div[@class="complaintStatus"]/div/div[1])[
 ${contract.value.amountNet}  xpath=//input[@name="data[value][amountNet]"]
 ${contract.value.amount}  xpath=//input[@name="data[value][amount]"]
 
+${locator.agreement.changes.modifications.itemId}  xpath=(//div[@data-change-id])[last()]
+
 ${award.view.awards[0].suppliers[0].address.countryName}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
 ${award.view.awards[0].suppliers[0].address.locality}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
 ${award.view.awards[0].suppliers[0].address.postalCode}  xpath=//div[contains(@class,"bidDocuments")]/descendant::td[text()="Юридична адреса"]
@@ -400,6 +402,7 @@ Select CPV
   ...  refresh_tender  ${dzo_internal_id}
   ...  AND  Reload Page
   ...  AND  Page Should Contain  Завершена
+  Run Keyword And Return If  "${field_name}" == "agreements[0].agreementID" and "${MODE}" == "framework_selection"  Get Agreement Id
   ${text}=  Run Keyword If
   ...  "value.amount" in "${field_name}" and "contracts" in "${field_name}"  Get Text  xpath=//div[text()="Ціна договору"]/following-sibling::div
   ...  ELSE IF  "value.amountNet" in "${field_name}" and "contracts" in "${field_name}"  Get Text  xpath=//div[text()="Ціна договору без ПДВ"]/following-sibling::div
@@ -414,6 +417,14 @@ Select CPV
   ...  ELSE  Get Text  ${tender.view.${field_name}}
   ${value}=  convert_dzo_data  ${text}  ${field_name}
 #  ${value}=  Set Variable If  "amount" in "${field_name}"  ${value.replace("`", "")}  ${value}
+  [Return]  ${value}
+
+Get Agreement Id
+  ${current_url}=  Get Location
+  Wait And Click  xpath=//a[contains(@href, "agreement")]
+  Wait Until Page Contains Element  xpath=//td[text()="Ідентифікатор угоди"]/following-sibling::td[1]
+  ${value}=  Get Text  xpath=//td[text()="Ідентифікатор угоди"]/following-sibling::td[1]
+  Go To  ${current_url}
   [Return]  ${value}
 
 Get Qualification Status
@@ -686,7 +697,7 @@ Go To Complaint Page
   Run Keyword If  ${tender_data.data.has_key("tenderPeriod")}  Click Element  xpath=//*[contains(text(),"Надайте календарну")]
   Wait Until Element Is Not Visible  xpath=//div[@id="ui-datepicker-div"]
 #  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}');
-  Run Keyword If  "Complaints" in "${SUITE NAME}" or "${procurementMethodType}" == "closeFrameworkAgreementUA" and "Reporting" not in "${SUITE NAME}" and "Negotiation" not in "${SUITE NAME}"  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}&submissionMethodDetails=quick(mode:fast-forward)');
+  Run Keyword If  "${MODE}" in "openeu open_competitive_dialogue" or "Complaints" in "${SUITE NAME}" and "Reporting" not in "${SUITE NAME}" and "Negotiation" not in "${SUITE NAME}"  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}&submissionMethodDetails=quick(mode:fast-forward)');
   ...  ELSE IF  "Reporting" not in "${SUITE NAME}" and "Negotiation" not in "${SUITE NAME}"  Execute Javascript  history.replaceState({}, null, window.location.pathname+'?accelerator=${dzo_accelerator}&submissionMethodDetails=quick');
   Wait And Click  xpath=//button[@value="publicate"]
   Wait Until Page Contains Element  xpath=//span[@class="js-apiID"]
@@ -827,7 +838,7 @@ Add Feature
   Run Keyword If  "${dzo_internal_id}" == "${None}" and ("openProcedure" in "${SUITE NAME}" or "Complaints" in "${SUITE NAME}" or "Reporting" in "${SUITE NAME}" or "Negotiation" in "${SUITE NAME}" or "Selection" in "${SUITE NAME}") or "${save_key}" == "second_stage_data"  Sleep  360
 #  ${search_page}=  Set Variable If  "${TEST NAME}" == "Можливість знайти звіт про укладений договір по ідентифікатору" and "Viewer" not in "${username}"  https://www.stage.dzo.com.ua/cabinet/tenders/purchase  https://www.stage.dzo.com.ua/tenders/public
   ${search_page}=  Set Variable If  "Owner" in "${username}"  https://www.stage.dzo.com.ua/cabinet/tenders/purchase  https://www.stage.dzo.com.ua/tenders/public
-  ${dzo_internal_id}=  Set Variable If  "${username}" == "DZO_Viewer" and "${TEST NAME}" == "Можливість знайти тендер по ідентифікатору"  ${USERS.users['Tender_Owner'].id_map['${tender_uaid}']}  ${dzo_internal_id}
+  ${dzo_internal_id}=  Set Variable If  "${username}" != "DZO_Owner" and "${TEST NAME}" == "Можливість знайти тендер по ідентифікатору"  ${USERS.users['Tender_Owner'].id_map['${tender_uaid}']}  ${dzo_internal_id}
   refresh_tender  ${dzo_internal_id}
   Go To  ${search_page}
   Select From List By Value  xpath=//select[@name="filter[object]"]  tenderID
