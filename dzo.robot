@@ -472,7 +472,7 @@ Get From Item
   ${item_index}=  Convert To Integer  ${match[0]}
   ${item_index}=  Set Variable  ${item_index + 1}
   ${field_name}=  Remove String Using Regexp  ${field_name}  \\[(\\d+)\\]
-  ${value}=  Run Keyword If  "deliveryDate.endDate" in ${field_name}
+  ${value}=  Run Keyword If  "deliveryDate.endDate" in "${field_name}"
   ...  Get Text  xpath=(//*[contains(text(),"Кінцевий строк поставки")]/../following-sibling::span[2])[${item_index}]
   ...  ELSE  Get Text  ${tender.view.${field_name}}
   [Return]  ${value}
