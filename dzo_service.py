@@ -59,6 +59,14 @@ def adapt_data_for_role(role_name, tender_data):
         tender_data['data']['procuringEntity']['name'] = u"ТОВ prozorroytenderowner"
         tender_data['data']['procuringEntity']['identifier']['id'] = "31212423"
         tender_data['data']['procuringEntity']['identifier']['legalName'] = u"ТОВ prozorroytenderowner"
+        if tender_data['data']['procuringEntity'].has_key('address'):
+            tender_data['data']['procuringEntity']['address']['locality'] = "prozorroytenderowner"
+            tender_data['data']['procuringEntity']['address']['region'] = u"м. Київ"
+            tender_data['data']['procuringEntity']['address']['postalCode'] = "41241"
+            tender_data['data']['procuringEntity']['address']['postalCode'] = "prozorroytenderowner"
+        if tender_data['data']['procuringEntity'].has_key('contactPoint'):
+            tender_data['data']['procuringEntity']['contactPoint']['name'] = "prozorroytenderowner prozorroytenderowner prozorroytenderowner"
+            tender_data['data']['procuringEntity']['contactPoint']['telephone'] = "+380993531028"
         if "classification" in tender_data['data'] and tender_data['data']['classification']['id'] == "99999999-9":
             tender_data['data']['classification']['description'] = u"Не визначено"
         for item in tender_data['data']['items']:
@@ -110,6 +118,8 @@ def convert_date_to_slash_format(isodate):
 
 
 def convert_dzo_data(value, field_name):
+    if "contracts" in field_name and "status" in field_name and value == u"ЗАВЕРШЕНА":
+        value = "active"
     if "contracts" in field_name and "amount" in field_name:
         value = value.split(" ")[0]
     if "amount" in field_name or "quantity" in field_name or "duration.days" in field_name or "maxAwardsCount" in field_name:
@@ -142,12 +152,13 @@ def convert_dzo_data(value, field_name):
     else:
         value_for_return = {
             u'ПЕРІОД УТОЧНЕНЬ': "active.enquiries",
+            u'ПЕРІОД ЗАПРОШЕННЯ': "active.enquiries",
             u'ПЕРІОД ПОДАННЯ ПРОПОЗИЦІЙ': "active.tendering",
             u'АУКЦІОН': "active.auction",
             u'КВАЛІФІКАЦІЯ': "active.qualification",
             u'ПРЕКВАЛІФІКАЦІЯ': "active.pre-qualification",
             u'ЗАПЛАНОВАНИЙ': "scheduled",
-            u'ЗАВЕРШЕНА': "active",
+            u'ЗАВЕРШЕНА': "complete",
             u'ОЧІКУВАННЯ АКТИВАЦІЇ 2ГО ЕТАПУ': "active.stage2.pending",
             u'ПЕРШИЙ ЕТАП ЗАВЕРШЕНО': "complete",
             u'ОСКАРЖЕННЯ ПРЕКВАЛІФІКАЦІЇ': "active.pre-qualification.stand-still",
@@ -259,12 +270,12 @@ def get_milestone_by_lot_id(tender_data, lot_id):
 
 
 def refresh_tender(tender_id):
-    resp = requests.get("https://www.sandbox.dzo.com.ua/cron/J7hdfks7_jlsdfn.php?tender_id={}&CDB_Number=0&run=KUgfjduk*tgkBkusdh&type=tenders".format(tender_id))
+    resp = requests.get("https://www.stage.dzo.com.ua/cron/J7hdfks7_jlsdfn.php?tender_id={}&CDB_Number=0&run=KUgfjduk*tgkBkusdh&type=tenders".format(tender_id))
     return resp.content
 
 
 def refresh_agreement(tender_id):
-    resp = requests.get("https://www.sandbox.dzo.com.ua/cron/J7hdfks7_jlsdfn.php?tender_id={}&CDB_Number=0&run=KUgfjduk*tgkBkusdh&type=agreements".format(tender_id))
+    resp = requests.get("https://www.stage.dzo.com.ua/cron/J7hdfks7_jlsdfn.php?tender_id={}&CDB_Number=0&run=KUgfjduk*tgkBkusdh&type=agreements".format(tender_id))
     return resp.content
 
 
