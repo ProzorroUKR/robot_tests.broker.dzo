@@ -1711,7 +1711,7 @@ Confirm Invalid Bid
   Wait Element Animation  xpath=//input[@name="data[unitPrices][0][value][amount]"]
   Wait And Input Text  xpath=//input[@name="data[unitPrices][0][value][amount]"]  ${amount}
   Wait And Click  xpath=//button[@class="bidAction"]
-  Wait Until Keyword Succeeds  20 x  1 s  Element Should Not Be Visible  xpath=//*[@id="jAlertBack"]
+  Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
   Wait And Click  xpath=//a[@onclick="modalClose();"]
 
 Зареєструвати угоду
@@ -1762,6 +1762,8 @@ Confirm Invalid Bid
   Run Keyword If  "${change_data.data.rationaleType}" != "partyWithdrawal"  Wait And Input Text  xpath=//input[contains(@name,"feature[modifications_items]")]  10
   ...  ELSE  Wait And Click  xpath=(//input[contains(@name,"feature[modifications_contracts]")]/..)[1]
   Wait And Click  xpath=//button[@class="bidAction"]
+  Wait Until Keyword Succeeds  20 x  5 s  Page Should Not Contain Element  xpath=//body[@class="blocked"]
+
 
 Оновити властивості угоди
   [Arguments]  ${username}  ${agreement_uaid}  ${data}
