@@ -886,7 +886,7 @@ Status Should Be
   Select From List By Value  xpath=//*[@name="data[suppliers][0][address][region]"]  ${supplier_data.data.suppliers[0].address.region}
   Input Text  xpath=//*[@name="data[suppliers][0][address][locality]"]  ${supplier_data.data.suppliers[0].address.locality}
   Input Text  xpath=//*[@name="data[suppliers][0][address][postalCode]"]  ${supplier_data.data.suppliers[0].address.postalCode}
-  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][name]"]  ${supplier_data.data.suppliers[0].contactPoint.name[:-2]}
+  Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][name]"]  ${supplier_data.data.suppliers[0].contactPoint.name}
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][email]"]  ${supplier_data.data.suppliers[0].contactPoint.email}
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][telephone]"]  ${supplier_data.data.suppliers[0].contactPoint.telephone}
   Input Text  xpath=//*[@name="data[suppliers][0][contactPoint][faxNumber]"]  ${supplier_data.data.suppliers[0].contactPoint.faxNumber}
